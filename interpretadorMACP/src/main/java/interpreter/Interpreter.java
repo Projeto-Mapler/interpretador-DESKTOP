@@ -66,6 +66,14 @@ public class Interpreter
 			}
 			return text;
 		}
+		
+		if(object instanceof Boolean) {
+			if((boolean) object) {
+				return "verdadeiro";
+			} else {
+				return "falso";
+			}
+		}
 
 		return object.toString();
 	}
