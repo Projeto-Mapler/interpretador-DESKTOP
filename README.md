@@ -4,7 +4,7 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 - operações aritimeticas (+, -, *, / )
 - operações lógicas (verdadeiro, falso, não, e, ou )
 - declaração e utilização de variaveis (tipagem dinâmica)
-- controle de fluxo com "se entao"
+- controle de fluxo com "se entao senao"
 - laços de repetição com "enquanto"
 - blocos utilizam "{ }" em vez de  "[[ ]]"
 
@@ -22,15 +22,19 @@ inicio
 	x<-1+2*3+(4/2);
 	escrever x;
 	
+	se x = 9 e x > 8 e nao(x<=7) entao{
+		escrever "dentro do se";
+	} senao {
+		escrever "dentro do senao";
+	}
+	
 	para x de 1 ate 5 passo 1 faca {
 		escrever x;
 	}
 fim
 ```
 
-
-
-#Gramática
+# Gramática
 
 - programa   → "variaveis" (declaracaoVariaveis)* "inicio" (declaracao)* "fim" EOF 
 - declaracaoVariaveis → IDENTIFICADOR ("," IDENTIFICADOR) ":" TIPO_DADO ";"
