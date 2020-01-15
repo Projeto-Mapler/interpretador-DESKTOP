@@ -1,4 +1,7 @@
 package util;
+import javax.lang.model.type.DeclaredType;
+import javax.swing.tree.TreeCellEditor;
+
 import model.Token;
 import model.TokenType;
 import tree.Expressao;
@@ -9,7 +12,15 @@ import tree.Expressao.Literal;
 import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
-public class ImpressoraAST implements Expressao.Visitor<String> {
+import tree.Declaracao;
+import tree.Declaracao.Bloco;
+import tree.Declaracao.Enquanto;
+import tree.Declaracao.Ler;
+import tree.Declaracao.Para;
+import tree.Declaracao.Print;
+import tree.Declaracao.Se;
+import tree.Declaracao.Var;
+public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Visitor<String>{
 
 	@Override
 	public String visitBinarioExpressao(Binario expressao) {
@@ -60,6 +71,7 @@ public class ImpressoraAST implements Expressao.Visitor<String> {
 
 		System.out.println(new ImpressoraAST().print(expression));
 	}
+	public void printASTTree() {}
 
 	@Override
 	public String visitVariavelExpressao(Variavel expressao) {
@@ -75,6 +87,55 @@ public class ImpressoraAST implements Expressao.Visitor<String> {
 
 	@Override
 	public String visitLogicoExpressao(Logico expressao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitBlocoDeclaracao(Bloco declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitExpressaoDeclaracao(
+			tree.Declaracao.Expressao declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitPrintDeclaracao(Print declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitSeDeclaracao(Se declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitLerDeclaracao(Ler declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitVarDeclaracao(Var declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitParaDeclaracao(Para declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitEnquantoDeclaracao(Enquanto declaracao) {
 		// TODO Auto-generated method stub
 		return null;
 	}

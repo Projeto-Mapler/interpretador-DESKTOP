@@ -9,31 +9,29 @@ import java.util.List;
 public class GeradorAST {
 
 	public static void main(String[] args) throws IOException {
-		String path = "src";
+		String path = "src/main/java";
 		// if (args.length != 1) {
 		// System.err.println("Usage: generate_ast <output directory>");
 		// System.exit(1);
 		// }
 		// String outputDir = args[0];
 		defineAst(path, "Expressao", Arrays.asList(
-				
+
 				"Binario   : Expressao esquerda, Token operador, Expressao direita",
-				"Grupo     : Expressao expressao", 
-				"Literal  : Object valor",
+				"Grupo     : Expressao expressao", "Literal  : Object valor",
 				"Logico  : Expressao esquerda, Token operador, Expressao direita",
 				"Unario    : Token operador, Expressao direira",
 				"Atribuicao: Token nome, Expressao valor",
 				"Variavel : Token nome"));
 		defineAst(path, "Declaracao", Arrays.asList(
-					"Bloco :  List<Declaracao> declaracoes",
-			      "Expressao : tree.Expressao expressao",          
-			      "Print      : tree.Expressao expressao",
-			      "Se         : tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco",
-			      "Ler      : tree.Expressao expressao",   
-			      "Var      : Token nome, tree.Expressao expressao",
-			      "Para         : tree.Expressao atribuicao, tree.Expressao condicao, Bloco facaBloco",
-			      "Enquanto      : tree.Expressao condicao, Bloco corpo"
-			    ));
+				"Bloco :  List<Declaracao> declaracoes",
+				"Expressao : tree.Expressao expressao",
+				"Print      : tree.Expressao expressao",
+				"Se         : tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco",
+				"Ler      : tree.Expressao expressao",
+				"Var      : Token nome, tree.Expressao expressao",
+				"Para         : tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco",
+				"Enquanto      : tree.Expressao condicao, Bloco corpo"));
 
 	}
 	private static void defineAst(String outputDir, String baseName,
@@ -57,9 +55,9 @@ public class GeradorAST {
 			String fields = type.split(":")[1].trim();
 			defineType(writer, baseName, className, fields);
 		}
-		// The base accept() method.                                   
-	    writer.println();                                              
-	    writer.println("  public abstract <R> R accept(Visitor<R> visitor);");
+		// The base accept() method.
+		writer.println();
+		writer.println("  public abstract <R> R accept(Visitor<R> visitor);");
 
 		writer.println("}");
 		writer.close();
@@ -72,8 +70,8 @@ public class GeradorAST {
 
 		for (String type : types) {
 			String typeName = type.split(":")[0].trim();
-			writer.println("public R visit" + typeName + baseName + "(" + typeName
-					+ " " + baseName.toLowerCase() + ");");
+			writer.println("public R visit" + typeName + baseName + "("
+					+ typeName + " " + baseName.toLowerCase() + ");");
 		}
 
 		writer.println("  }");
@@ -81,8 +79,8 @@ public class GeradorAST {
 	}
 	private static void defineType(PrintWriter writer, String baseName,
 			String className, String fieldList) {
-		writer.println(
-				"public static class " + className + " extends " + baseName + " {");
+		writer.println("public static class " + className + " extends "
+				+ baseName + " {");
 
 		// Constructor.
 		writer.println("    public " + className + "(" + fieldList + ") {");
@@ -95,13 +93,13 @@ public class GeradorAST {
 		}
 
 		writer.println("    }");
-		
-		 // Visitor pattern.                                      
-	    writer.println();                                        
-	    writer.println("    public <R> R accept(Visitor<R> visitor) {");
-	    writer.println("      return visitor.visit" +            
-	        className + baseName + "(this);");                   
-	    writer.println("    }");              
+
+		// Visitor pattern.
+		writer.println();
+		writer.println("    public <R> R accept(Visitor<R> visitor) {");
+		writer.println("      return visitor.visit" + className + baseName
+				+ "(this);");
+		writer.println("    }");
 
 		// Fields.
 		writer.println();

@@ -16,6 +16,7 @@ import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.Enquanto;
 import tree.Declaracao.Ler;
+import tree.Declaracao.Para;
 import tree.Declaracao.Print;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
@@ -37,7 +38,6 @@ public class Interpreter
 	private Environment environment = new Environment();                 
 	
 	public Interpreter(BufferedReader reader) {
-		// TODO Auto-generated constructor stub
 		this.reader = reader;
 	}
 	public void interpret(List<Declaracao> declaracoes) {
@@ -281,7 +281,6 @@ public class Interpreter
 			System.out.println("ler: " + v);//imprime acoes no terminal
 			
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return null;
@@ -339,6 +338,15 @@ public class Interpreter
 	public Void visitEnquantoDeclaracao(Enquanto declaracao) {
 		while(isTruthy(evaluate(declaracao.condicao))) {
 			execute(declaracao.corpo);
+		}
+		return null;
+	}
+	@Override
+	public Void visitParaDeclaracao(Para declaracao) {
+		evaluate(declaracao.atribuicao);
+		while(isTruthy(evaluate(declaracao.condicao))) {
+			execute(declaracao.facaBloco);
+			evaluate(declaracao.incremento);
 		}
 		return null;
 	}

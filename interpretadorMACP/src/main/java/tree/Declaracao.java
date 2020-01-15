@@ -12,6 +12,7 @@ public R visitPrintDeclaracao(Print declaracao);
 public R visitSeDeclaracao(Se declaracao);
 public R visitLerDeclaracao(Ler declaracao);
 public R visitVarDeclaracao(Var declaracao);
+public R visitParaDeclaracao(Para declaracao);
 public R visitEnquantoDeclaracao(Enquanto declaracao);
   }
 public static class Bloco extends Declaracao {
@@ -85,6 +86,23 @@ public static class Var extends Declaracao {
 
     public final Token nome;
     public final tree.Expressao expressao;
+  }
+public static class Para extends Declaracao {
+    public Para(tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco) {
+      this.atribuicao = atribuicao;
+      this.condicao = condicao;
+      this.incremento = incremento;
+      this.facaBloco = facaBloco;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitParaDeclaracao(this);
+    }
+
+    public final tree.Expressao atribuicao;
+    public final tree.Expressao condicao;
+    public final tree.Expressao incremento;
+    public final Bloco facaBloco;
   }
 public static class Enquanto extends Declaracao {
     public Enquanto(tree.Expressao condicao, Bloco corpo) {

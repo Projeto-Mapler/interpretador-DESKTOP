@@ -13,6 +13,7 @@ import static model.TokenType.*;
 
 import tree.Declaracao;
 import tree.Expressao;
+import tree.Declaracao.Bloco;
 import tree.Expressao.Binario;
 
 public class Parser {
@@ -423,7 +424,7 @@ public class Parser {
 		// atribuicao
 		Expressao.Literal valorAtribuicao = new Expressao.Literal(passoInteiro.literal);
 		Expressao.Atribuicao atribuicaoExpressao = new Expressao.Atribuicao(identificador, valorAtribuicao);
-		Declaracao.Expressao atribuicaoDeclaracao = new Declaracao.Expressao(atribuicaoExpressao);
+//		Declaracao.Expressao atribuicaoDeclaracao = new Declaracao.Expressao(atribuicaoExpressao);
 		
 		// condicao
 //		Expressao.Literal deValor = new Expressao.Literal(deInteiro.literal);
@@ -436,15 +437,15 @@ public class Parser {
 		Token operadorI = new Token(MAIS, "+", null, linhaOperador);
 		Expressao.Binario valorIncremento = new Expressao.Binario(variavel, operadorI, incrementoValor);
 		Expressao.Atribuicao incrementoExpressao = new Expressao.Atribuicao(identificador, valorIncremento);
-		Declaracao.Expressao incrementoDeclaracao = new Declaracao.Expressao(incrementoExpressao);
+//		Declaracao.Expressao incrementoDeclaracao = new Declaracao.Expressao(incrementoExpressao);
 		
 		// while aux
-		Declaracao.Bloco corpoIncremento = new Declaracao.Bloco(Arrays.asList(corpo, incrementoDeclaracao));
-		Declaracao.Enquanto enquanto = new Declaracao.Enquanto(condicao, corpoIncremento);
+//		Declaracao.Bloco corpoIncremento = new Declaracao.Bloco(Arrays.asList(corpo, incrementoDeclaracao));
+//		Declaracao.Enquanto enquanto = new Declaracao.Enquanto(condicao, corpoIncremento);
 		
-		Declaracao retorno = new Declaracao.Bloco(Arrays.asList(atribuicaoDeclaracao, enquanto));
-		
-		return retorno;
+//		Declaracao retorno = new Declaracao.Bloco(Arrays.asList(atribuicaoDeclaracao, enquanto));
+		return new Declaracao.Para(atribuicaoExpressao, condicao, incrementoExpressao, corpo);
+//		return retorno;
 		
 	}
 }
