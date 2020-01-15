@@ -5,7 +5,7 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 - operações lógicas (verdadeiro, falso, não, e, ou )
 - declaração e utilização de variaveis (tipagem dinâmica)
 - controle de fluxo com "se entao senao"
-- laços de repetição com "enquanto"
+- laços de repetição com "enquanto" e "faca"
 - blocos utilizam "{ }" em vez de  "[[ ]]"
 
 # Como rodar
