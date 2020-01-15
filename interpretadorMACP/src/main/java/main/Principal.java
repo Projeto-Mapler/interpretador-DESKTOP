@@ -64,11 +64,11 @@ public class Principal {
 		// }
 		Parser parser = new Parser(tokens);
 		List<Declaracao> declaracoes = parser.parse();
-
 		// Stop if there was a syntax error.
 		if (hadError)
 			return;
-
+		System.out.println(declaracoes.size());
+		new ImpressoraAST().print(declaracoes);
 		interpreter.interpret(declaracoes);
 
 	}

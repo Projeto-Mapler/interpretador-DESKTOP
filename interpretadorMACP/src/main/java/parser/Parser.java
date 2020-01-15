@@ -116,6 +116,7 @@ public class Parser {
 	 * @return
 	 */
 	private Declaracao declaracaoVariaveis() {
+		//TODO: aceitar x,y,z <- inteiro;
 		Token nome = consume(IDENTIFICADOR, "Expect variable name.");
 		Expressao inicializador = null;
 		consume(DOIS_PONTOS, "Expected ':' ");

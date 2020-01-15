@@ -1,9 +1,13 @@
 package util;
+import java.util.List;
+
 import javax.lang.model.type.DeclaredType;
 import javax.swing.tree.TreeCellEditor;
 
+import main.Principal;
 import model.Token;
 import model.TokenType;
+import parser.RuntimeError;
 import tree.Expressao;
 import tree.Expressao.Atribuicao;
 import tree.Expressao.Binario;
@@ -37,6 +41,16 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 	public String visitLiteralExpressao(Literal expressao) {
 		if (expressao.valor == null)
 			return "nulo";
+		if(expressao.valor instanceof Boolean) {
+			if((boolean)expressao.valor) {
+				return "verdadeiro";
+			} else {
+				return "falso";
+			}
+		}
+		if(expressao.valor instanceof String) {
+			return "\""+expressao.valor.toString()+"\"";
+		}
 		return expressao.valor.toString();
 	}
 
@@ -45,13 +59,23 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 		return parenthesize(expressao.operador.lexeme, expressao.direira);
 	}
 
-	private String parenthesize(String nome, Expressao... expressoes) {
+	private String parenthesize(String nome, Object... expressoes) {
 		StringBuilder builder = new StringBuilder();
 
 		builder.append("(").append(nome);
-		for (Expressao expr : expressoes) {
-			builder.append(" ");
-			builder.append(expr.accept(this));
+		if(expressoes != null) {
+			
+			for (Object expr : expressoes) {
+				if(expr != null) {
+					builder.append(" ");	
+					if(expr instanceof Expressao) {						
+						builder.append(((Expressao)expr).accept(this));
+					} else if(expr instanceof Expressao) {						
+						builder.append(((Declaracao)expr).accept(this));
+					}
+					// THROW ERROR Expressao ou Expressao nao encontrado
+				}
+			}
 		}
 		builder.append(")");
 
@@ -59,7 +83,25 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 	}
 
 	public String print(Expressao expressao) {
-		return expressao.accept(this);
+		String retorno = expressao.accept(this);
+//		System.out.println(retorno);
+		return retorno;
+	}
+	public String print(Declaracao declaracao) {
+		String retorno = declaracao.accept(this);
+//		System.out.println(retorno);
+		return retorno;
+	}
+	public void print(List<Declaracao> declaracoes) {
+		StringBuilder builder = new StringBuilder();
+		try {
+			for (Declaracao declaracao : declaracoes) {
+				builder.append(print(declaracao));
+			}
+		} catch (RuntimeError error) {
+			Principal.runtimeError(error);
+		}
+		System.out.println( builder.toString());
 	}
 	public static void main(String[] args) {
 		Expressao esquerda = new Expressao.Unario(
@@ -71,24 +113,20 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 		System.out.println(new ImpressoraAST().print(expression));
 	}
-	public void printASTTree() {}
 
 	@Override
 	public String visitVariavelExpressao(Variavel expressao) {
-		// TODO Auto-generated method stub
-		return null;
+		return expressao.nome.lexeme;
 	}
 
 	@Override
 	public String visitAtribuicaoExpressao(Atribuicao expressao) {
-		// TODO Auto-generated method stub
-		return null;
+		return parenthesize("atribuicao " + expressao.nome.lexeme, expressao.valor);
 	}
 
 	@Override
 	public String visitLogicoExpressao(Logico expressao) {
-		// TODO Auto-generated method stub
-		return null;
+		return parenthesize("lógico "+expressao.operador.lexeme, expressao.esquerda, expressao.direita);
 	}
 
 	@Override
@@ -106,14 +144,12 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitPrintDeclaracao(Print declaracao) {
-		// TODO Auto-generated method stub
-		return null;
+		return parenthesize("escreva ", declaracao.expressao);
 	}
 
 	@Override
 	public String visitSeDeclaracao(Se declaracao) {
-		// TODO Auto-generated method stub
-		return null;
+		return parenthesize("se ", declaracao.condicao, declaracao.entaoBloco, declaracao.senaoBloco);
 	}
 
 	@Override
@@ -124,8 +160,7 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitVarDeclaracao(Var declaracao) {
-		// TODO Auto-generated method stub
-		return null;
+		return parenthesize("variavel " + declaracao.nome.lexeme, declaracao.expressao);
 	}
 
 	@Override
