@@ -102,7 +102,7 @@ public class Interpreter
 			return;
 		if (operand instanceof Integer)
 			return;
-		throw new RuntimeError(operator, "Operand must be a number.");
+		throw new RuntimeError(operator, "Operador deve ser um número.");
 	}
 	private void checkNumberOperands(Token operator, Object left,
 			Object right) {
@@ -113,7 +113,7 @@ public class Interpreter
 		if (leftDoubleInt && rightDoubleInt)
 			return;
 
-		throw new RuntimeError(operator, "Operands must be numbers.");
+		throw new RuntimeError(operator, "Operadores devem ser números.");
 	}
 	private Object retornaValorNumericoTipoCorreto(TokenType op, Object left,
 			Object right) {
@@ -207,7 +207,7 @@ public class Interpreter
 							direita);
 				}
 				throw new RuntimeError(expressao.operador,
-						"Operands must be two numbers or two strings.");
+						"Operadores devem ser números ou cadeia de caracteres.");
 			case MAIOR_QUE :
 				checkNumberOperands(expressao.operador, esquerda, direita);
 				return toDouble(esquerda) > toDouble(direita);

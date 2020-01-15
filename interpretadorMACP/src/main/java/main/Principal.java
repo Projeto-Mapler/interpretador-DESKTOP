@@ -67,8 +67,8 @@ public class Principal {
 		// Stop if there was a syntax error.
 		if (hadError)
 			return;
-		System.out.println(declaracoes.size());
-		new ImpressoraAST().print(declaracoes);
+//		System.out.println(declaracoes.size());
+//		new ImpressoraAST().print(declaracoes);// imprime arvore
 		interpreter.interpret(declaracoes);
 
 	}
@@ -78,19 +78,19 @@ public class Principal {
 
 	private static void report(int line, String where, String message) {
 		System.err
-				.println("[line " + line + "] Error" + where + ": " + message);
+				.println("[linha " + line + "] Erro" + where + ": " + message);
 		hadError = true;
 	}
 	public static void error(Token token, String message) {
 		if (token.type == TokenType.EOF) {
-			report(token.line, " at end", message);
+			report(token.line, " no fim", message);
 		} else {
-			report(token.line, " at '" + token.lexeme + "'", message);
+			report(token.line, " em '" + token.lexeme + "'", message);
 		}
 	}
 	public static void runtimeError(RuntimeError error) {
 		System.err.println(
-				error.getMessage() + "\n[line " + error.token.line + "]");
+				error.getMessage() + "\n[linha " + error.token.line + "]");
 		hadRuntimeError = true;
 	}
 }

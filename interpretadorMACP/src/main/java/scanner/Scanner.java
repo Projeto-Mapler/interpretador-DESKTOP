@@ -150,7 +150,7 @@ public class Scanner {
 				} else if (isAlpha(c)) {
 					identifier();
 				} else {
-					Principal.error(line, "Unexpected character.");
+					Principal.error(line, "caracter não identificado.");
 				}
 				break;
 		}
@@ -209,7 +209,7 @@ public class Scanner {
 
 		// Unterminated string.
 		if (isAtEnd()) {
-			Principal.error(line, "Unterminated string.");
+			Principal.error(line, "string não determinada.");
 			return;
 		}
 

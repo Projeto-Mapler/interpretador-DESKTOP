@@ -26,16 +26,16 @@ public class Parser {
 
 	public List<Declaracao> parse() {
 		List<Declaracao> declaracoes = new ArrayList<>();
-		consume(VARIAVEIS, "Expected \"variaveis\"");
+		consume(VARIAVEIS, "Esperado \"variaveis\"");
 		while (!isAtEnd() && peek().type != INICIO) {
 			declaracoes.add(declaracaoVariaveis());
 		}
-		consume(INICIO, "Expected \"inicio\"");
+		consume(INICIO, "Esperado \"inicio\"");
 
 		while (!isAtEnd() && peek().type != FIM) {
 			declaracoes.add(declaracao());
 		}
-		consume(FIM, "Expected \"fim\"");
+		consume(FIM, "Esperado \"fim\"");
 
 		return declaracoes;
 	}
@@ -117,13 +117,13 @@ public class Parser {
 	 */
 	private Declaracao declaracaoVariaveis() {
 		//TODO: aceitar x,y,z <- inteiro;
-		Token nome = consume(IDENTIFICADOR, "Expect variable name.");
+		Token nome = consume(IDENTIFICADOR, "Esperado nome da variavel.");
 		Expressao inicializador = null;
-		consume(DOIS_PONTOS, "Expected ':' ");
+		consume(DOIS_PONTOS, "Esperado ':' ");
 
 		Token tipo = tipoDado();// TODO: armazenar o tipo do dado?
 
-		consume(PONTO_VIRGULA, "Expected ;");
+		consume(PONTO_VIRGULA, "Esperado ;");
 
 		return new Declaracao.Var(nome, inicializador);
 	}
@@ -164,7 +164,7 @@ public class Parser {
 			declaracoes.add(declaracao());
 		}
 
-		consume(DIR_CHAVES, "Expect '}' after block.");
+		consume(DIR_CHAVES, "Esperado '}' depois do bloco.");
 		return declaracoes;
 	}
 	/**
@@ -174,7 +174,7 @@ public class Parser {
 	 */
 	private Declaracao printDeclaracao() {
 		Expressao expressao = expressao();
-		consume(PONTO_VIRGULA, "Expect ';' after value.");
+		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
 		return new Declaracao.Print(expressao);
 	}
 	/**
@@ -184,7 +184,7 @@ public class Parser {
 	 */
 	private Declaracao lerDeclaracao() {
 		Expressao expressao = expressao();
-		consume(PONTO_VIRGULA, "Expect ';' after value.");
+		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
 		return new Declaracao.Ler(expressao);
 	}
 	/**
@@ -194,7 +194,7 @@ public class Parser {
 	 */
 	private Declaracao expressaoDeclaracao() {
 		Expressao expressao = expressao();
-		consume(PONTO_VIRGULA, "Expect ';' after value.");
+		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
 		return new Declaracao.Expressao(expressao);
 	}
 	/**
@@ -353,10 +353,10 @@ public class Parser {
 
 		if (match(ESQ_PARENTESES)) {
 			Expressao expresao = expressao();
-			consume(DIR_PARENTESES, "Expect ')' after expression.");
+			consume(DIR_PARENTESES, "Esperado ')' depois da expressao.");
 			return new Expressao.Grupo(expresao);
 		}
-		throw error(peek(), "Expect expression.");
+		throw error(peek(), "Esperado expressao.");
 	}
 	/**
 	 * TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" |
@@ -379,12 +379,12 @@ public class Parser {
 	 */
 	private Declaracao seDeclaracao() {
 		Expressao condicao = ou();
-		consume(ENTAO, "Expect 'entao' after expression.");
-		consume(ESQ_CHAVES, "Expect '{' after expression.");
+		consume(ENTAO, "Esperado 'entao' depois da expressao.");
+		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 		Declaracao.Bloco entaoBloco = new Declaracao.Bloco(bloco());
 		Declaracao.Bloco senaoBloco = null;
 		if (match(SENAO)) {
-			consume(ESQ_CHAVES, "Expect '{' after expression.");
+			consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 			senaoBloco = new Declaracao.Bloco(bloco());
 		}
 		return new Declaracao.Se(condicao, entaoBloco, senaoBloco);
@@ -397,8 +397,8 @@ public class Parser {
 	 */
 	private Declaracao enquantoDeclaracao() {
 		Expressao condicao = ou();
-		consume(FACA, "Expect 'faca' after expression.");
-		consume(ESQ_CHAVES, "Expect '{' after expression.");
+		consume(FACA, "Esperado 'faca' depois da expressao.");
+		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
 		return new Declaracao.Enquanto(condicao, corpo);
 	}
@@ -409,15 +409,15 @@ public class Parser {
 	 */
 	private Declaracao paraDeclaracao() {
 		
-		Token identificador = consume(IDENTIFICADOR, "Expect 'identificador' after expression.");
-		consume(DE, "Expect 'de' after expression.");
-		Token deInteiro = consume(INTEIRO, "Expect 'INTEIRO' after expression.");
-		int linhaOperador = consume(ATE, "Expect 'ate' after expression.").line;
-		Token ateInteiro = consume(INTEIRO, "Expect 'INTEIRO' after expression.");
-		consume(PASSO, "Expect 'passo' after expression.");
-		Token passoInteiro = consume(INTEIRO, "Expect 'INTEIRO' after expression.");
-		consume(FACA, "Expect 'faca' after expression.");
-		consume(ESQ_CHAVES, "Expect '{' after expression.");
+		Token identificador = consume(IDENTIFICADOR, "Esperado 'identificador' depois da expressao.");
+		consume(DE, "Esperado 'de' depois da expressao.");
+		Token deInteiro = consume(INTEIRO, "Esperado 'INTEIRO' depois da expressao.");
+		int linhaOperador = consume(ATE, "Esperado 'ate' depois da expressao.").line;
+		Token ateInteiro = consume(INTEIRO, "Esperado 'INTEIRO' depois da expressao.");
+		consume(PASSO, "Esperado 'passo' depois da expressao.");
+		Token passoInteiro = consume(INTEIRO, "Esperado 'INTEIRO' depois da expressao.");
+		consume(FACA, "Esperado 'faca' depois da expressao.");
+		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
 		
 		Expressao.Variavel variavel = new Expressao.Variavel(identificador);
