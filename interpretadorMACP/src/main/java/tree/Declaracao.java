@@ -75,9 +75,9 @@ public static class Ler extends Declaracao {
     public final tree.Expressao expressao;
   }
 public static class Var extends Declaracao {
-    public Var(Token nome, tree.Expressao expressao) {
+    public Var(Token nome, Token tipo) {
       this.nome = nome;
-      this.expressao = expressao;
+      this.tipo = tipo;
     }
 
     public <R> R accept(Visitor<R> visitor) {
@@ -85,7 +85,7 @@ public static class Var extends Declaracao {
     }
 
     public final Token nome;
-    public final tree.Expressao expressao;
+    public final Token tipo;
   }
 public static class Para extends Declaracao {
     public Para(tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco) {

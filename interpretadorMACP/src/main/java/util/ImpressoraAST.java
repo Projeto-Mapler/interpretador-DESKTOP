@@ -160,7 +160,7 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitVarDeclaracao(Var declaracao) {
-		return parenthesize("variavel " + declaracao.nome.lexeme, declaracao.expressao);
+		return parenthesize("variavel " + declaracao.nome.lexeme, declaracao.tipo.lexeme);
 	}
 
 	@Override
