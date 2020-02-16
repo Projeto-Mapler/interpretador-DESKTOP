@@ -23,20 +23,21 @@ public class Parser {
 	this.tokens = tokens;
     }
 
-    public List<Declaracao> parse() {
-	List<Declaracao> declaracoes = new ArrayList<>();
+    public Declaracao.Programa parse() {
+	List<Declaracao> variaveis = new ArrayList<>();
+	List<Declaracao> corpo = new ArrayList<>();
 	consume(VARIAVEIS, "Esperado \"variaveis\"");
 	while (!isAtEnd() && peek().type != INICIO) {
-	    declaracoes.add(declaracaoVariaveis());
+	    variaveis.add(declaracaoVariaveis());
 	}
 	consume(INICIO, "Esperado \"inicio\"");
 
 	while (!isAtEnd() && peek().type != FIM) {
-	    declaracoes.add(declaracao());
+	    corpo.add(declaracao());
 	}
 	consume(FIM, "Esperado \"fim\"");
 
-	return declaracoes;
+	return new Declaracao.Programa(variaveis, corpo);
     }
 
     // NAVEGADORES:

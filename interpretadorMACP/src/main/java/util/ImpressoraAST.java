@@ -22,6 +22,7 @@ import tree.Declaracao.Enquanto;
 import tree.Declaracao.Ler;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
+import tree.Declaracao.Programa;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
 public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Visitor<String>{
@@ -173,5 +174,11 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 	public String visitEnquantoDeclaracao(Enquanto declaracao) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+
+	@Override
+	public String visitProgramaDeclaracao(Programa declaracao) {
+	    // TODO Auto-generated method stub
+	    return null;
 	}
 }

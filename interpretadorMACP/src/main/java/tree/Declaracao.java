@@ -14,6 +14,7 @@ public R visitLerDeclaracao(Ler declaracao);
 public R visitVarDeclaracao(Var declaracao);
 public R visitParaDeclaracao(Para declaracao);
 public R visitEnquantoDeclaracao(Enquanto declaracao);
+public R visitProgramaDeclaracao(Programa declaracao);
   }
 public static class Bloco extends Declaracao {
     public Bloco(List<Declaracao> declaracoes) {
@@ -116,6 +117,19 @@ public static class Enquanto extends Declaracao {
 
     public final tree.Expressao condicao;
     public final Bloco corpo;
+  }
+public static class Programa extends Declaracao {
+    public Programa(List<Declaracao> variaveis, List<Declaracao> corpo) {
+      this.variaveis = variaveis;
+      this.corpo = corpo;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitProgramaDeclaracao(this);
+    }
+
+    public final List<Declaracao> variaveis;
+    public final List<Declaracao> corpo;
   }
 
   public abstract <R> R accept(Visitor<R> visitor);

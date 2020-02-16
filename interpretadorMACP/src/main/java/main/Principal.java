@@ -63,13 +63,13 @@ public class Principal {
 		// System.out.println(token);
 		// }
 		Parser parser = new Parser(tokens);
-		List<Declaracao> declaracoes = parser.parse();
+		Declaracao.Programa programa = parser.parse();
 		// Stop if there was a syntax error.
 		if (hadError)
 			return;
 //		System.out.println(declaracoes.size());
 //		new ImpressoraAST().print(declaracoes);// imprime arvore
-		interpreter.interpret(declaracoes);
+		interpreter.interpret(programa);
 
 	}
 	public static void error(int line, String message) {

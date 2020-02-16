@@ -20,6 +20,7 @@ import tree.Declaracao.Enquanto;
 import tree.Declaracao.Ler;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
+import tree.Declaracao.Programa;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
 import tree.Expressao;
@@ -39,11 +40,10 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
 	this.reader = reader;
     }
 
-    public void interpret(List<Declaracao> declaracoes) {
+    public void interpret(Declaracao.Programa programa) {
 	try {
-	    for (Declaracao declaracao : declaracoes) {
-		execute(declaracao);
-	    }
+	    this.visitProgramaDeclaracao(programa);
+	   
 	} catch (RuntimeError error) {
 	    Principal.runtimeError(error);
 	}
@@ -352,6 +352,17 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
 	    execute(declaracao.facaBloco);
 	    evaluate(declaracao.incremento);
 	}
+	return null;
+    }
+
+    @Override
+    public Void visitProgramaDeclaracao(Programa declaracao) {
+	 for (Declaracao variaveis : declaracao.variaveis) {
+		execute(variaveis);
+	 }
+	 for (Declaracao corpo : declaracao.corpo) {
+		execute(corpo);
+	 }
 	return null;
     }
 
