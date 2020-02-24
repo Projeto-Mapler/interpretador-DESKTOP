@@ -66,15 +66,15 @@ public static class Se extends Declaracao {
     public final Bloco senaoBloco;
   }
 public static class Ler extends Declaracao {
-    public Ler(tree.Expressao expressao) {
-      this.expressao = expressao;
+    public Ler(tree.Expressao atribuicao) {
+      this.atribuicao = atribuicao;
     }
 
     public <R> R accept(Visitor<R> visitor) {
       return visitor.visitLerDeclaracao(this);
     }
 
-    public final tree.Expressao expressao;
+    public final tree.Expressao atribuicao;
   }
 public static class Var extends Declaracao {
     public Var(Token nome, Token tipo) {

@@ -1,12 +1,23 @@
 # Interpretador
 
 Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi possível desenvolver até o momento um interpretador para a linguagem que suporta:
+
 - operações aritimeticas (+, -, *, / )
-- operações lógicas (verdadeiro, falso, não, e, ou )
-- declaração e utilização de variaveis (tipagem dinâmica)
+- operações lógicas (verdadeiro, falso, não, e, ou)
+- declaração e utilização de variaveis (tipagem estática)
+- Tipos:
+	- inteiro
+	- lógico
+	- real
+	- cadeia
+	- caractere
+	- vetor
 - controle de fluxo com "se entao senao"
-- laços de repetição com "enquanto" e "faca"
-- blocos utilizam "{ }" em vez de  "[[ ]]"
+- laços de repetição com "enquanto" e "para"
+- blocos utilizam "{ }" 
+- vetores
+- I/O com 'ler' e 'escrever'
+
 
 # Como rodar
 
@@ -37,22 +48,27 @@ fim
 # Gramática
 ```
 
+
 programa   → "variaveis" (declaracaoVariaveis)* "inicio" (declaracao)* "fim" EOF 
 
-declaracaoVariaveis → IDENTIFICADOR ("," IDENTIFICADOR) ":" TIPO_DADO ";"
-declaracao → expressaoDeclarativa | escrever | ler | bloco |se | enquanto | para
+declaracaoVariaveis → IDENTIFICADOR ("," IDENTIFICADOR)* ":" (TIPO_DADO | declaracaoVariavelArray) ";" 
+declaracaoVariavelArray → "vetor" "[" INTEIRO ".." INTEIRO "]" "de" TIPO_DADO
+
+declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para
 expressaoDeclarativa → expressao ";" 
 
 bloco → "{" (declaracao)* "}" 
 escrever → "escrever" expressao ";" 
-ler → "ler" IDENTIFICADOR ";" (?)
+ler → "ler" variavel ";" 
 se  → "se" ou "entao" bloco ("senao" bloco)*
 enquanto → "enquanto" ou "faca" bloco
-para → "para" IDENTIFICADOR "de" INTEGER "ate" INTEGER "passo" INTEGER "faca" bloco
+para → "para" variavel "de" INTEGER "ate" INTEGER "passo" INTEGER "faca" bloco
 
 
 expressao → atribuicao
-atribuicao → (IDENTIFICADOR "<-" atribuicao) | ou
+atribuicao → (IDENTIFICADOR "<-" atribuicao) | ou | atribuicaoArray
+atribuicaoArray → IDENTIFICADOR "[" (INTEIRO | IDENTIFICADOR) "]" "<-" atribuicao
+
 ou → e ("ou" e)*
 e → igualdade ("e" igualdade)*
 igualdade → comparacao ( ( "<>" | "=" ) comparacao)*
@@ -60,9 +76,13 @@ comparacao → adicao( ( ">" | ">=" | "<" | "<=" ) adicao)*
 adicao → multiplicacao ( ( "-" | "+" ) multiplicacao )* 
 multiplicacao → unario ( ( "/" | "*" ) unario)* 
 unario → ( "nao" | "-" ) unario | primario
-primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | "(" expressao ")" | IDENTIFICADOR
 
-TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" | "vetor" "[" INTEIRO "..." INTEIRO "]" "de" TIPO_DADO
+primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | "(" expressao ")" | variavel  
+
+variavel →  IDENTIFICADOR | variavelArray
+variavelArray → IDENTIFICADOR "[" (INTEIRO | IDENTIFICADOR) "]" 
+
+TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" 
 ```
 ## Fontes
 

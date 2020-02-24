@@ -32,7 +32,7 @@ public class GeradorAST {
 				"Expressao : tree.Expressao expressao",
 				"Print      : tree.Expressao expressao",
 				"Se         : tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco",
-				"Ler      : tree.Expressao expressao",
+				"Ler      : tree.Expressao atribuicao",
 				"Var      : Token nome, Token tipo",
 				"VariavelArray : Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo",
 				"Para         : tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco",

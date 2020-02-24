@@ -13,6 +13,8 @@ import static model.TokenType.*;
 import tree.Declaracao;
 import tree.Expressao;
 import tree.Declaracao.Bloco;
+import tree.Declaracao.VariavelArray;
+import tree.Expressao.AtribuicaoArray;
 import tree.Expressao.Binario;
 
 public class Parser {
@@ -188,14 +190,25 @@ public class Parser {
     }
 
     /**
-     * ler → "ler" ????????? ";"
+     * ler → "ler" variavel ";"
      * 
      * @return
      */
     private Declaracao lerDeclaracao() {
-	Expressao expressao = expressao();
+	Expressao expressao = ou();
+	Declaracao retorno = null;
+	if (expressao instanceof Expressao.VariavelArray) {
+	    Token nome = ((Expressao.VariavelArray) expressao).nome;
+	    Expressao index = ((Expressao.VariavelArray) expressao).index;
+	    retorno = new Declaracao.Ler(new Expressao.AtribuicaoArray(nome, index, null));
+	} 
+	 if (expressao instanceof Expressao.Variavel) {
+		Token nome = ((Expressao.Variavel) expressao).nome;
+	    retorno = new Declaracao.Ler(new Expressao.Atribuicao(nome, null));
+	}
+
 	consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
-	return new Declaracao.Ler(expressao);
+	return retorno;
     }
 
     /**
@@ -233,7 +246,7 @@ public class Parser {
 		Token nome = ((Expressao.Variavel) expressao).nome;
 		return new Expressao.Atribuicao(nome, valor);
 	    }
-	    if(expressao instanceof Expressao.VariavelArray) {
+	    if (expressao instanceof Expressao.VariavelArray) {
 		Token nome = ((Expressao.VariavelArray) expressao).nome;
 		Expressao index = ((Expressao.VariavelArray) expressao).index;
 		return new Expressao.AtribuicaoArray(nome, index, valor);
@@ -242,6 +255,7 @@ public class Parser {
 	}
 	return expressao;
     }
+
     /**
      * ou → e ("ou" e)*
      * 
@@ -365,7 +379,7 @@ public class Parser {
     private Expressao primario() {
 	if (match(IDENTIFICADOR)) {
 	    Token identificador = previous();
-	    if(match(ESQ_COLCHETE)) {
+	    if (match(ESQ_COLCHETE)) {
 		Expressao index = ou();
 		consume(DIR_COLCHETE, "Esperado ]");
 		return new Expressao.VariavelArray(identificador, index);
@@ -388,6 +402,7 @@ public class Parser {
 	}
 	throw error(peek(), "Esperado expressao.");
     }
+
     /**
      * TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico"
      * 

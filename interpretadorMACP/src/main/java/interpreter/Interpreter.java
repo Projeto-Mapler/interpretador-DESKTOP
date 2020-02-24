@@ -285,8 +285,20 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
     @Override
     public Void visitLerDeclaracao(Ler declaracao) {
 	try {
-	    String v = reader.readLine();
-	    System.out.println("ler: " + v);// imprime acoes no terminal
+	    System.out.print(">");
+	    String valor = reader.readLine();
+	    System.err.println("lido: " + valor);// imprime acoes no terminal
+	    Expressao atribuicao = declaracao.atribuicao;
+	    if(atribuicao instanceof Expressao.Atribuicao) {
+		Token nome = ((Expressao.Atribuicao) atribuicao).nome;
+		environment.assignLer(nome, valor,null);
+	    }
+	    if(atribuicao instanceof Expressao.AtribuicaoArray) {
+		Token nome = ((Expressao.AtribuicaoArray) atribuicao).nome;
+		Object index = evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
+		environment.assignLer(nome, valor, index);
+	    }
+	    
 
 	} catch (IOException e) {
 	    e.printStackTrace();

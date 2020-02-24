@@ -68,6 +68,33 @@ public class Environment {
 	throw new RuntimeError(nome, "variavel indefinida '" + nome.lexeme + "'.");
     }
     
+    /**
+     * Executa cast e atribuicao do valor lido pela funcao ler
+     * 
+     * @param nome - token identificador
+     * @param valorLido - string que a funcao ler capturou do usuario
+     * @param index - nulo se a variavel a ser atribuida nao for um vetor
+     */
+    public void assignLer(Token nome, String valorLido, Object index) {
+	TokenType tipo = getVarTipo(nome);
+	
+	if(tipo == TokenType.TIPO_VETOR) {
+	    tipo = ((VariavelVetor)this.get(nome)).getTipo();
+	}
+	
+	Object valor;
+	try {
+	    valor = checadorTipo.castLerValor(valorLido, tipo);
+	} catch (Exception e) {
+	    throw new RuntimeError(nome, "atribuição inválida '" + nome.lexeme + "'.");
+	}
+	if(index != null) {
+	    this.assignVetor(nome, index, valor);
+	} else {
+	    this.assign(nome, valor);
+	}
+    }
+    
     public TokenType getVarTipo(Token nome) {
 	return definicoes.get(nome.lexeme);
     }

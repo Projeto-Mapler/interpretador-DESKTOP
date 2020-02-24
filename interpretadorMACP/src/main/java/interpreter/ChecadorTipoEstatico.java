@@ -1,6 +1,7 @@
 package interpreter;
 
 import model.TokenType;
+import parser.RuntimeError;
 
 
 public class ChecadorTipoEstatico {
@@ -26,6 +27,31 @@ public class ChecadorTipoEstatico {
 //	}
 	// TODO: throw error ?
 	return null;
+    }
+    
+    public Object castLerValor(String valor, TokenType tipo)  throws Exception{ 
+
+	switch(tipo) {
+	case TIPO_INTEIRO:
+	    return Integer.parseInt(valor);
+	case TIPO_CARACTERE:
+	    return valor.charAt(0);
+	case TIPO_LOGICO:
+	    if(valor.equals("falso")) {
+		return false;
+	    }
+	    if(valor.equals("verdadeiro")) {
+		return true;
+	    }
+	    return null;
+	case TIPO_REAL:
+	    return Double.parseDouble(valor);
+	case TIPO_CADEIA:
+	    return valor;
+	}
+ 
+	return null;
+	// throw error?
     }
     
     
