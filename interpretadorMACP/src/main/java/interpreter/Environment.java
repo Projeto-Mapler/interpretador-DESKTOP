@@ -6,6 +6,7 @@ import java.util.Map;
 import model.Token;
 import model.TokenType;
 import parser.RuntimeError;
+import tree.Declaracao;
 
 public class Environment {
     private final Map<String, Object> valores = new HashMap<>();
@@ -15,6 +16,11 @@ public class Environment {
     public void define(Token nome, Token tipo) {
 	definicoes.put(nome.lexeme, tipo.type);
 	valores.put(nome.lexeme, null);
+    }
+    
+    public void defineArray(Token nome, VariavelVetor vetor) {
+	definicoes.put(nome.lexeme, TokenType.TIPO_VETOR);
+	valores.put(nome.lexeme, vetor);
     }
 
     public Object get(Token name) {
@@ -36,6 +42,29 @@ public class Environment {
 	    }
 	}
 
+	throw new RuntimeError(nome, "variavel indefinida '" + nome.lexeme + "'.");
+    }
+    
+    public void assignVetor(Token nome, Object index,  Object valor) {
+	if (valores.containsKey(nome.lexeme)) {
+	    VariavelVetor variavel = (VariavelVetor) this.get(nome);
+	    
+	    if(!(index instanceof Integer)) {
+		    throw new RuntimeError(nome, "Index informado não pode ser resolvido.");
+		}
+		if((int) index < 0 || (int)index > variavel.getIntervaloF() || (int) index < variavel.getIntervaloI()) {
+		    throw new RuntimeError(nome, "Index informado não encontrado");
+		}	
+	    
+	    if(checadorTipo.isTipoValorValido(variavel.getTipo(), valor)) {		
+		variavel.getValores()[(int)index - variavel.getIntervaloI()] = valor;
+		return;
+	    } else {
+		
+		throw new RuntimeError(nome, "atribuição inválida '" + nome.lexeme + "'.");
+	    }
+	}
+	
 	throw new RuntimeError(nome, "variavel indefinida '" + nome.lexeme + "'.");
     }
     

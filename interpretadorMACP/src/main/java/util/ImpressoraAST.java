@@ -10,6 +10,7 @@ import model.TokenType;
 import parser.RuntimeError;
 import tree.Expressao;
 import tree.Expressao.Atribuicao;
+import tree.Expressao.AtribuicaoArray;
 import tree.Expressao.Binario;
 import tree.Expressao.Grupo;
 import tree.Expressao.Literal;
@@ -25,6 +26,7 @@ import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
+import tree.Declaracao.VariavelArray;
 public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Visitor<String>{
 
 	@Override
@@ -178,6 +180,24 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitProgramaDeclaracao(Programa declaracao) {
+	    // TODO Auto-generated method stub
+	    return null;
+	}
+
+	@Override
+	public String visitVariavelArrayDeclaracao(VariavelArray declaracao) {
+	    // TODO Auto-generated method stub
+	    return null;
+	}
+
+	@Override
+	public String visitAtribuicaoArrayExpressao(AtribuicaoArray expressao) {
+	    // TODO Auto-generated method stub
+	    return null;
+	}
+
+	@Override
+	public String visitVariavelArrayExpressao(tree.Expressao.VariavelArray expressao) {
 	    // TODO Auto-generated method stub
 	    return null;
 	}

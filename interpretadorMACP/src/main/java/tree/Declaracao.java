@@ -12,6 +12,7 @@ public R visitPrintDeclaracao(Print declaracao);
 public R visitSeDeclaracao(Se declaracao);
 public R visitLerDeclaracao(Ler declaracao);
 public R visitVarDeclaracao(Var declaracao);
+public R visitVariavelArrayDeclaracao(VariavelArray declaracao);
 public R visitParaDeclaracao(Para declaracao);
 public R visitEnquantoDeclaracao(Enquanto declaracao);
 public R visitProgramaDeclaracao(Programa declaracao);
@@ -86,6 +87,23 @@ public static class Var extends Declaracao {
     }
 
     public final Token nome;
+    public final Token tipo;
+  }
+public static class VariavelArray extends Declaracao {
+    public VariavelArray(Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo) {
+      this.nome = nome;
+      this.intervaloI = intervaloI;
+      this.intervaloF = intervaloF;
+      this.tipo = tipo;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitVariavelArrayDeclaracao(this);
+    }
+
+    public final Token nome;
+    public final tree.Expressao intervaloI;
+    public final tree.Expressao intervaloF;
     public final Token tipo;
   }
 public static class Para extends Declaracao {

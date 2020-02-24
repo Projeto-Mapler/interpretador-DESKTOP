@@ -23,8 +23,10 @@ import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
+import tree.Declaracao.VariavelArray;
 import tree.Expressao;
 import tree.Expressao.Atribuicao;
+import tree.Expressao.AtribuicaoArray;
 import tree.Expressao.Binario;
 import tree.Expressao.Grupo;
 import tree.Expressao.Literal;
@@ -43,7 +45,7 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
     public void interpret(Declaracao.Programa programa) {
 	try {
 	    this.visitProgramaDeclaracao(programa);
-	   
+
 	} catch (RuntimeError error) {
 	    Principal.runtimeError(error);
 	}
@@ -282,13 +284,6 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
 
     @Override
     public Void visitVarDeclaracao(Var declaracao) {
-	// TODO: atribuir tipo, iniciar com valor nulo, remover expressao da declaracao
-	// e substituir por tipo
-//		Object value = null;                        
-//	    if (declaracao.expressao != null) {             
-//	      value = evaluate(declaracao.expressao);       
-//	    }
-
 	environment.define(declaracao.nome, declaracao.tipo);
 	return null;
     }
@@ -357,13 +352,53 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
 
     @Override
     public Void visitProgramaDeclaracao(Programa declaracao) {
-	 for (Declaracao variaveis : declaracao.variaveis) {
-		execute(variaveis);
-	 }
-	 for (Declaracao corpo : declaracao.corpo) {
-		execute(corpo);
-	 }
+	for (Declaracao variaveis : declaracao.variaveis) {
+	    execute(variaveis);
+	}
+	for (Declaracao corpo : declaracao.corpo) {
+	    execute(corpo);
+	}
 	return null;
+    }
+
+    @Override
+    public Void visitVariavelArrayDeclaracao(VariavelArray declaracao) {
+	int intervaloI = (int) evaluate(declaracao.intervaloI);
+	int intervaloF = (int) evaluate(declaracao.intervaloF);
+	
+//	if(intervaloI < 0 || intervaloF < 0) {
+//	    throw new RuntimeError(declaracao.nome, "Intervalos não podem ser negativos");
+//	}
+	if(intervaloI > intervaloF) {
+	    throw new RuntimeError(declaracao.nome, "Intervalo inicial não pode ser maior que o intervalo final");
+	}
+	
+	environment.defineArray(declaracao.nome, new VariavelVetor(declaracao.tipo.type, intervaloI, intervaloF));
+	return null;
+    }
+
+    @Override
+    public Object visitAtribuicaoArrayExpressao(AtribuicaoArray expressao) {
+	Object index = evaluate(expressao.index);	
+	Object valor = evaluate(expressao.valor);
+	
+	this.environment.assignVetor(expressao.nome, index, valor);
+	
+	
+	return null;
+    }
+
+    @Override
+    public Object visitVariavelArrayExpressao(Expressao.VariavelArray expressao) {
+	VariavelVetor variavel = (VariavelVetor) environment.get(expressao.nome);
+	Object index = evaluate(expressao.index);
+	if(!(index instanceof Integer)) {
+	    throw new RuntimeError(expressao.nome, "Index informado não pode ser resolvido.");
+	}
+	if((int) index < 0 || (int)index > variavel.getIntervaloF() || (int) index < variavel.getIntervaloI()) {
+	    throw new RuntimeError(expressao.nome, "Index informado não encontrado");
+	}	
+	return variavel.getValores()[(int)index - variavel.getIntervaloI()];
     }
 
 }

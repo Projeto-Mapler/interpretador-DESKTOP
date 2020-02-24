@@ -113,21 +113,25 @@ public class Parser {
 
     // REGRAS:
     /**
-     * declaracaoVariaveis → IDENTIFICADOR ("," IDENTIFICADOR) ":" TIPO_DADO ";"
+     * declaracaoVariaveis → IDENTIFICADOR ("," IDENTIFICADOR) ":" TIPO_DADO |
+     * varArray ";"
      * 
      * @return
      */
     private Declaracao declaracaoVariaveis() {
-	// TODO: aceitar x,y,z: inteiro;
+	Declaracao retorno = null;
 	Token nome = consume(IDENTIFICADOR, "Esperado nome da variavel.");
-//		Expressao inicializador = null;
+
 	consume(DOIS_PONTOS, "Esperado ':' ");
 
-	Token tipo = tipoDado();
-
+	if (match(TIPO_VETOR)) {
+	    retorno = declaracaoVariavelArray(nome);
+	} else {
+	    Token tipo = tipoDado();
+	    retorno = new Declaracao.Var(nome, tipo);
+	}
 	consume(PONTO_VIRGULA, "Esperado ;");
-
-	return new Declaracao.Var(nome, tipo);
+	return retorno;
     }
 
     /**
@@ -229,11 +233,15 @@ public class Parser {
 		Token nome = ((Expressao.Variavel) expressao).nome;
 		return new Expressao.Atribuicao(nome, valor);
 	    }
+	    if(expressao instanceof Expressao.VariavelArray) {
+		Token nome = ((Expressao.VariavelArray) expressao).nome;
+		Expressao index = ((Expressao.VariavelArray) expressao).index;
+		return new Expressao.AtribuicaoArray(nome, index, valor);
+	    }
 	    error(atribuicao, "Atribuicao inválida");
 	}
 	return expressao;
     }
-
     /**
      * ou → e ("ou" e)*
      * 
@@ -356,7 +364,13 @@ public class Parser {
      */
     private Expressao primario() {
 	if (match(IDENTIFICADOR)) {
-	    return new Expressao.Variavel(previous());
+	    Token identificador = previous();
+	    if(match(ESQ_COLCHETE)) {
+		Expressao index = ou();
+		consume(DIR_COLCHETE, "Esperado ]");
+		return new Expressao.VariavelArray(identificador, index);
+	    }
+	    return new Expressao.Variavel(identificador);
 	}
 	if (match(FALSO))
 	    return new Expressao.Literal(false);
@@ -374,16 +388,13 @@ public class Parser {
 	}
 	throw error(peek(), "Esperado expressao.");
     }
-
     /**
-     * TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" | "vetor["
-     * INTEIRO "..."I NTEIRO "] de" TIPO_DADO
+     * TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico"
      * 
      * @return
      */
     private Token tipoDado() {
-	if (match(TIPO_INTEIRO, TIPO_CADEIA, TIPO_CARACTERE, TIPO_LOGICO, TIPO_REAL, TIPO_VETOR)) {
-	
+	if (match(TIPO_INTEIRO, TIPO_CADEIA, TIPO_CARACTERE, TIPO_LOGICO, TIPO_REAL)) {
 	    return previous();
 	}
 	throw error(peek(), "TIPO nao informado.");
@@ -468,5 +479,24 @@ public class Parser {
 	return new Declaracao.Para(atribuicaoExpressao, condicao, incrementoExpressao, corpo);
 //		return retorno;
 
+    }
+
+    /**
+     * varArray → IDENTIFICADOR : "vetor" "[" INTEIRO ".." INTEIRO "]" "de"
+     * TIPO_DADO
+     * 
+     * @return
+     */
+    private Declaracao declaracaoVariavelArray(Token nome) {
+	consume(ESQ_COLCHETE, "Esperado [");
+	Token intervaloI = consume(INTEIRO, "Esperado valor inteiro positivo");
+	consume(INTERVALO, "Esperado ..");
+	Token intervaloF = consume(INTEIRO, "Esperado valor inteiro positivo");
+	consume(DIR_COLCHETE, "Esperado ]");
+	consume(DE, "Esperado de");
+	Token tipoDoVetor = tipoDado();
+
+	return new Declaracao.VariavelArray(nome, new Expressao.Literal(intervaloI.literal),
+		new Expressao.Literal(intervaloF.literal), tipoDoVetor);
     }
 }

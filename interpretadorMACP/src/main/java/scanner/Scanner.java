@@ -43,6 +43,8 @@ public class Scanner {
 	keywords.put("logico", TIPO_LOGICO);
 	keywords.put("cadeia", TIPO_CADEIA);
 	keywords.put("caractere", TIPO_CARACTERE);
+	keywords.put("..", INTERVALO);
+	keywords.put("vetor", TIPO_VETOR);
     }
 
     private int start = 0;
@@ -77,6 +79,12 @@ public class Scanner {
 	case ')':
 	    addToken(DIR_PARENTESES);
 	    break;
+	case '[':
+	    addToken(ESQ_COLCHETE);
+	    break;
+	case ']':
+	    addToken(DIR_COLCHETE);
+	    break;
 	case '{':
 	    addToken(ESQ_CHAVES);
 	    break;
@@ -87,7 +95,11 @@ public class Scanner {
 	    addToken(VIRGULA);
 	    break;
 	case '.':
-	    addToken(PONTO);
+	    if(match('.')) {
+		addToken(INTERVALO);
+	    } else {		
+		addToken(PONTO);
+	    }
 	    break;
 	case '-':
 	    addToken(MENOS);

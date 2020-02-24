@@ -12,6 +12,8 @@ public R visitLiteralExpressao(Literal expressao);
 public R visitLogicoExpressao(Logico expressao);
 public R visitUnarioExpressao(Unario expressao);
 public R visitAtribuicaoExpressao(Atribuicao expressao);
+public R visitAtribuicaoArrayExpressao(AtribuicaoArray expressao);
+public R visitVariavelArrayExpressao(VariavelArray expressao);
 public R visitVariavelExpressao(Variavel expressao);
   }
 public static class Binario extends Expressao {
@@ -91,6 +93,34 @@ public static class Atribuicao extends Expressao {
 
     public final Token nome;
     public final Expressao valor;
+  }
+public static class AtribuicaoArray extends Expressao {
+    public AtribuicaoArray(Token nome, Expressao index, Expressao valor) {
+      this.nome = nome;
+      this.index = index;
+      this.valor = valor;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitAtribuicaoArrayExpressao(this);
+    }
+
+    public final Token nome;
+    public final Expressao index;
+    public final Expressao valor;
+  }
+public static class VariavelArray extends Expressao {
+    public VariavelArray(Token nome, Expressao index) {
+      this.nome = nome;
+      this.index = index;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitVariavelArrayExpressao(this);
+    }
+
+    public final Token nome;
+    public final Expressao index;
   }
 public static class Variavel extends Expressao {
     public Variavel(Token nome) {

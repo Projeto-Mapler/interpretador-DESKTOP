@@ -18,11 +18,15 @@ public class GeradorAST {
 		defineAst(path, "Expressao", Arrays.asList(
 
 				"Binario   : Expressao esquerda, Token operador, Expressao direita",
-				"Grupo     : Expressao expressao", "Literal  : Object valor",
+				"Grupo     : Expressao expressao", 
+				"Literal  : Object valor",
 				"Logico  : Expressao esquerda, Token operador, Expressao direita",
 				"Unario    : Token operador, Expressao direira",
 				"Atribuicao: Token nome, Expressao valor",
-				"Variavel : Token nome"));
+				"AtribuicaoArray: Token nome, Expressao index, Expressao valor",
+				"VariavelArray: Token nome, Expressao index",
+				"Variavel : Token nome"
+				));
 		defineAst(path, "Declaracao", Arrays.asList(
 				"Bloco :  List<Declaracao> declaracoes",
 				"Expressao : tree.Expressao expressao",
@@ -30,6 +34,7 @@ public class GeradorAST {
 				"Se         : tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco",
 				"Ler      : tree.Expressao expressao",
 				"Var      : Token nome, Token tipo",
+				"VariavelArray : Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo",
 				"Para         : tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco",
 				"Enquanto      : tree.Expressao condicao, Bloco corpo",
 				"Programa: List<Declaracao> variaveis, List<Declaracao> corpo"
