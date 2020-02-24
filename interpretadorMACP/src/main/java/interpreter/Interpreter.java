@@ -266,6 +266,18 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
     @Override
     public Void visitPrintDeclaracao(Print declaracao) {
 	Object valor = evaluate(declaracao.expressao);
+	if(valor instanceof VariavelVetor) {
+	    Object v[] = ((VariavelVetor) valor).getValores();
+	    System.out.print("[");
+	    for(int x = 0; x < v.length; x++) {
+		System.out.print(stringify(v[x]));
+		if(x < v.length - 1) {
+		    System.out.print(", ");
+		}
+	    }
+	    System.out.println("]");
+	    return null;
+	}
 	System.out.println(stringify(valor)); // imprime acoes no terminal
 	return null;
     }
