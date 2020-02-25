@@ -162,7 +162,7 @@ public class Interpreter implements Expressao.Visitor<Object>, Declaracao.Visito
 	return (double) valor;
     }
 
-    void executeBlock(List<Declaracao> statements, Environment environment) {
+    private void executeBlock(List<Declaracao> statements, Environment environment) {
 	Environment previous = this.environment; // uselles?
 	try {
 	    this.environment = environment;

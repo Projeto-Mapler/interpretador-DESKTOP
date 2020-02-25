@@ -9,6 +9,7 @@ import java.nio.file.Paths;
 import java.util.List;
 
 import interpreter.Interpreter;
+import interpreter.JavaConversorTeste;
 import model.Token;
 import model.TokenType;
 import parser.Parser;
@@ -69,6 +70,8 @@ public class Principal {
 			return;
 //		System.out.println(declaracoes.size());
 //		new ImpressoraAST().print(declaracoes);// imprime arvore
+		JavaConversorTeste t = new JavaConversorTeste();
+		System.out.println(t.converter(programa));
 		interpreter.interpret(programa);
 
 	}
