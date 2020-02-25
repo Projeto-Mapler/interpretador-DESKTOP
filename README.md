@@ -17,6 +17,7 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 - blocos utilizam "{ }" 
 - vetores
 - I/O com 'ler' e 'escrever'
+- Conversão do código para linguagem Java [em progresso]
 
 
 # Como rodar
