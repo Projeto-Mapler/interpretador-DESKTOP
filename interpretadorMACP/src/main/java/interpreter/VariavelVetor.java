@@ -22,6 +22,14 @@ public class VariavelVetor {
 	this.valores = new Object[tamanho + 1];
     }
     
+    public int resolverIndex(int valor) {
+    	return (valor - this.intervaloI);
+    }
+    
+    public Object getValorNoIndex(int pseudoIndex) {
+    	return this.valores[this.resolverIndex(pseudoIndex)];
+    }
+    
     public int getIntervaloI() {
         return intervaloI;
     }

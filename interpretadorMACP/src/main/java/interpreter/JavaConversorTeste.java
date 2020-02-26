@@ -6,6 +6,8 @@ import static model.TokenType.MAIS;
 import static model.TokenType.MENOS;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 import main.Principal;
 import model.Token;
@@ -38,9 +40,11 @@ public class JavaConversorTeste
 
 	private StringBuilder builder;
 	private int indexIdentacao = 0;
+	private Map<String, VariavelVetor> mapaVariaveisArray; 
 
 	public JavaConversorTeste() {
 		this.builder = new StringBuilder();
+		this.mapaVariaveisArray = new HashMap<String, VariavelVetor>();
 	}
 
 	public String converter(Declaracao.Programa programa) {
@@ -145,6 +149,7 @@ public class JavaConversorTeste
 				return "";
 		}
 	}
+	
 
 	private void evaluate(Expressao expressao) {
 		expressao.accept(this);
@@ -230,9 +235,21 @@ public class JavaConversorTeste
 
 	@Override
 	public Void visitVariavelArrayDeclaracao(VariavelArray declaracao) {
+		String tipo = this.tipoVariavel(declaracao.tipo.type);
+		VariavelVetor vv = new VariavelVetor(
+				declaracao.tipo.type, 
+				(int)((Expressao.Literal) declaracao.intervaloI).valor, 
+				(int)((Expressao.Literal) declaracao.intervaloF).valor);
 
+		addLinha("public static " + tipo + " " + declaracao.nome.lexeme + "["+ vv.getTamanho() +"];",
+				null, true);
+		this.mapaVariaveisArray.put(
+				declaracao.nome.lexeme, 
+				vv);
 		return null;
 	}
+
+	
 
 	@Override
 	public Void visitParaDeclaracao(Para declaracao) {
@@ -378,14 +395,39 @@ public class JavaConversorTeste
 
 	@Override
 	public Void visitAtribuicaoArrayExpressao(AtribuicaoArray expressao) {
-		// TODO Auto-generated method stub
+
+		concaternarNaLinha(expressao.nome.lexeme, null, false);
+		concaternarNaLinha("[", null, false);
+		
+		if(expressao.index instanceof Expressao.Literal) {
+			
+			int valorIndex = (int)((Expressao.Literal) expressao.index).valor;
+			concaternarNaLinha(
+					this.mapaVariaveisArray.get(expressao.nome.lexeme).resolverIndex(valorIndex) + "",
+					null, 
+					false);
+		} else {
+			evaluate(expressao.index);
+		}	
+		concaternarNaLinha("] = ", null, false);
+		evaluate(expressao.valor);
+		
 		return null;
 	}
 
 	@Override
 	public Void visitVariavelArrayExpressao(
 			tree.Expressao.VariavelArray expressao) {
-		// TODO Auto-generated method stub
+		String nome = expressao.nome.lexeme;
+		if(expressao.index == null) {
+			concaternarNaLinha(nome, null, false);
+		}else {			
+			concaternarNaLinha(nome + "[", null, false);
+			evaluate(expressao.index);
+			concaternarNaLinha("]", null, false);
+		}
+		
+		
 		return null;
 	}
 
