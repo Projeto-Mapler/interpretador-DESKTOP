@@ -21,6 +21,7 @@ import tree.Declaracao.Ler;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
+import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
 import tree.Declaracao.VariavelArray;
@@ -458,6 +459,14 @@ public class Interpreter
 	@Override
 	public Object visitExpParentizadaExpressao(ExpParentizada expressao) {
 		return this.evaluate(expressao.grupo);
+	}
+
+	@Override
+	public Void visitRepitaDeclaracao(Repita declaracao) {
+		do {
+			execute(declaracao.corpo);
+		} while(isTruthy(evaluate(declaracao.condicao)));
+		return null;
 	}
 
 }

@@ -20,6 +20,7 @@ import tree.Declaracao.Ler;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
+import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
 import tree.Declaracao.VariavelArray;
@@ -443,6 +444,17 @@ public class JavaConversorTeste
 		concaternarNaLinha("(", null, false);
 		evaluate(expressao.grupo);
 		concaternarNaLinha(")", null, false);
+		return null;
+	}
+
+	@Override
+	public Void visitRepitaDeclaracao(Repita declaracao) {
+		addLinha("do {", true, true);
+		execute(declaracao.corpo);
+		this.indexIdentacao--;
+		addLinha("while (", null, false);
+		evaluate(declaracao.condicao);
+		concaternarNaLinha(");", null, true);
 		return null;
 	}
 

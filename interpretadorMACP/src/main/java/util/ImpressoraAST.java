@@ -25,6 +25,7 @@ import tree.Declaracao.Ler;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
+import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
 import tree.Declaracao.VariavelArray;
@@ -205,6 +206,12 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitExpParentizadaExpressao(ExpParentizada expressao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitRepitaDeclaracao(Repita declaracao) {
 		// TODO Auto-generated method stub
 		return null;
 	}

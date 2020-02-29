@@ -15,6 +15,7 @@ public R visitVarDeclaracao(Var declaracao);
 public R visitVariavelArrayDeclaracao(VariavelArray declaracao);
 public R visitParaDeclaracao(Para declaracao);
 public R visitEnquantoDeclaracao(Enquanto declaracao);
+public R visitRepitaDeclaracao(Repita declaracao);
 public R visitProgramaDeclaracao(Programa declaracao);
   }
 public static class Bloco extends Declaracao {
@@ -135,6 +136,19 @@ public static class Enquanto extends Declaracao {
 
     public final tree.Expressao condicao;
     public final Bloco corpo;
+  }
+public static class Repita extends Declaracao {
+    public Repita(Bloco corpo, tree.Expressao condicao) {
+      this.corpo = corpo;
+      this.condicao = condicao;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitRepitaDeclaracao(this);
+    }
+
+    public final Bloco corpo;
+    public final tree.Expressao condicao;
   }
 public static class Programa extends Declaracao {
     public Programa(List<Declaracao> variaveis, List<Declaracao> corpo) {

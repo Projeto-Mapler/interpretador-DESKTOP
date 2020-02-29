@@ -137,7 +137,7 @@ public class Parser {
 	}
 
 	/**
-	 * declaracao → expressaoDeclarativa | escrever | ler | bloco
+	 * declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para | repita
 	 * 
 	 * @return
 	 */
@@ -155,6 +155,8 @@ public class Parser {
 				return lerDeclaracao();
 			if (match(ESQ_CHAVES))
 				return new Declaracao.Bloco(bloco());
+			if(match(REPITA))
+				return repitaDeclaracao();
 			return expressaoDeclaracao();
 		} catch (ParserError error) {
 			synchronize();
@@ -383,8 +385,7 @@ public class Parser {
 	}
 
 	/**
-	 * primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO |
-	 * "("expressao ")" | IDENTIFICADOR
+	 * primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | variavel  | expParentizada 
 	 * 
 	 * @return
 	 */
@@ -521,6 +522,22 @@ public class Parser {
 				incrementoExpressao, corpo);
 		// return retorno;
 
+	}
+	
+	/**
+	 * repita → "repita" bloco "ate" ou ";"
+	 * 
+	 * @return
+	 */
+	private Declaracao repitaDeclaracao(){
+		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
+		consume(ATE, "Esperado 'ate' depois da expressão.");
+		Expressao condicao = ou();
+		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		
+		return new Declaracao.Repita(corpo, condicao);
+		
 	}
 
 	/**

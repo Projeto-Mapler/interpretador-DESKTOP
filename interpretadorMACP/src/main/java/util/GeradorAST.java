@@ -38,6 +38,7 @@ public class GeradorAST {
 				"VariavelArray : Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo",
 				"Para         : tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco",
 				"Enquanto      : tree.Expressao condicao, Bloco corpo",
+				"Repita:  Bloco corpo, tree.Expressao condicao",
 				"Programa: List<Declaracao> variaveis, List<Declaracao> corpo"
 			));
 

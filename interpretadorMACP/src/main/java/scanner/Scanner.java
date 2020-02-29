@@ -29,6 +29,7 @@ public class Scanner {
 	keywords.put("senao", SENAO);
 	keywords.put("faca", FACA);
 	keywords.put("enquanto", ENQUANTO);
+	keywords.put("repita", REPITA);
 	keywords.put("para", PARA);
 	keywords.put("de", DE);
 	keywords.put("ate", ATE);

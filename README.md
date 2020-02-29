@@ -13,7 +13,7 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 	- caractere
 	- vetor
 - controle de fluxo com "se entao senao"
-- laços de repetição com "enquanto" e "para"
+- laços de repetição com "enquanto...", "repita...ate..." e "para ... de ... ate ... passo ... faca ..."
 - blocos utilizam "{ }" 
 - vetores
 - I/O com 'ler' e 'escrever'
@@ -48,14 +48,12 @@ fim
 
 # Gramática
 ```
-
-
 programa   → "variaveis" (declaracaoVariaveis)* "inicio" (declaracao)* "fim" EOF 
 
 declaracaoVariaveis → IDENTIFICADOR ("," IDENTIFICADOR)* ":" (TIPO_DADO | declaracaoVariavelArray) ";" 
 declaracaoVariavelArray → "vetor" "[" INTEIRO ".." INTEIRO "]" "de" TIPO_DADO
 
-declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para
+declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para | repita
 expressaoDeclarativa → expressao ";" 
 
 bloco → "{" (declaracao)* "}" 
@@ -63,10 +61,12 @@ escrever → "escrever" expressao ";"
 ler → "ler" variavel ";" 
 se  → "se" ou "entao" bloco ("senao" bloco)*
 enquanto → "enquanto" ou "faca" bloco
-para → "para" variavel "de" INTEGER "ate" INTEGER "passo" INTEGER "faca" bloco
+para → "para" variavel "de" INTEIRO "ate" INTEIRO "passo" INTEIRO "faca" bloco
+repita → "repita" bloco "ate" ou ";"
 
 
 expressao → atribuicao
+expParentizada → "(" expressao ")"
 atribuicao → (IDENTIFICADOR "<-" atribuicao) | ou | atribuicaoArray
 atribuicaoArray → IDENTIFICADOR "[" (INTEIRO | IDENTIFICADOR) "]" "<-" atribuicao
 
@@ -78,7 +78,7 @@ adicao → multiplicacao ( ( "-" | "+" ) multiplicacao )*
 multiplicacao → unario ( ( "/" | "*" ) unario)* 
 unario → ( "nao" | "-" ) unario | primario
 
-primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | "(" expressao ")" | variavel  
+primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | variavel  | expParentizada 
 
 variavel →  IDENTIFICADOR | variavelArray
 variavelArray → IDENTIFICADOR "[" (INTEIRO | IDENTIFICADOR) "]" 
