@@ -27,6 +27,7 @@ import tree.Expressao;
 import tree.Expressao.Atribuicao;
 import tree.Expressao.AtribuicaoArray;
 import tree.Expressao.Binario;
+import tree.Expressao.ExpParentizada;
 import tree.Expressao.Grupo;
 import tree.Expressao.Literal;
 import tree.Expressao.Logico;
@@ -434,6 +435,14 @@ public class JavaConversorTeste
 	@Override
 	public Void visitVariavelExpressao(Variavel expressao) {
 		concaternarNaLinha(expressao.nome.lexeme, null, false);
+		return null;
+	}
+
+	@Override
+	public Void visitExpParentizadaExpressao(ExpParentizada expressao) {
+		concaternarNaLinha("(", null, false);
+		evaluate(expressao.grupo);
+		concaternarNaLinha(")", null, false);
 		return null;
 	}
 

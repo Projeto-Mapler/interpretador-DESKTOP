@@ -12,6 +12,7 @@ import tree.Expressao;
 import tree.Expressao.Atribuicao;
 import tree.Expressao.AtribuicaoArray;
 import tree.Expressao.Binario;
+import tree.Expressao.ExpParentizada;
 import tree.Expressao.Grupo;
 import tree.Expressao.Literal;
 import tree.Expressao.Logico;
@@ -200,5 +201,11 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 	public String visitVariavelArrayExpressao(tree.Expressao.VariavelArray expressao) {
 	    // TODO Auto-generated method stub
 	    return null;
+	}
+
+	@Override
+	public String visitExpParentizadaExpressao(ExpParentizada expressao) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

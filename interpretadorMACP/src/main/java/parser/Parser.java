@@ -232,6 +232,16 @@ public class Parser {
 	private Expressao expressao() {
 		return atribuicao();
 	}
+	/**
+	 * expParentizada → "(" expressao ")"
+	 * 
+	 * @return
+	 */
+	private Expressao expParentizada() {
+		Expressao expressao = expressao();
+		consume(DIR_PARENTESES, "Esperado ')' depois da expressao.");
+		return new Expressao.ExpParentizada(new Expressao.Grupo(expressao));
+	}
 
 	/**
 	 * atribuicao → (IDENTIFICADOR "<-" atribuicao) | ou
@@ -398,9 +408,7 @@ public class Parser {
 		}
 
 		if (match(ESQ_PARENTESES)) {
-			Expressao expresao = expressao();
-			consume(DIR_PARENTESES, "Esperado ')' depois da expressao.");
-			return new Expressao.Grupo(expresao);
+			return expParentizada();
 		}
 		throw error(peek(), "Esperado expressao.");
 	}

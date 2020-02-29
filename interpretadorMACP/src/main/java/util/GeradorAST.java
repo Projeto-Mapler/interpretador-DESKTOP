@@ -19,6 +19,7 @@ public class GeradorAST {
 
 				"Binario   : Expressao esquerda, Token operador, Expressao direita",
 				"Grupo     : Expressao expressao", 
+				"ExpParentizada : Grupo grupo",
 				"Literal  : Object valor",
 				"Logico  : Expressao esquerda, Token operador, Expressao direita",
 				"Unario    : Token operador, Expressao direira",

@@ -28,6 +28,7 @@ import tree.Expressao;
 import tree.Expressao.Atribuicao;
 import tree.Expressao.AtribuicaoArray;
 import tree.Expressao.Binario;
+import tree.Expressao.ExpParentizada;
 import tree.Expressao.Grupo;
 import tree.Expressao.Literal;
 import tree.Expressao.Logico;
@@ -452,6 +453,11 @@ public class Interpreter
 					"Index informado não encontrado");
 		}
 		return variavel.getValorNoIndex((int) index);
+	}
+
+	@Override
+	public Object visitExpParentizadaExpressao(ExpParentizada expressao) {
+		return this.evaluate(expressao.grupo);
 	}
 
 }

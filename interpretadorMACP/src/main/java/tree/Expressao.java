@@ -8,6 +8,7 @@ public abstract class Expressao {
 public interface Visitor<R> {
 public R visitBinarioExpressao(Binario expressao);
 public R visitGrupoExpressao(Grupo expressao);
+public R visitExpParentizadaExpressao(ExpParentizada expressao);
 public R visitLiteralExpressao(Literal expressao);
 public R visitLogicoExpressao(Logico expressao);
 public R visitUnarioExpressao(Unario expressao);
@@ -41,6 +42,17 @@ public static class Grupo extends Expressao {
     }
 
     public final Expressao expressao;
+  }
+public static class ExpParentizada extends Expressao {
+    public ExpParentizada(Grupo grupo) {
+      this.grupo = grupo;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitExpParentizadaExpressao(this);
+    }
+
+    public final Grupo grupo;
   }
 public static class Literal extends Expressao {
     public Literal(Object valor) {
