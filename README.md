@@ -48,13 +48,16 @@ fim
 
 # Gramática
 ```
-programa   → "variaveis" (declaracaoVariaveis)* "inicio" (declaracao)* "fim" EOF 
+programa → "variaveis" (declaracaoVariaveis)* "inicio" (declaracao)* "fim" (declaracaoModulo)* EOF 
 
 declaracaoVariaveis → IDENTIFICADOR ("," IDENTIFICADOR)* ":" (TIPO_DADO | declaracaoVariavelArray) ";" 
 declaracaoVariavelArray → "vetor" "[" INTEIRO ".." INTEIRO "]" "de" TIPO_DADO
 
-declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para | repita
-expressaoDeclarativa → expressao ";" 
+declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para | repita 
+expressaoDeclarativa → expressao | chamadaModulo ";" 
+
+declaracaoModulo → "modulo" IDENTIFICADOR bloco
+chamadaModulo → IDENTIFICADOR 
 
 bloco → "{" (declaracao)* "}" 
 escrever → "escrever" expressao ";" 
@@ -67,7 +70,7 @@ repita → "repita" bloco "ate" ou ";"
 
 expressao → atribuicao
 expParentizada → "(" expressao ")"
-atribuicao → (IDENTIFICADOR "<-" atribuicao) | ou | atribuicaoArray
+atribuicao → (IDENTIFICADOR "<-" atribuicao) | ou | atribuicaoArray 
 atribuicaoArray → IDENTIFICADOR "[" (INTEIRO | IDENTIFICADOR) "]" "<-" atribuicao
 
 ou → e ("ou" e)*
@@ -83,7 +86,7 @@ primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | variavel
 variavel →  IDENTIFICADOR | variavelArray
 variavelArray → IDENTIFICADOR "[" (INTEIRO | IDENTIFICADOR) "]" 
 
-TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" 
+TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" | "modulo" 
 ```
 ## Fontes
 
