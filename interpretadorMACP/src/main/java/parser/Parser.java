@@ -26,8 +26,9 @@ public class Parser {
 	}
 
 	public Declaracao.Programa parse() {
-		List<Declaracao> variaveis = new ArrayList<>();
-		List<Declaracao> corpo = new ArrayList<>();
+		List<Declaracao> variaveis = new ArrayList<Declaracao>();
+		List<Declaracao> corpo = new ArrayList<Declaracao>();
+		List<Declaracao> modulos = new ArrayList<Declaracao>();
 		consume(VARIAVEIS, "Esperado \"variaveis\"");
 		while (!isAtEnd() && peek().type != INICIO) {
 			variaveis.add(declaracaoVariaveis());
@@ -38,8 +39,11 @@ public class Parser {
 			corpo.add(declaracao());
 		}
 		consume(FIM, "Esperado \"fim\"");
-
-		return new Declaracao.Programa(variaveis, corpo);
+		
+		while(!isAtEnd()) {
+			modulos.add(declaracaoModulo());
+		}
+		return new Declaracao.Programa(variaveis, corpo, modulos);
 	}
 
 	// NAVEGADORES:
@@ -101,6 +105,7 @@ public class Parser {
 				case SE :
 				case LER :
 				case ESCREVER :
+				case REPITA:
 					return;
 			}
 
@@ -223,6 +228,9 @@ public class Parser {
 	private Declaracao expressaoDeclaracao() {
 		Expressao expressao = expressao();
 		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		if(expressao instanceof Expressao.Variavel) {
+			return chamadaModulo(((Expressao.Variavel)expressao).nome);
+		}
 		return new Declaracao.Expressao(expressao);
 	}
 
@@ -421,10 +429,10 @@ public class Parser {
 	 */
 	private Token tipoDado() {
 		if (match(TIPO_INTEIRO, TIPO_CADEIA, TIPO_CARACTERE, TIPO_LOGICO,
-				TIPO_REAL)) {
+				TIPO_REAL, TIPO_MODULO)) {
 			return previous();
 		}
-		throw error(peek(), "TIPO nao informado.");
+		throw error(peek(), "Tipo inválido.");
 	}
 
 	/**
@@ -558,5 +566,28 @@ public class Parser {
 		return new Declaracao.VariavelArray(nome,
 				new Expressao.Literal(intervaloI.literal),
 				new Expressao.Literal(intervaloF.literal), tipoDoVetor);
+	}
+	/**
+	 * declaracaoModulo → "modulo" IDENTIFICADOR bloco
+	 * 
+	 * @return
+	 */
+	private Declaracao declaracaoModulo() {
+		consume(TIPO_MODULO, "Esperado 'modulo'");
+		Token nome = consume(IDENTIFICADOR, "Esperado nome do módulo");
+		consume(ESQ_CHAVES, "Esperado {");
+		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
+		
+		return new Declaracao.Modulo(nome, corpo);
+		
+	}
+	
+	/**
+	 * chamadaModulo → IDENTIFICADOR ";"
+	 * 
+	 * @return
+	 */
+	private Declaracao chamadaModulo(Token nome) {		
+		return new Declaracao.ChamadaModulo(nome);
 	}
 }

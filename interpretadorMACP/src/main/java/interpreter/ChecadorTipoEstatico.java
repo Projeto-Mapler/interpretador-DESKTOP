@@ -2,6 +2,7 @@ package interpreter;
 
 import model.TokenType;
 import parser.RuntimeError;
+import tree.Declaracao.Modulo;
 
 
 public class ChecadorTipoEstatico {
@@ -21,6 +22,9 @@ public class ChecadorTipoEstatico {
 	}
 	if(valor instanceof String) {
 	    return TokenType.TIPO_CADEIA;
+	}
+	if(valor instanceof model.Modulo) {
+		return TokenType.TIPO_MODULO;
 	}
 //	if(valor instanceof Arrays) {
 //	    return TokenType.TIPO_VETOR;

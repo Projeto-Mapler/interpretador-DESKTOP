@@ -16,8 +16,10 @@ import model.TokenType;
 import parser.RuntimeError;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
+import tree.Declaracao.ChamadaModulo;
 import tree.Declaracao.Enquanto;
 import tree.Declaracao.Ler;
+import tree.Declaracao.Modulo;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
@@ -36,21 +38,20 @@ import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
-public class Interpreter
+public class Interpretador
 		implements
 			Expressao.Visitor<Object>,
 			Declaracao.Visitor<Void> {
 	private BufferedReader reader;
 	private Environment environment = new Environment();
 
-	public Interpreter(BufferedReader reader) {
+	public Interpretador(BufferedReader reader) {
 		this.reader = reader;
 	}
 
 	public void interpret(Declaracao.Programa programa) {
 		try {
 			this.visitProgramaDeclaracao(programa);
-
 		} catch (RuntimeError error) {
 			Principal.runtimeError(error);
 		}
@@ -175,17 +176,20 @@ public class Interpreter
 		return (double) valor;
 	}
 
-	private void executeBlock(List<Declaracao> statements,
+	// TODO: analisar remoção da variavel enviroment 
+	// nao usada pois existe apenas o escopo local
+	public void executeBlock(List<Declaracao> statements,
 			Environment environment) {
-		Environment previous = this.environment; // uselles?
+	
+//		Environment previous = this.environment; // uselles?
 		try {
-			this.environment = environment;
+//			this.environment = environment;// uselles?
 
 			for (Declaracao statement : statements) {
 				execute(statement);
 			}
 		} finally {
-			this.environment = previous;
+//			this.environment = previous;
 		}
 	}
 
@@ -347,7 +351,8 @@ public class Interpreter
 
 	@Override
 	public Void visitBlocoDeclaracao(Bloco declaracao) {
-		executeBlock(declaracao.declaracoes, this.environment);
+		
+		executeBlock(declaracao.declaracoes, null);
 		return null;
 	}
 
@@ -396,12 +401,19 @@ public class Interpreter
 
 	@Override
 	public Void visitProgramaDeclaracao(Programa declaracao) {
+
 		for (Declaracao variaveis : declaracao.variaveis) {
 			execute(variaveis);
 		}
+		
+		for(Declaracao modulo : declaracao.modulos) {
+			execute(modulo);
+		}
+		
 		for (Declaracao corpo : declaracao.corpo) {
 			execute(corpo);
 		}
+		
 		return null;
 	}
 
@@ -466,6 +478,20 @@ public class Interpreter
 		do {
 			execute(declaracao.corpo);
 		} while(isTruthy(evaluate(declaracao.condicao)));
+		return null;
+	}
+
+	@Override
+	public Void visitModuloDeclaracao(Modulo declaracao) {
+		model.Modulo modulo = new model.Modulo(declaracao);
+		this.environment.assign(declaracao.nome, modulo);
+		return null;
+	}
+
+	@Override
+	public Void visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
+		model.Modulo modulo = (model.Modulo) environment.get(declaracao.identificador);
+		modulo.chamar(this, null);
 		return null;
 	}
 

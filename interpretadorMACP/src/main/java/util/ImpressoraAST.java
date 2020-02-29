@@ -20,8 +20,10 @@ import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
+import tree.Declaracao.ChamadaModulo;
 import tree.Declaracao.Enquanto;
 import tree.Declaracao.Ler;
+import tree.Declaracao.Modulo;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
@@ -212,6 +214,18 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitRepitaDeclaracao(Repita declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitModuloDeclaracao(Modulo declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
 		// TODO Auto-generated method stub
 		return null;
 	}

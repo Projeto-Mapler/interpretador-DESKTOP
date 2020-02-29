@@ -16,6 +16,8 @@ public R visitVariavelArrayDeclaracao(VariavelArray declaracao);
 public R visitParaDeclaracao(Para declaracao);
 public R visitEnquantoDeclaracao(Enquanto declaracao);
 public R visitRepitaDeclaracao(Repita declaracao);
+public R visitModuloDeclaracao(Modulo declaracao);
+public R visitChamadaModuloDeclaracao(ChamadaModulo declaracao);
 public R visitProgramaDeclaracao(Programa declaracao);
   }
 public static class Bloco extends Declaracao {
@@ -150,10 +152,35 @@ public static class Repita extends Declaracao {
     public final Bloco corpo;
     public final tree.Expressao condicao;
   }
+public static class Modulo extends Declaracao {
+    public Modulo(Token nome, Bloco corpo) {
+      this.nome = nome;
+      this.corpo = corpo;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitModuloDeclaracao(this);
+    }
+
+    public final Token nome;
+    public final Bloco corpo;
+  }
+public static class ChamadaModulo extends Declaracao {
+    public ChamadaModulo(Token identificador) {
+      this.identificador = identificador;
+    }
+
+    public <R> R accept(Visitor<R> visitor) {
+      return visitor.visitChamadaModuloDeclaracao(this);
+    }
+
+    public final Token identificador;
+  }
 public static class Programa extends Declaracao {
-    public Programa(List<Declaracao> variaveis, List<Declaracao> corpo) {
+    public Programa(List<Declaracao> variaveis, List<Declaracao> corpo, List<Declaracao> modulos) {
       this.variaveis = variaveis;
       this.corpo = corpo;
+      this.modulos = modulos;
     }
 
     public <R> R accept(Visitor<R> visitor) {
@@ -162,6 +189,7 @@ public static class Programa extends Declaracao {
 
     public final List<Declaracao> variaveis;
     public final List<Declaracao> corpo;
+    public final List<Declaracao> modulos;
   }
 
   public abstract <R> R accept(Visitor<R> visitor);

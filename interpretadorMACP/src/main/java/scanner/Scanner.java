@@ -45,6 +45,7 @@ public class Scanner {
 	keywords.put("cadeia", TIPO_CADEIA);
 	keywords.put("caractere", TIPO_CARACTERE);
 	keywords.put("..", INTERVALO);
+	keywords.put("modulo", TIPO_MODULO);
 	keywords.put("vetor", TIPO_VETOR);
     }
 
@@ -165,7 +166,7 @@ public class Scanner {
 	    } else if (isAlpha(c)) {
 		identifier();
 	    } else {
-		Principal.error(line, "caracter não identificado.");
+		Principal.error(line, "caractere não identificado.");
 	    }
 	    break;
 	}
@@ -175,7 +176,7 @@ public class Scanner {
 	return c >= '0' && c <= '9';
     }
 
-    private void identifier() {
+	private void identifier() {
 	while (isAlphaNumeric(peek()))
 	    advance();
 	String text = source.substring(start, current);

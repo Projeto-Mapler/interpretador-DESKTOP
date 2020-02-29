@@ -39,7 +39,9 @@ public class GeradorAST {
 				"Para         : tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco",
 				"Enquanto      : tree.Expressao condicao, Bloco corpo",
 				"Repita:  Bloco corpo, tree.Expressao condicao",
-				"Programa: List<Declaracao> variaveis, List<Declaracao> corpo"
+				"Modulo: Token nome, Bloco corpo",
+				"ChamadaModulo: Token identificador",
+				"Programa: List<Declaracao> variaveis, List<Declaracao> corpo, List<Declaracao> modulos"
 			));
 
 	}

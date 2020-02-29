@@ -3,100 +3,121 @@ package interpreter;
 import java.util.HashMap;
 import java.util.Map;
 
+import model.Modulo;
 import model.Token;
 import model.TokenType;
 import parser.RuntimeError;
-import tree.Declaracao;
 
 public class Environment {
-    private final Map<String, Object> valores = new HashMap<>();
-    private final Map<String, TokenType> definicoes = new HashMap<>();
-    private ChecadorTipoEstatico checadorTipo = new ChecadorTipoEstatico();
+	private final Map<String, Object> valores = new HashMap<>();
+	private final Map<String, TokenType> definicoes = new HashMap<>();
+	private ChecadorTipoEstatico checadorTipo = new ChecadorTipoEstatico();
 
-    public void define(Token nome, Token tipo) {
-	definicoes.put(nome.lexeme, tipo.type);
-	valores.put(nome.lexeme, null);
-    }
-    
-    public void defineArray(Token nome, VariavelVetor vetor) {
-	definicoes.put(nome.lexeme, TokenType.TIPO_VETOR);
-	valores.put(nome.lexeme, vetor);
-    }
-
-    public Object get(Token name) {
-	if (valores.containsKey(name.lexeme)) {
-	    return valores.get(name.lexeme);
+	public void define(Token nome, Token tipo) {
+//		System.err.println(nome.lexeme + " - " + tipo.lexeme + " definido");
+		definicoes.put(nome.lexeme, tipo.type);
+		valores.put(nome.lexeme, null);
 	}
 
-	throw new RuntimeError(name, "variavel indefinida '" + name.lexeme + "'.");
-    }
-
-    public void assign(Token nome, Object valor) {
-	if (valores.containsKey(nome.lexeme)) {
-	    if(checadorTipo.isTipoValorValido(getVarTipo(nome), valor)) {		
-		valores.put(nome.lexeme, valor);
-		return;
-	    } else {
-		
-		throw new RuntimeError(nome, "atribuição inválida '" + nome.lexeme + "'.");
-	    }
+	public void defineArray(Token nome, VariavelVetor vetor) {
+		definicoes.put(nome.lexeme, TokenType.TIPO_VETOR);
+		valores.put(nome.lexeme, vetor);
 	}
 
-	throw new RuntimeError(nome, "variavel indefinida '" + nome.lexeme + "'.");
-    }
-    
-    public void assignVetor(Token nome, Object index,  Object valor) {
-	if (valores.containsKey(nome.lexeme)) {
-	    VariavelVetor variavel = (VariavelVetor) this.get(nome);
-	    
-	    if(!(index instanceof Integer)) {
-		    throw new RuntimeError(nome, "Index informado não pode ser resolvido.");
+	public Object get(Token nome) {
+		if (valores.containsKey(nome.lexeme)) {
+			if (getVarTipo(nome) == TokenType.TIPO_MODULO
+					&& valores.get(nome.lexeme) == null) {
+				throw new RuntimeError(nome,
+						"modulo não declarado '" + nome.lexeme + "'.");
+			}
+			return valores.get(nome.lexeme);
 		}
-		if((int) index < 0 || (int)index > variavel.getIntervaloF() || (int) index < variavel.getIntervaloI()) {
-		    throw new RuntimeError(nome, "Index informado não encontrado");
-		}	
-	    
-	    if(checadorTipo.isTipoValorValido(variavel.getTipo(), valor)) {		
-		variavel.getValores()[(int)index - variavel.getIntervaloI()] = valor;
-		return;
-	    } else {
-		
-		throw new RuntimeError(nome, "atribuição inválida '" + nome.lexeme + "'.");
-	    }
+
+		throw new RuntimeError(nome,
+				"variavel indefinida '" + nome.lexeme + "'.");
 	}
-	
-	throw new RuntimeError(nome, "variavel indefinida '" + nome.lexeme + "'.");
-    }
-    
-    /**
-     * Executa cast e atribuicao do valor lido pela funcao ler
-     * 
-     * @param nome - token identificador
-     * @param valorLido - string que a funcao ler capturou do usuario
-     * @param index - nulo se a variavel a ser atribuida nao for um vetor
-     */
-    public void assignLer(Token nome, String valorLido, Object index) {
-	TokenType tipo = getVarTipo(nome);
-	
-	if(tipo == TokenType.TIPO_VETOR) {
-	    tipo = ((VariavelVetor)this.get(nome)).getTipo();
+
+	public void assign(Token nome, Object valor) {
+		if (valores.containsKey(nome.lexeme)) {
+			if (checadorTipo.isTipoValorValido(getVarTipo(nome), valor)) {
+				valores.put(nome.lexeme, valor);
+				return;
+			} else {
+
+				throw new RuntimeError(nome,
+						"atribuição inválida '" + nome.lexeme + "'.");
+			}
+		}
+		if (checadorTipo.isTipoValorValido(TokenType.TIPO_MODULO, valor)) {
+			throw new RuntimeError(nome,
+					"modulo não declarado '" + nome.lexeme + "'.");
+		}
+		throw new RuntimeError(nome,
+				"variavel indefinida '" + nome.lexeme + "'.");
 	}
-	
-	Object valor;
-	try {
-	    valor = checadorTipo.castLerValor(valorLido, tipo);
-	} catch (Exception e) {
-	    throw new RuntimeError(nome, "atribuição inválida '" + nome.lexeme + "'.");
+
+	public void assignVetor(Token nome, Object index, Object valor) {
+		if (valores.containsKey(nome.lexeme)) {
+			VariavelVetor variavel = (VariavelVetor) this.get(nome);
+
+			if (!(index instanceof Integer)) {
+				throw new RuntimeError(nome,
+						"Index informado não pode ser resolvido.");
+			}
+			if ((int) index < 0 || (int) index > variavel.getIntervaloF()
+					|| (int) index < variavel.getIntervaloI()) {
+				throw new RuntimeError(nome, "Index informado não encontrado");
+			}
+
+			if (checadorTipo.isTipoValorValido(variavel.getTipo(), valor)) {
+				variavel.getValores()[(int) index
+						- variavel.getIntervaloI()] = valor;
+				return;
+			} else {
+
+				throw new RuntimeError(nome,
+						"atribuição inválida '" + nome.lexeme + "'.");
+			}
+		}
+
+		throw new RuntimeError(nome,
+				"variavel indefinida '" + nome.lexeme + "'.");
 	}
-	if(index != null) {
-	    this.assignVetor(nome, index, valor);
-	} else {
-	    this.assign(nome, valor);
+
+	/**
+	 * Executa cast e atribuicao do valor lido pela funcao ler
+	 * 
+	 * @param nome
+	 *            - token identificador
+	 * @param valorLido
+	 *            - string que a funcao ler capturou do usuario
+	 * @param index
+	 *            - nulo se a variavel a ser atribuida nao for um vetor
+	 */
+	public void assignLer(Token nome, String valorLido, Object index) {
+		TokenType tipo = getVarTipo(nome);
+
+		if (tipo == TokenType.TIPO_VETOR) {
+			tipo = ((VariavelVetor) this.get(nome)).getTipo();
+		}
+
+		Object valor;
+		try {
+			valor = checadorTipo.castLerValor(valorLido, tipo);
+		} catch (Exception e) {
+			throw new RuntimeError(nome,
+					"atribuição inválida '" + nome.lexeme + "'.");
+		}
+		if (index != null) {
+			this.assignVetor(nome, index, valor);
+		} else {
+			this.assign(nome, valor);
+		}
 	}
-    }
-    
-    public TokenType getVarTipo(Token nome) {
-	return definicoes.get(nome.lexeme);
-    }
+
+	public TokenType getVarTipo(Token nome) {
+		return definicoes.get(nome.lexeme);
+	}
 
 }

@@ -15,8 +15,10 @@ import model.TokenType;
 import parser.RuntimeError;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
+import tree.Declaracao.ChamadaModulo;
 import tree.Declaracao.Enquanto;
 import tree.Declaracao.Ler;
+import tree.Declaracao.Modulo;
 import tree.Declaracao.Para;
 import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
@@ -227,7 +229,10 @@ public class JavaConversorTeste
 
 	@Override
 	public Void visitVarDeclaracao(Var declaracao) {
-
+		
+		if(declaracao.tipo.type == TokenType.TIPO_MODULO) {
+			return null;
+		}
 		String tipo = this.tipoVariavel(declaracao.tipo.type);
 		// TODO interceptar tipo vetor...
 		addLinha("public static " + tipo + " " + declaracao.nome.lexeme + ";",
@@ -295,7 +300,12 @@ public class JavaConversorTeste
 			execute(corpo);
 		}
 		this.indexIdentacao--;
-		addLinha("}", false, true); // main
+		addLinha("}", null, true); // main
+		for (Declaracao modulo : declaracao.modulos) {
+			concaternarNaLinha("", null, true);
+			execute(modulo);
+		}
+		this.indexIdentacao--;
 		addLinha("}", null, true); // class
 		return null;
 	}
@@ -455,6 +465,24 @@ public class JavaConversorTeste
 		addLinha("while (", null, false);
 		evaluate(declaracao.condicao);
 		concaternarNaLinha(");", null, true);
+		return null;
+	}
+
+	@Override
+	public Void visitModuloDeclaracao(Modulo declaracao) {
+	    addLinha("public static void " + declaracao.nome.lexeme + " () { ", true, true);
+	    execute(declaracao.corpo);
+	    this.indexIdentacao--;
+	    addLinha("}",null, true);
+	    
+		return null;
+	}
+
+	@Override
+	public Void visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
+		addLinha("", null, false);
+		concaternarNaLinha(declaracao.identificador.lexeme + "()", null, false);
+		concaternarNaLinha(";", null, true);		
 		return null;
 	}
 

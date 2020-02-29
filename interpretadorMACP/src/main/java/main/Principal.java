@@ -8,7 +8,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import interpreter.Interpreter;
+import interpreter.Interpretador;
 import interpreter.JavaConversorTeste;
 import model.Token;
 import model.TokenType;
@@ -24,7 +24,7 @@ public class Principal {
 	static boolean hadRuntimeError = false;
 	static final InputStreamReader input = new InputStreamReader(System.in);
 	static final BufferedReader reader = new BufferedReader(input);
-	private static final Interpreter interpreter = new Interpreter(reader);
+	private static final Interpretador interpreter = new Interpretador(reader);
 
 	public static void main(String[] args) throws IOException {
 		if (args.length > 1) {
