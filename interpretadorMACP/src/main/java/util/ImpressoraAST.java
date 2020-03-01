@@ -18,6 +18,7 @@ import tree.Declaracao.Programa;
 import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
+import tree.Declaracao.VarDeclaracoes;
 import tree.Declaracao.VariavelArray;
 import tree.Expressao;
 import tree.Expressao.Atribuicao;
@@ -225,6 +226,12 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitEscrevaDeclaracao(Escreva declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitVarDeclaracoesDeclaracao(VarDeclaracoes declaracao) {
 		// TODO Auto-generated method stub
 		return null;
 	}

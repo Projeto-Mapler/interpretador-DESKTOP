@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import main.Principal;
+import model.Token;
 import model.TokenType;
 import parser.RuntimeError;
 import tree.Declaracao;
@@ -19,6 +20,7 @@ import tree.Declaracao.Programa;
 import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
+import tree.Declaracao.VarDeclaracoes;
 import tree.Declaracao.VariavelArray;
 import tree.Expressao;
 import tree.Expressao.Atribuicao;
@@ -38,7 +40,7 @@ public class JavaConversorTeste
 
 	private StringBuilder builder;
 	private int indexIdentacao = 0;
-	private Map<String, VariavelVetor> mapaVariaveisArray; 
+	private Map<String, VariavelVetor> mapaVariaveisArray;
 
 	public JavaConversorTeste() {
 		this.builder = new StringBuilder();
@@ -147,7 +149,6 @@ public class JavaConversorTeste
 				return "";
 		}
 	}
-	
 
 	private void evaluate(Expressao expressao) {
 		expressao.accept(this);
@@ -177,10 +178,10 @@ public class JavaConversorTeste
 	public Void visitEscrevaDeclaracao(Escreva declaracao) {
 
 		addLinha("System.out.println(", null, false);
-		List<tree.Expressao> expressoes =  declaracao.expressoes;
-		for(int i = 0; i < expressoes.size(); i++) {
+		List<tree.Expressao> expressoes = declaracao.expressoes;
+		for (int i = 0; i < expressoes.size(); i++) {
 			evaluate(expressoes.get(i));
-			if(i < (expressoes.size() - 1)) {
+			if (i < (expressoes.size() - 1)) {
 				concaternarNaLinha(" + ", null, false);
 			}
 		}
@@ -212,16 +213,16 @@ public class JavaConversorTeste
 		if (atribuicao instanceof Expressao.Atribuicao) {
 			String lexeme = ((Expressao.Atribuicao) atribuicao).nome.lexeme;
 			addLinha(lexeme + " = entrada.nextByte();", null, true);
-			
+
 		}
 		if (atribuicao instanceof Expressao.AtribuicaoArray) {
-			String lexeme =((Expressao.AtribuicaoArray) atribuicao).nome.lexeme;
+			String lexeme = ((Expressao.AtribuicaoArray) atribuicao).nome.lexeme;
 			addLinha(lexeme + "[", null, false);
 			evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
-			
+
 			concaternarNaLinha("] = entrada.nextByte();", null, true);
-//			addLinha(lexeme + "["+ +"] = " + "entrada.nextByte();", null, true);
-			
+			// addLinha(lexeme + "["+ +"] = " + "entrada.nextByte();", null,
+			// true);
 
 		}
 		return null;
@@ -229,8 +230,8 @@ public class JavaConversorTeste
 
 	@Override
 	public Void visitVarDeclaracao(Var declaracao) {
-		
-		if(declaracao.tipo.type == TokenType.TIPO_MODULO) {
+
+		if (declaracao.tipo.type == TokenType.TIPO_MODULO) {
 			return null;
 		}
 		String tipo = this.tipoVariavel(declaracao.tipo.type);
@@ -243,20 +244,15 @@ public class JavaConversorTeste
 	@Override
 	public Void visitVariavelArrayDeclaracao(VariavelArray declaracao) {
 		String tipo = this.tipoVariavel(declaracao.tipo.type);
-		VariavelVetor vv = new VariavelVetor(
-				declaracao.tipo.type, 
-				(int)((Expressao.Literal) declaracao.intervaloI).valor, 
-				(int)((Expressao.Literal) declaracao.intervaloF).valor);
+		VariavelVetor vv = new VariavelVetor(declaracao.tipo.type,
+				(int) ((Expressao.Literal) declaracao.intervaloI).valor,
+				(int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
-		addLinha("public static " + tipo + " " + declaracao.nome.lexeme + "["+ vv.getTamanho() +"];",
-				null, true);
-		this.mapaVariaveisArray.put(
-				declaracao.nome.lexeme, 
-				vv);
+		addLinha("public static " + tipo + " " + declaracao.nome.lexeme + "["
+				+ vv.getTamanho() + "];", null, true);
+		this.mapaVariaveisArray.put(declaracao.nome.lexeme, vv);
 		return null;
 	}
-
-	
 
 	@Override
 	public Void visitParaDeclaracao(Para declaracao) {
@@ -410,20 +406,19 @@ public class JavaConversorTeste
 
 		concaternarNaLinha(expressao.nome.lexeme, null, false);
 		concaternarNaLinha("[", null, false);
-		
-		if(expressao.index instanceof Expressao.Literal) {
-			
-			int valorIndex = (int)((Expressao.Literal) expressao.index).valor;
-			concaternarNaLinha(
-					this.mapaVariaveisArray.get(expressao.nome.lexeme).resolverIndex(valorIndex) + "",
-					null, 
-					false);
+
+		if (expressao.index instanceof Expressao.Literal) {
+
+			int valorIndex = (int) ((Expressao.Literal) expressao.index).valor;
+			concaternarNaLinha(this.mapaVariaveisArray
+					.get(expressao.nome.lexeme).resolverIndex(valorIndex) + "",
+					null, false);
 		} else {
 			evaluate(expressao.index);
-		}	
+		}
 		concaternarNaLinha("] = ", null, false);
 		evaluate(expressao.valor);
-		
+
 		return null;
 	}
 
@@ -431,22 +426,21 @@ public class JavaConversorTeste
 	public Void visitVariavelArrayExpressao(
 			tree.Expressao.VariavelArray expressao) {
 		String nome = expressao.nome.lexeme;
-		if(expressao.index == null) {
+		if (expressao.index == null) {
 			concaternarNaLinha(nome, null, false);
-		}else if(expressao.index instanceof tree.Expressao.Literal){
+		} else if (expressao.index instanceof tree.Expressao.Literal) {
 			concaternarNaLinha(nome + "[", null, false);
 			int i = (int) ((tree.Expressao.Literal) expressao.index).valor;
 			VariavelVetor vv = this.mapaVariaveisArray.get(nome);
 			concaternarNaLinha(vv.resolverIndex(i) + "", null, false);
 			concaternarNaLinha("]", null, false);
-		}	else {
+		} else {
 			concaternarNaLinha(nome + "[", null, false);
-			
+
 			evaluate(expressao.index);
 			concaternarNaLinha("]", null, false);
 		}
-		
-		
+
 		return null;
 	}
 
@@ -477,11 +471,12 @@ public class JavaConversorTeste
 
 	@Override
 	public Void visitModuloDeclaracao(Modulo declaracao) {
-	    addLinha("public static void " + declaracao.nome.lexeme + " () { ", true, true);
-	    execute(declaracao.corpo);
-	    this.indexIdentacao--;
-	    addLinha("}",null, true);
-	    
+		addLinha("public static void " + declaracao.nome.lexeme + " () { ",
+				true, true);
+		execute(declaracao.corpo);
+		this.indexIdentacao--;
+		addLinha("}", null, true);
+
 		return null;
 	}
 
@@ -489,7 +484,59 @@ public class JavaConversorTeste
 	public Void visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
 		addLinha("", null, false);
 		concaternarNaLinha(declaracao.identificador.lexeme + "()", null, false);
-		concaternarNaLinha(";", null, true);		
+		concaternarNaLinha(";", null, true);
+		return null;
+	}
+
+	@Override
+	public Void visitVarDeclaracoesDeclaracao(VarDeclaracoes declaracao) {
+		if (declaracao.variaveis.size() > 1) {
+			List<Declaracao> lista = declaracao.variaveis;
+			Declaracao primeiro = lista.get(0);
+
+			if (primeiro instanceof Declaracao.Var) {
+				Token tipoVar = ((Declaracao.Var) primeiro).tipo;
+				if (tipoVar.type == TokenType.TIPO_MODULO) {
+					return null;
+				}
+				String tipo = this.tipoVariavel(tipoVar.type);
+				addLinha("public static " + tipo + " ", null, false);
+
+				for (int i = 0; i < lista.size(); i++) {
+					Declaracao.Var varriavel = (Declaracao.Var) lista.get(i);
+					concaternarNaLinha(varriavel.nome.lexeme, null, false);
+					if (i < lista.size() - 1) {
+						concaternarNaLinha(", ", null, false);
+					}
+				}
+
+				concaternarNaLinha(";", null, true);
+			} else if (primeiro instanceof Declaracao.VariavelArray) {
+				Token tipoVar = ((Declaracao.VariavelArray) primeiro).tipo;
+				String tipo = this.tipoVariavel(tipoVar.type);
+
+				addLinha("public static " + tipo + " ", null, false);
+
+				for (int i = 0; i < lista.size(); i++) {
+					Declaracao.VariavelArray varriavel = (Declaracao.VariavelArray) lista
+							.get(i);
+					VariavelVetor vv = new VariavelVetor(varriavel.tipo.type,
+							(int) ((Expressao.Literal) varriavel.intervaloI).valor,
+							(int) ((Expressao.Literal) varriavel.intervaloF).valor);
+					this.mapaVariaveisArray.put(varriavel.nome.lexeme, vv);
+					concaternarNaLinha(
+							varriavel.nome.lexeme + "[" + vv.getTamanho() + "]",
+							null, false);
+					if (i < lista.size() - 1) {
+						concaternarNaLinha(", ", null, false);
+					}
+				}
+				concaternarNaLinha(";", null, true);
+
+			}
+		} else {
+			execute(declaracao.variaveis.get(0));
+		}
 		return null;
 	}
 

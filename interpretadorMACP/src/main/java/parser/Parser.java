@@ -13,6 +13,7 @@ import static model.TokenType.*;
 import tree.Declaracao;
 import tree.Expressao;
 import tree.Declaracao.Bloco;
+import tree.Declaracao.Var;
 import tree.Declaracao.VariavelArray;
 import tree.Expressao.AtribuicaoArray;
 import tree.Expressao.Binario;
@@ -126,19 +127,32 @@ public class Parser {
 	 * @return
 	 */
 	private Declaracao declaracaoVariaveis() {
-		Declaracao retorno = null;
-		Token nome = consume(IDENTIFICADOR, "Esperado nome da variavel.");
-
+		List<Declaracao> retorno = new ArrayList<Declaracao>();
+		List<Token> nomes = new ArrayList<Token>();
+		do {
+			nomes.add( consume(IDENTIFICADOR, "Esperado nome da variavel."));
+		} while (match(VIRGULA));
 		consume(DOIS_PONTOS, "Esperado ':' ");
 
 		if (match(TIPO_VETOR)) {
-			retorno = declaracaoVariavelArray(nome);
+			consume(ESQ_COLCHETE, "Esperado [");
+			Token intervaloI = consume(INTEIRO, "Esperado valor inteiro positivo");
+			consume(INTERVALO, "Esperado ..");
+			Token intervaloF = consume(INTEIRO, "Esperado valor inteiro positivo");
+			consume(DIR_COLCHETE, "Esperado ]");
+			consume(DE, "Esperado de");
+			Token tipoDoVetor = tipoDado();
+			for(Token nome : nomes) {
+				retorno.add(declaracaoVariavelArray(nome, intervaloI, intervaloF, tipoDoVetor));
+			}
 		} else {
 			Token tipo = tipoDado();
-			retorno = new Declaracao.Var(nome, tipo);
+			for(Token nome : nomes) {
+				retorno.add(new Declaracao.Var(nome, tipo));
+			}
 		}
 		consume(PONTO_VIRGULA, "Esperado ;");
-		return retorno;
+		return new Declaracao.VarDeclaracoes(retorno);
 	}
 
 	/**
@@ -536,18 +550,11 @@ public class Parser {
 	 * 
 	 * @return
 	 */
-	private Declaracao declaracaoVariavelArray(Token nome) {
-		consume(ESQ_COLCHETE, "Esperado [");
-		Token intervaloI = consume(INTEIRO, "Esperado valor inteiro positivo");
-		consume(INTERVALO, "Esperado ..");
-		Token intervaloF = consume(INTEIRO, "Esperado valor inteiro positivo");
-		consume(DIR_COLCHETE, "Esperado ]");
-		consume(DE, "Esperado de");
-		Token tipoDoVetor = tipoDado();
+	private Declaracao declaracaoVariavelArray(Token nome, Token intervaloI, Token intervaloF, Token tipo) {
 
 		return new Declaracao.VariavelArray(nome,
 				new Expressao.Literal(intervaloI.literal),
-				new Expressao.Literal(intervaloF.literal), tipoDoVetor);
+				new Expressao.Literal(intervaloF.literal), tipo);
 	}
 	/**
 	 * declaracaoModulo → "modulo" IDENTIFICADOR bloco

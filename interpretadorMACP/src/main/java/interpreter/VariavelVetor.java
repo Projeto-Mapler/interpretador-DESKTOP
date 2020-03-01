@@ -3,6 +3,7 @@ package interpreter;
 import java.util.Arrays;
 
 import model.TokenType;
+import parser.RuntimeError;
 
 public class VariavelVetor {
     private Object[] valores;
@@ -11,15 +12,16 @@ public class VariavelVetor {
     
     
     public VariavelVetor(TokenType tipo, int intervaloI, int intervaloF) {
-	this.tipo = tipo;
-	this.intervaloI = intervaloI;
-	this.intervaloF = intervaloF;
-	
-	// TODO: check intervalo I < intervaloF
-	
-	// intervalos inclusivos: [4..6] == [4,5,6]
-	this.tamanho = intervaloF - intervaloI + 1;
-	this.valores = new Object[tamanho];
+    	
+		this.tipo = tipo;
+		this.intervaloI = intervaloI;
+		this.intervaloF = intervaloF;
+		
+		// TODO: check intervalo I < intervaloF
+		
+		// intervalos inclusivos: [4..6] == [4,5,6]
+		this.tamanho = intervaloF - intervaloI + 1;
+		this.valores = new Object[tamanho];
     }
     
     public int resolverIndex(int valor) {

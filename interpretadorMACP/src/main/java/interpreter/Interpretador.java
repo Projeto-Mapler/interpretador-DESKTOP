@@ -26,6 +26,7 @@ import tree.Declaracao.Programa;
 import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
 import tree.Declaracao.Var;
+import tree.Declaracao.VarDeclaracoes;
 import tree.Declaracao.VariavelArray;
 import tree.Expressao;
 import tree.Expressao.Atribuicao;
@@ -437,7 +438,10 @@ public class Interpretador
 			throw new RuntimeError(declaracao.nome,
 					"Intervalo inicial não pode ser maior que o intervalo final");
 		}
-
+		if(declaracao.tipo.type == TokenType.TIPO_MODULO) {
+    		throw new RuntimeError(declaracao.nome,
+					"vetor não pode ter o tipo modulo.");
+    	}
 		environment.defineArray(declaracao.nome, new VariavelVetor(
 				declaracao.tipo.type, intervaloI, intervaloF));
 		return null;
@@ -499,6 +503,14 @@ public class Interpretador
 	public Void visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
 		model.Modulo modulo = (model.Modulo) environment.get(declaracao.identificador);
 		modulo.chamar(this, null);
+		return null;
+	}
+
+	@Override
+	public Void visitVarDeclaracoesDeclaracao(VarDeclaracoes declaracao) {
+		for(Declaracao variavel : declaracao.variaveis) {
+			execute(variavel);
+		}
 		return null;
 	}
 
