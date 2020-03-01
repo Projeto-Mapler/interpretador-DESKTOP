@@ -12,266 +12,265 @@ import model.TokenType;
 import static model.TokenType.*;
 
 public class Scanner {
-    private final String source;
-    private final List<Token> tokens = new ArrayList<>();
-    private static final Map<String, TokenType> keywords;
+	private final String source;
+	private final List<Token> tokens = new ArrayList<>();
+	private static final Map<String, TokenType> keywords;
 
-    static {
-	keywords = new HashMap<>();
-	keywords.put("e", E);
-	keywords.put("ou", OU);
-	keywords.put("nao", NAO);
-	keywords.put("verdadeiro", VERDADEIRO);
-	keywords.put("falso", FALSO);
-	keywords.put("se", SE);
-	keywords.put("entao", ENTAO);
-	keywords.put("caso", CASO);
-	keywords.put("senao", SENAO);
-	keywords.put("faca", FACA);
-	keywords.put("enquanto", ENQUANTO);
-	keywords.put("repita", REPITA);
-	keywords.put("para", PARA);
-	keywords.put("de", DE);
-	keywords.put("ate", ATE);
-	keywords.put("passo", PASSO);
-	keywords.put("escrever", ESCREVER);
-	keywords.put("ler", LER);
-	keywords.put("variaveis", VARIAVEIS);
-	keywords.put("inicio", INICIO);
-	keywords.put("fim", FIM);
-	keywords.put("inteiro", TIPO_INTEIRO);
-	keywords.put("real", TIPO_REAL);
-	keywords.put("logico", TIPO_LOGICO);
-	keywords.put("cadeia", TIPO_CADEIA);
-	keywords.put("caractere", TIPO_CARACTERE);
-	keywords.put("..", INTERVALO);
-	keywords.put("modulo", TIPO_MODULO);
-	keywords.put("vetor", TIPO_VETOR);
-    }
-
-    private int start = 0;
-    private int current = 0;
-    private int line = 1;
-
-    public Scanner(String source) {
-	this.source = source;
-    }
-
-    public List<Token> scanTokens() {
-	while (!isAtEnd()) {
-	    // We are at the beginning of the next lexeme.
-	    start = current;
-	    scanToken();
+	static {
+		keywords = new HashMap<>();
+		keywords.put("e", E);
+		keywords.put("ou", OU);
+		keywords.put("nao", NAO);
+		keywords.put("verdadeiro", VERDADEIRO);
+		keywords.put("falso", FALSO);
+		keywords.put("se", SE);
+		keywords.put("entao", ENTAO);
+		keywords.put("caso", CASO);
+		keywords.put("senao", SENAO);
+		keywords.put("faca", FACA);
+		keywords.put("enquanto", ENQUANTO);
+		keywords.put("repita", REPITA);
+		keywords.put("para", PARA);
+		keywords.put("de", DE);
+		keywords.put("ate", ATE);
+		keywords.put("passo", PASSO);
+		keywords.put("escrever", ESCREVER);
+		keywords.put("ler", LER);
+		keywords.put("variaveis", VARIAVEIS);
+		keywords.put("inicio", INICIO);
+		keywords.put("fim", FIM);
+		keywords.put("inteiro", TIPO_INTEIRO);
+		keywords.put("real", TIPO_REAL);
+		keywords.put("logico", TIPO_LOGICO);
+		keywords.put("cadeia", TIPO_CADEIA);
+		keywords.put("caractere", TIPO_CARACTERE);
+		keywords.put("..", INTERVALO);
+		keywords.put("modulo", TIPO_MODULO);
+		keywords.put("vetor", TIPO_VETOR);
 	}
 
-	tokens.add(new Token(EOF, "", null, line));
-	return tokens;
-    }
+	private int comeco = 0;
+	private int atual = 0;
+	private int linha = 1;
 
-    private boolean isAtEnd() {
-	return current >= source.length();
-    }
-
-    private void scanToken() {
-	char c = advance();
-	switch (c) {
-	case '(':
-	    addToken(ESQ_PARENTESES);
-	    break;
-	case ')':
-	    addToken(DIR_PARENTESES);
-	    break;
-	case '[':
-	    addToken(ESQ_COLCHETE);
-	    break;
-	case ']':
-	    addToken(DIR_COLCHETE);
-	    break;
-	case '{':
-	    addToken(ESQ_CHAVES);
-	    break;
-	case '}':
-	    addToken(DIR_CHAVES);
-	    break;
-	case ',':
-	    addToken(VIRGULA);
-	    break;
-	case '.':
-	    if(match('.')) {
-		addToken(INTERVALO);
-	    } else {		
-		addToken(PONTO);
-	    }
-	    break;
-	case '-':
-	    addToken(MENOS);
-	    break;
-	case '+':
-	    addToken(MAIS);
-	    break;
-	case ';':
-	    addToken(PONTO_VIRGULA);
-	    break;
-	case '*':
-	    addToken(ASTERISCO);
-	    break;
-	case ':':
-	    addToken(DOIS_PONTOS);
-	    break;
-
-	case '=':
-	    addToken(IGUAL);
-	    break;
-	case '<':
-	    if (match('=')) {
-		addToken(MENOR_IGUAL);
-	    } else if (match('-')) {
-		addToken(ATRIBUICAO);
-	    } else if (match('>')) {
-		addToken(DIFERENTE);
-	    } else {
-		addToken(MENOR_QUE);
-	    }
-
-	    break;
-	case '>':
-	    addToken(match('=') ? MAIOR_IQUAL : MAIOR_QUE);
-	    break;
-	// comments:
-	case '/':
-	    if (match('/')) {
-		// A comment goes until the end of the line.
-		while (peek() != '\n' && !isAtEnd())
-		    advance();
-	    } else {
-		addToken(BARRA);
-	    }
-	    break;
-	// inuteis:
-	case ' ':
-	case '\r':
-	case '\t':
-	    // Ignore whitespace.
-	    break;
-
-	case '\n':
-	    line++;
-	    break;
-	case '"':
-	    string();
-	    break;
-	default:
-	    if (isDigit(c)) {
-		number();
-	    } else if (isAlpha(c)) {
-		identifier();
-	    } else {
-		Principal.error(line, "caractere não identificado.");
-	    }
-	    break;
-	}
-    }
-
-    private boolean isDigit(char c) {
-	return c >= '0' && c <= '9';
-    }
-
-	private void identifier() {
-	while (isAlphaNumeric(peek()))
-	    advance();
-	String text = source.substring(start, current);
-
-	TokenType type = keywords.get(text);
-	if (type == null)
-	    type = IDENTIFICADOR;
-	addToken(type);
-    }
-
-    private boolean isAlpha(char c) {
-	return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
-    }
-
-    private boolean isAlphaNumeric(char c) {
-	return isAlpha(c) || isDigit(c);
-    }
-
-    private void number() {
-	while (isDigit(peek()))
-	    advance();
-
-	// Look for a fractional part.
-	if (peek() == '.' && isDigit(peekNext())) {
-	    // Consume the "."
-	    advance();
-
-	    while (isDigit(peek()))
-		advance();
-	}
-	String valorString = source.substring(start, current);
-	if (valorString.contains(".")) {
-	    addToken(REAL, Double.parseDouble(valorString));
-	} else {
-	    addToken(INTEIRO, Integer.parseInt(valorString));
-	}
-    }
-
-    private char peekNext() {
-	if (current + 1 >= source.length())
-	    return '\0';
-	return source.charAt(current + 1);
-    }
-
-    private void string() {
-	// " ou ' ??
-	while (peek() != '"' && !isAtEnd()) {
-	    if (peek() == '\n')
-		line++; // suporte para multi-line strings
-	    advance();
+	public Scanner(String source) {
+		this.source = source;
 	}
 
-	// Unterminated string.
-	if (isAtEnd()) {
-	    Principal.error(line, "string não determinada.");
-	    return;
+	public List<Token> scanTokens() {
+		while (!isFinal()) {
+			// comeco do proximo lexeme
+			comeco = atual;
+			scanToken();
+		}
+
+		tokens.add(new Token(EOF, "", null, linha));
+		return tokens;
 	}
 
-	// The closing ".
-	advance();
-
-	// Trim the surrounding quotes.
-	String value = source.substring(start + 1, current - 1);
-	if (value.length() == 1) {
-	    addToken(CARACTERE, value);
-	} else {
-	    addToken(CADEIA, value);
+	private boolean isFinal() {
+		return atual >= source.length();
 	}
-    }
 
-    private char peek() {
-	if (isAtEnd())
-	    return '\0';
-	return source.charAt(current);
-    }
+	private void scanToken() {
+		char c = avancar();
+		switch (c) {
+			case '(' :
+				addToken(ESQ_PARENTESES);
+				break;
+			case ')' :
+				addToken(DIR_PARENTESES);
+				break;
+			case '[' :
+				addToken(ESQ_COLCHETE);
+				break;
+			case ']' :
+				addToken(DIR_COLCHETE);
+				break;
+			case '{' :
+				addToken(ESQ_CHAVES);
+				break;
+			case '}' :
+				addToken(DIR_CHAVES);
+				break;
+			case ',' :
+				addToken(VIRGULA);
+				break;
+			case '.' :
+				if (comparar('.')) {
+					addToken(INTERVALO);
+				} else {
+					addToken(PONTO);
+				}
+				break;
+			case '-' :
+				addToken(MENOS);
+				break;
+			case '+' :
+				addToken(MAIS);
+				break;
+			case ';' :
+				addToken(PONTO_VIRGULA);
+				break;
+			case '*' :
+				addToken(ASTERISCO);
+				break;
+			case ':' :
+				addToken(DOIS_PONTOS);
+				break;
 
-    private boolean match(char expected) {
-	if (peek() != expected)
-	    return false;
+			case '=' :
+				addToken(IGUAL);
+				break;
+			case '<' :
+				if (comparar('=')) {
+					addToken(MENOR_IGUAL);
+				} else if (comparar('-')) {
+					addToken(ATRIBUICAO);
+				} else if (comparar('>')) {
+					addToken(DIFERENTE);
+				} else {
+					addToken(MENOR_QUE);
+				}
 
-	current++;
-	return true;
-    }
+				break;
+			case '>' :
+				addToken(comparar('=') ? MAIOR_IQUAL : MAIOR_QUE);
+				break;
+			// comentario:
+			case '/' :
+				if (comparar('/')) {
+					// comentario termina no fim da linha.
+					while (checar() != '\n' && !isFinal())
+						avancar();
+				} else {
+					addToken(BARRA);
+				}
+				break;
+			// inuteis:
+			case ' ' :
+			case '\r' :
+			case '\t' :
+				// ignora espaco em branco
+				break;
+			case '\n' :
+				linha++;
+				break;
+			case '"' :
+				cadeia();
+				break;
+			default :
+				if (isNumerico(c)) {
+					numero();
+				} else if (isLetra(c)) {
+					identificador();
+				} else {
+					Principal.error(linha, "caractere não identificado.");
+				}
+				break;
+		}
+	}
 
-    private char advance() {
-	current++;
-	return source.charAt(current - 1);
-    }
+	private boolean isNumerico(char c) {
+		return c >= '0' && c <= '9';
+	}
 
-    private void addToken(TokenType type) {
-	addToken(type, null);
-    }
+	private void identificador() {
+		while (isLetraOuNumero(checar()))
+			avancar();
+		String text = source.substring(comeco, atual);
 
-    private void addToken(TokenType type, Object literal) {
-	String text = source.substring(start, current);
-	tokens.add(new Token(type, text, literal, line));
-    }
+		TokenType type = keywords.get(text);
+		if (type == null)
+			type = IDENTIFICADOR;
+		addToken(type);
+	}
+
+	private boolean isLetra(char c) {
+		return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+	}
+
+	private boolean isLetraOuNumero(char c) {
+		return isLetra(c) || isNumerico(c);
+	}
+
+	private void numero() {
+		while (isNumerico(checar()))
+			avancar();
+
+		// Procura pela parte fracionada
+		if (checar() == '.' && isNumerico(checkProximo())) {
+			// consome "."
+			avancar();
+
+			while (isNumerico(checar()))
+				avancar();
+		}
+		String valorString = source.substring(comeco, atual);
+		if (valorString.contains(".")) {
+			addToken(REAL, Double.parseDouble(valorString));
+		} else {
+			addToken(INTEIRO, Integer.parseInt(valorString));
+		}
+	}
+
+	private char checkProximo() {
+		if (atual + 1 >= source.length())
+			return '\0';
+		return source.charAt(atual + 1);
+	}
+
+	private void cadeia() {
+		// " ou ' ??
+		while (checar() != '"' && !isFinal()) {
+			if (checar() == '\n')
+				linha++; // suporte para cadeia multi-line
+			avancar();
+		}
+
+		// Unterminated string.
+		if (isFinal()) {
+			Principal.error(linha, "cadeia não determinada.");
+			return;
+		}
+
+		// The closing ".
+		avancar();
+
+		// Trim the surrounding quotes.
+		String value = source.substring(comeco + 1, atual - 1);
+		if (value.length() == 1) {
+			addToken(CARACTERE, value);
+		} else {
+			addToken(CADEIA, value);
+		}
+	}
+
+	private char checar() {
+		if (isFinal())
+			return '\0';
+		return source.charAt(atual);
+	}
+
+	private boolean comparar(char esperado) {
+		if (checar() != esperado)
+			return false;
+
+		atual++;
+		return true;
+	}
+
+	private char avancar() {
+		atual++;
+		return source.charAt(atual - 1);
+	}
+
+	private void addToken(TokenType type) {
+		addToken(type, null);
+	}
+
+	private void addToken(TokenType type, Object literal) {
+		String text = source.substring(comeco, atual);
+		tokens.add(new Token(type, text, literal, linha));
+	}
 }

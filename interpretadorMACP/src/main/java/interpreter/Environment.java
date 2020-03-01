@@ -15,11 +15,19 @@ public class Environment {
 
 	public void define(Token nome, Token tipo) {
 //		System.err.println(nome.lexeme + " - " + tipo.lexeme + " definido");
+//		if(!isNomeVariavelValido(nome.lexeme)) {
+//			throw new RuntimeError(nome,
+//					"variável '" + nome.lexeme + "' possue um nome inválido.");
+//		}
 		definicoes.put(nome.lexeme, tipo.type);
 		valores.put(nome.lexeme, null);
 	}
 
 	public void defineArray(Token nome, VariavelVetor vetor) {
+//		if(!isNomeVariavelValido(nome.lexeme)) {
+//			throw new RuntimeError(nome,
+//					"variável '" + nome.lexeme + "' possue um nome inválido.");
+//		}
 		definicoes.put(nome.lexeme, TokenType.TIPO_VETOR);
 		valores.put(nome.lexeme, vetor);
 	}
@@ -119,5 +127,13 @@ public class Environment {
 	public TokenType getVarTipo(Token nome) {
 		return definicoes.get(nome.lexeme);
 	}
+	
+//	private boolean isNomeVariavelValido(String nome) {
+//		char inicial =  nome.charAt(0);
+//		if(Character.isAlphabetic(inicial) || inicial == '_') {
+//			return true;
+//		}
+//		return false;
+//	}
 
 }
