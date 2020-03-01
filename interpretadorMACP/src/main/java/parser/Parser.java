@@ -515,7 +515,7 @@ public class Parser {
 
 		// condicao
 		Expressao.Binario condicao = new Expressao.Binario(variavel,
-				new Token(DIFERENTE, "!=", null, linhaOperador), ate);
+				new Token(MENOR_IGUAL, "<=", null, linhaOperador), ate);
 
 		// incremento
 		Expressao.Binario operacaoIncremento = new Expressao.Binario(variavel,
