@@ -497,12 +497,12 @@ public class Parser {
 		Token identificador = consume(IDENTIFICADOR,
 				"Esperado 'identificador' depois da expressao.");
 		consume(DE, "Esperado 'de' depois da expressao.");
-		Expressao de = expressao();
+		Expressao de = adicao();
 		int linhaOperador = consume(ATE,
 				"Esperado 'ate' depois da expressao.").line;
-		Expressao ate = expressao();
+		Expressao ate = adicao();
 		consume(PASSO, "Esperado 'passo' depois da expressao.");
-		Expressao passo = expressao();
+		Expressao passo = adicao();
 		consume(FACA, "Esperado 'faca' depois da expressao.");
 		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
@@ -515,7 +515,7 @@ public class Parser {
 
 		// condicao
 		Expressao.Binario condicao = new Expressao.Binario(variavel,
-				new Token(MENOR_IGUAL, "<=", null, linhaOperador), ate);
+				new Token(DIFERENTE, "!=", null, linhaOperador), ate);
 
 		// incremento
 		Expressao.Binario operacaoIncremento = new Expressao.Binario(variavel,

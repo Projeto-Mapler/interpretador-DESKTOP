@@ -64,7 +64,7 @@ escrever → "escrever" expressao ("," expressao)*";"
 ler → "ler" variavel ";" 
 se  → "se" ou "entao" bloco ("senao" bloco)*
 enquanto → "enquanto" ou "faca" bloco
-para → "para" variavel "de" INTEIRO "ate" INTEIRO "passo" INTEIRO "faca" bloco
+para → "para" variavel "de" adicao "ate" adicao "passo" adicao "faca" bloco
 repita → "repita" bloco "ate" ou ";"
 
 
