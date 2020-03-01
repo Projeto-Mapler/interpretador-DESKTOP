@@ -92,8 +92,7 @@ public class Principal {
 		}
 	}
 	public static void runtimeError(RuntimeError error) {
-		System.err.println(
-				error.getMessage() + "\n[linha " + error.token.line + "]");
+		System.err.println(	"[linha " + error.token.line + "] " + error.getMessage() );
 		hadRuntimeError = true;
 	}
 }

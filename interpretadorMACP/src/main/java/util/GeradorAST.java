@@ -6,7 +6,7 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
-public class GeradorAST {
+ class GeradorAST {
 
 	public static void main(String[] args) throws IOException {
 		String path = "src/main/java";
@@ -36,7 +36,7 @@ public class GeradorAST {
 				"Ler      : tree.Expressao atribuicao",
 				"Var      : Token nome, Token tipo",
 				"VariavelArray : Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo",
-				"Para         : tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco",
+				"Para         :  tree.Expressao variavel,  tree.Expressao inicio,  tree.Expressao fim,  tree.Expressao passo, Bloco facaBloco",
 				"Enquanto      : tree.Expressao condicao, Bloco corpo",
 				"Repita:  Bloco corpo, tree.Expressao condicao",
 				"Modulo: Token nome, Bloco corpo",

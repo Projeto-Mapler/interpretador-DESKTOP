@@ -46,7 +46,7 @@ public class Environment {
 			} else {
 
 				throw new RuntimeError(nome,
-						"atribuição inválida '" + nome.lexeme + "'.");
+						"atribuição inválida para '" + nome.lexeme + "'.");
 			}
 		}
 		if (checadorTipo.isTipoValorValido(TokenType.TIPO_MODULO, valor)) {
@@ -77,7 +77,7 @@ public class Environment {
 			} else {
 
 				throw new RuntimeError(nome,
-						"atribuição inválida '" + nome.lexeme + "'.");
+						"atribuição inválida para '" + nome.lexeme + "'.");
 			}
 		}
 

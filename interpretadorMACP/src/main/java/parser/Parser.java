@@ -39,8 +39,8 @@ public class Parser {
 			corpo.add(declaracao());
 		}
 		consume(FIM, "Esperado \"fim\"");
-		
-		while(!isAtEnd()) {
+
+		while (!isAtEnd()) {
 			modulos.add(declaracaoModulo());
 		}
 		return new Declaracao.Programa(variaveis, corpo, modulos);
@@ -105,7 +105,7 @@ public class Parser {
 				case SE :
 				case LER :
 				case ESCREVER :
-				case REPITA:
+				case REPITA :
 					return;
 			}
 
@@ -142,7 +142,8 @@ public class Parser {
 	}
 
 	/**
-	 * declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para | repita
+	 * declaracao → expressaoDeclarativa | escrever | ler | bloco | se |
+	 * enquanto | para | repita
 	 * 
 	 * @return
 	 */
@@ -160,7 +161,7 @@ public class Parser {
 				return lerDeclaracao();
 			if (match(ESQ_CHAVES))
 				return new Declaracao.Bloco(bloco());
-			if(match(REPITA))
+			if (match(REPITA))
 				return repitaDeclaracao();
 			return expressaoDeclaracao();
 		} catch (ParserError error) {
@@ -209,7 +210,7 @@ public class Parser {
 			Expressao index = ((Expressao.VariavelArray) expressao).index;
 			retorno = new Declaracao.Ler(
 					new Expressao.AtribuicaoArray(nome, index, null));
-		} else 	if (expressao instanceof Expressao.Variavel) {
+		} else if (expressao instanceof Expressao.Variavel) {
 			Token nome = ((Expressao.Variavel) expressao).nome;
 			retorno = new Declaracao.Ler(new Expressao.Atribuicao(nome, null));
 		} else {
@@ -228,8 +229,8 @@ public class Parser {
 	private Declaracao expressaoDeclaracao() {
 		Expressao expressao = expressao();
 		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
-		if(expressao instanceof Expressao.Variavel) {
-			return chamadaModulo(((Expressao.Variavel)expressao).nome);
+		if (expressao instanceof Expressao.Variavel) {
+			return chamadaModulo(((Expressao.Variavel) expressao).nome);
 		}
 		return new Declaracao.Expressao(expressao);
 	}
@@ -393,7 +394,8 @@ public class Parser {
 	}
 
 	/**
-	 * primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | variavel  | expParentizada 
+	 * primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO |
+	 * variavel | expParentizada
 	 * 
 	 * @return
 	 */
@@ -478,15 +480,12 @@ public class Parser {
 		Token identificador = consume(IDENTIFICADOR,
 				"Esperado 'identificador' depois da expressao.");
 		consume(DE, "Esperado 'de' depois da expressao.");
-		Token deInteiro = consume(INTEIRO,
-				"Esperado 'INTEIRO' depois da expressao.");
+		Expressao de = expressao();
 		int linhaOperador = consume(ATE,
 				"Esperado 'ate' depois da expressao.").line;
-		Token ateInteiro = consume(INTEIRO,
-				"Esperado 'INTEIRO' depois da expressao.");
+		Expressao ate = expressao();
 		consume(PASSO, "Esperado 'passo' depois da expressao.");
-		Token passoInteiro = consume(INTEIRO,
-				"Esperado 'INTEIRO' depois da expressao.");
+		Expressao passo = expressao();
 		consume(FACA, "Esperado 'faca' depois da expressao.");
 		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
@@ -494,58 +493,38 @@ public class Parser {
 		Expressao.Variavel variavel = new Expressao.Variavel(identificador);
 
 		// atribuicao
-		Expressao.Literal valorAtribuicao = new Expressao.Literal(
-				passoInteiro.literal);
 		Expressao.Atribuicao atribuicaoExpressao = new Expressao.Atribuicao(
-				identificador, valorAtribuicao);
-		// Declaracao.Expressao atribuicaoDeclaracao = new
-		// Declaracao.Expressao(atribuicaoExpressao);
+				identificador, de);
 
 		// condicao
-		// Expressao.Literal deValor = new Expressao.Literal(deInteiro.literal);
-		Expressao.Literal ateValor = new Expressao.Literal(ateInteiro.literal);
-		Token operadorC = new Token(MENOR_IGUAL, "<=", null, linhaOperador);
-		Expressao.Binario condicao = new Expressao.Binario(variavel, operadorC,
-				ateValor);
+		Expressao.Binario condicao = new Expressao.Binario(variavel,
+				new Token(MENOR_IGUAL, "<=", null, linhaOperador), ate);
 
 		// incremento
-		Expressao.Literal incrementoValor = new Expressao.Literal(1);
-		Token operadorI = new Token(MAIS, "+", null, linhaOperador);
-		Expressao.Binario valorIncremento = new Expressao.Binario(variavel,
-				operadorI, incrementoValor);
+		Expressao.Binario operacaoIncremento = new Expressao.Binario(variavel,
+				new Token(MAIS, "+", null, linhaOperador), passo);
 		Expressao.Atribuicao incrementoExpressao = new Expressao.Atribuicao(
-				identificador, valorIncremento);
-		// Declaracao.Expressao incrementoDeclaracao = new
-		// Declaracao.Expressao(incrementoExpressao);
+				identificador, operacaoIncremento);
 
-		// while aux
-		// Declaracao.Bloco corpoIncremento = new
-		// Declaracao.Bloco(Arrays.asList(corpo, incrementoDeclaracao));
-		// Declaracao.Enquanto enquanto = new Declaracao.Enquanto(condicao,
-		// corpoIncremento);
-
-		// Declaracao retorno = new
-		// Declaracao.Bloco(Arrays.asList(atribuicaoDeclaracao, enquanto));
 		return new Declaracao.Para(atribuicaoExpressao, condicao,
 				incrementoExpressao, corpo);
-		// return retorno;
 
 	}
-	
+
 	/**
 	 * repita → "repita" bloco "ate" ou ";"
 	 * 
 	 * @return
 	 */
-	private Declaracao repitaDeclaracao(){
+	private Declaracao repitaDeclaracao() {
 		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
 		consume(ATE, "Esperado 'ate' depois da expressão.");
 		Expressao condicao = ou();
 		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
-		
+
 		return new Declaracao.Repita(corpo, condicao);
-		
+
 	}
 
 	/**
@@ -577,17 +556,17 @@ public class Parser {
 		Token nome = consume(IDENTIFICADOR, "Esperado nome do módulo");
 		consume(ESQ_CHAVES, "Esperado {");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(bloco());
-		
+
 		return new Declaracao.Modulo(nome, corpo);
-		
+
 	}
-	
+
 	/**
 	 * chamadaModulo → IDENTIFICADOR ";"
 	 * 
 	 * @return
 	 */
-	private Declaracao chamadaModulo(Token nome) {		
+	private Declaracao chamadaModulo(Token nome) {
 		return new Declaracao.ChamadaModulo(nome);
 	}
 }

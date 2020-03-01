@@ -391,6 +391,8 @@ public class Interpretador
 
 	@Override
 	public Void visitParaDeclaracao(Para declaracao) {
+		
+		
 		evaluate(declaracao.atribuicao);
 		while (isTruthy(evaluate(declaracao.condicao))) {
 			execute(declaracao.facaBloco);
