@@ -60,7 +60,7 @@ declaracaoModulo → "modulo" IDENTIFICADOR bloco
 chamadaModulo → IDENTIFICADOR 
 
 bloco → "{" (declaracao)* "}" 
-escrever → "escrever" expressao ";" 
+escrever → "escrever" expressao ("," expressao)*";" 
 ler → "ler" variavel ";" 
 se  → "se" ou "entao" bloco ("senao" bloco)*
 enquanto → "enquanto" ou "faca" bloco
@@ -86,7 +86,7 @@ primario → INTEIRO | REAL | CADEIA | CARACTERE | VERDADEIRO | FALSO | variavel
 variavel →  IDENTIFICADOR | variavelArray
 variavelArray → IDENTIFICADOR "[" (INTEIRO | IDENTIFICADOR) "]" 
 
-TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" | "modulo" 
+TIPO_DADO → "inteiro" | "real" | "cadeia" | "caractere" | "logico" | "modulo"
 ```
 ## Fontes
 

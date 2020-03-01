@@ -156,7 +156,7 @@ public class Parser {
 			if (match(ENQUANTO))
 				return enquantoDeclaracao();
 			if (match(ESCREVER))
-				return printDeclaracao();
+				return escreverDeclaracao();
 			if (match(LER))
 				return lerDeclaracao();
 			if (match(ESQ_CHAVES))
@@ -191,10 +191,13 @@ public class Parser {
 	 * 
 	 * @return
 	 */
-	private Declaracao printDeclaracao() {
-		Expressao expressao = expressao();
+	private Declaracao escreverDeclaracao() {
+		List<Expressao> expressoes = new ArrayList<Expressao>();
+		do{
+			expressoes.add(expressao());
+		}while(match(VIRGULA));
 		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
-		return new Declaracao.Print(expressao);
+		return new Declaracao.Escreva(expressoes);
 	}
 
 	/**

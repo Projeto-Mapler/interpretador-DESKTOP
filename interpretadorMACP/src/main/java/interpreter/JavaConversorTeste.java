@@ -1,26 +1,20 @@
 package interpreter;
 
-import static model.TokenType.ASTERISCO;
-import static model.TokenType.BARRA;
-import static model.TokenType.MAIS;
-import static model.TokenType.MENOS;
-
-import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import main.Principal;
-import model.Token;
 import model.TokenType;
 import parser.RuntimeError;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
 import tree.Declaracao.Enquanto;
+import tree.Declaracao.Escreva;
 import tree.Declaracao.Ler;
 import tree.Declaracao.Modulo;
 import tree.Declaracao.Para;
-import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
 import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
@@ -180,10 +174,16 @@ public class JavaConversorTeste
 	}
 
 	@Override
-	public Void visitPrintDeclaracao(Print declaracao) {
+	public Void visitEscrevaDeclaracao(Escreva declaracao) {
 
 		addLinha("System.out.println(", null, false);
-		evaluate(declaracao.expressao);
+		List<tree.Expressao> expressoes =  declaracao.expressoes;
+		for(int i = 0; i < expressoes.size(); i++) {
+			evaluate(expressoes.get(i));
+			if(i < (expressoes.size() - 1)) {
+				concaternarNaLinha(" + ", null, false);
+			}
+		}
 		concaternarNaLinha(");", null, true);
 		return null;
 	}
@@ -433,8 +433,15 @@ public class JavaConversorTeste
 		String nome = expressao.nome.lexeme;
 		if(expressao.index == null) {
 			concaternarNaLinha(nome, null, false);
-		}else {			
+		}else if(expressao.index instanceof tree.Expressao.Literal){
 			concaternarNaLinha(nome + "[", null, false);
+			int i = (int) ((tree.Expressao.Literal) expressao.index).valor;
+			VariavelVetor vv = this.mapaVariaveisArray.get(nome);
+			concaternarNaLinha(vv.resolverIndex(i) + "", null, false);
+			concaternarNaLinha("]", null, false);
+		}	else {
+			concaternarNaLinha(nome + "[", null, false);
+			
 			evaluate(expressao.index);
 			concaternarNaLinha("]", null, false);
 		}

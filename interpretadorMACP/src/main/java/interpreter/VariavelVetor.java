@@ -17,9 +17,9 @@ public class VariavelVetor {
 	
 	// TODO: check intervalo I < intervaloF
 	
-	this.tamanho = intervaloF - intervaloI;
 	// intervalos inclusivos: [4..6] == [4,5,6]
-	this.valores = new Object[tamanho + 1];
+	this.tamanho = intervaloF - intervaloI + 1;
+	this.valores = new Object[tamanho];
     }
     
     public int resolverIndex(int valor) {

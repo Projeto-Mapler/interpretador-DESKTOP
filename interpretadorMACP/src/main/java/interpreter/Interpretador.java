@@ -18,10 +18,10 @@ import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
 import tree.Declaracao.Enquanto;
+import tree.Declaracao.Escreva;
 import tree.Declaracao.Ler;
 import tree.Declaracao.Modulo;
 import tree.Declaracao.Para;
-import tree.Declaracao.Print;
 import tree.Declaracao.Programa;
 import tree.Declaracao.Repita;
 import tree.Declaracao.Se;
@@ -288,21 +288,26 @@ public class Interpretador
 	}
 
 	@Override
-	public Void visitPrintDeclaracao(Print declaracao) {
-		Object valor = evaluate(declaracao.expressao);
-		if (valor instanceof VariavelVetor) {
-			Object v[] = ((VariavelVetor) valor).getValores();
-			System.out.print("[");
-			for (int x = 0; x < v.length; x++) {
-				System.out.print(stringify(v[x]));
-				if (x < v.length - 1) {
-					System.out.print(", ");
+	public Void visitEscrevaDeclaracao(Escreva declaracao) {
+		StringBuilder output = new StringBuilder();
+		
+		for(tree.Expressao expressao : declaracao.expressoes) {
+			Object valor = evaluate(expressao);
+			if (valor instanceof VariavelVetor) {
+				Object v[] = ((VariavelVetor) valor).getValores();
+				output.append("[");
+				for (int x = 0; x < v.length; x++) {
+					output.append(stringify(v[x]));
+					if (x < v.length - 1) {
+						output.append(", ");
+					}
 				}
+				output.append("]");
+				return null;
 			}
-			System.out.println("]");
-			return null;
+			output.append(stringify(valor)); 
 		}
-		System.out.println(stringify(valor)); // imprime acoes no terminal
+		System.out.println(output.toString());// imprime acoes no terminal
 		return null;
 	}
 

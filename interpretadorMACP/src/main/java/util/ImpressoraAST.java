@@ -1,13 +1,24 @@
 package util;
 import java.util.List;
 
-import javax.lang.model.type.DeclaredType;
-import javax.swing.tree.TreeCellEditor;
-
 import main.Principal;
 import model.Token;
 import model.TokenType;
 import parser.RuntimeError;
+import scala.reflect.Print;
+import tree.Declaracao;
+import tree.Declaracao.Bloco;
+import tree.Declaracao.ChamadaModulo;
+import tree.Declaracao.Enquanto;
+import tree.Declaracao.Escreva;
+import tree.Declaracao.Ler;
+import tree.Declaracao.Modulo;
+import tree.Declaracao.Para;
+import tree.Declaracao.Programa;
+import tree.Declaracao.Repita;
+import tree.Declaracao.Se;
+import tree.Declaracao.Var;
+import tree.Declaracao.VariavelArray;
 import tree.Expressao;
 import tree.Expressao.Atribuicao;
 import tree.Expressao.AtribuicaoArray;
@@ -18,19 +29,6 @@ import tree.Expressao.Literal;
 import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
-import tree.Declaracao;
-import tree.Declaracao.Bloco;
-import tree.Declaracao.ChamadaModulo;
-import tree.Declaracao.Enquanto;
-import tree.Declaracao.Ler;
-import tree.Declaracao.Modulo;
-import tree.Declaracao.Para;
-import tree.Declaracao.Print;
-import tree.Declaracao.Programa;
-import tree.Declaracao.Repita;
-import tree.Declaracao.Se;
-import tree.Declaracao.Var;
-import tree.Declaracao.VariavelArray;
 public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Visitor<String>{
 
 	@Override
@@ -150,11 +148,6 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 	}
 
 	@Override
-	public String visitPrintDeclaracao(Print declaracao) {
-		return parenthesize("escreva ", declaracao.expressao);
-	}
-
-	@Override
 	public String visitSeDeclaracao(Se declaracao) {
 		return parenthesize("se ", declaracao.condicao, declaracao.entaoBloco, declaracao.senaoBloco);
 	}
@@ -226,6 +219,12 @@ public class ImpressoraAST implements Expressao.Visitor<String>,  Declaracao.Vis
 
 	@Override
 	public String visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public String visitEscrevaDeclaracao(Escreva declaracao) {
 		// TODO Auto-generated method stub
 		return null;
 	}

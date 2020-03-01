@@ -8,7 +8,7 @@ public abstract class Declaracao {
 public interface Visitor<R> {
 public R visitBlocoDeclaracao(Bloco declaracao);
 public R visitExpressaoDeclaracao(Expressao declaracao);
-public R visitPrintDeclaracao(Print declaracao);
+public R visitEscrevaDeclaracao(Escreva declaracao);
 public R visitSeDeclaracao(Se declaracao);
 public R visitLerDeclaracao(Ler declaracao);
 public R visitVarDeclaracao(Var declaracao);
@@ -42,16 +42,16 @@ public static class Expressao extends Declaracao {
 
     public final tree.Expressao expressao;
   }
-public static class Print extends Declaracao {
-    public Print(tree.Expressao expressao) {
-      this.expressao = expressao;
+public static class Escreva extends Declaracao {
+    public Escreva(List<tree.Expressao> expressoes) {
+      this.expressoes = expressoes;
     }
 
     public <R> R accept(Visitor<R> visitor) {
-      return visitor.visitPrintDeclaracao(this);
+      return visitor.visitEscrevaDeclaracao(this);
     }
 
-    public final tree.Expressao expressao;
+    public final List<tree.Expressao> expressoes;
   }
 public static class Se extends Declaracao {
     public Se(tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco) {
