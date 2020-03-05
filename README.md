@@ -5,17 +5,16 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 - operações aritimeticas (+, -, *, / )
 - operações lógicas (verdadeiro, falso, não, e, ou)
 - declaração e utilização de variaveis (tipagem estática)
-- Tipos:
 	- inteiro
 	- lógico
 	- real
 	- cadeia
 	- caractere
-	- vetor
 - controle de fluxo com "se entao senao"
 - laços de repetição com "enquanto...", "repita...ate..." e "para ... de ... ate ... passo ... faca ..."
 - blocos utilizam "{ }" 
-- vetores
+- vetores 
+- módulos (funções sem parâmetros e sem retorno)
 - I/O com 'ler' e 'escrever'
 - Conversão do código para linguagem Java [em progresso]
 
@@ -23,7 +22,8 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 # Como rodar
 
 Executar classe Principal.java no pacote main.
-Passar o caminho do arquivo de texto contendo o pseudocódigo no args[] do método main.
+
+Passar o caminho do arquivo de texto contendo o pseudocódigo na variável arquivo do método main.
 
 # Exemplo de código
 

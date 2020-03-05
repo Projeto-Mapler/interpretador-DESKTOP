@@ -20,59 +20,40 @@ import tree.Expressao;
 import util.ImpressoraAST;
 
 public class Principal {
-	static boolean hadError = false;
-	static boolean hadRuntimeError = false;
+	static boolean temErro = false;
+	static boolean temRunTimeErro = false;
 	static final InputStreamReader input = new InputStreamReader(System.in);
 	static final BufferedReader reader = new BufferedReader(input);
 	private static final Interpretador interpreter = new Interpretador(reader);
 
 	public static void main(String[] args) throws IOException {
-		if (args.length > 1) {
-			System.out.println("Usage: Principal [script]");
-			System.exit(64);
-		} else if (args.length == 1) {
-			System.out.println("Usage: Principal [file]");
-			runFile(args[0]);
-		} else {
-			System.out.println("Usage: Principal [prompt]");
-			runPrompt();
-		}
+			String arquivo = "C:\\Users\\Kerlyson\\Desktop\\12.txt";
+			runFile(arquivo);
 	}
 	private static void runFile(String path) throws IOException {
 		byte[] bytes = Files.readAllBytes(Paths.get(path));
 		run(new String(bytes, Charset.defaultCharset()));
 		// Indicate an error in the exit code.
-		if (hadError)
+		if (temErro)
 			System.exit(65);
-		if (hadRuntimeError)
+		if (temRunTimeErro)
 			System.exit(70);
 	}
-	private static void runPrompt() throws IOException {
-
-		for (;;) {
-			System.out.print("> ");
-			run(reader.readLine());
-			hadError = false;
-		}
-	}
+	
 	private static void run(String source) {
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
-
-		// For now, just print the tokens.
-		// for (Token token : tokens) {
-		// System.out.println(token);
-		// }
 		Parser parser = new Parser(tokens);
 		Declaracao.Programa programa = parser.parse();
-		// Stop if there was a syntax error.
-		if (hadError)
+
+		if (temErro)
 			return;
 //		System.out.println(declaracoes.size());
 //		new ImpressoraAST().print(declaracoes);// imprime arvore
 		JavaConversorTeste t = new JavaConversorTeste();
-		System.out.println(t.converter(programa));
 		interpreter.interpret(programa);
+		System.out.println("\n\n===>>Conversor Java:\n");
+		System.out.println(t.converter(programa));
 
 	}
 	public static void error(int line, String message) {
@@ -82,7 +63,7 @@ public class Principal {
 	private static void report(int line, String where, String message) {
 		System.err
 				.println("[linha " + line + "] Erro" + where + ": " + message);
-		hadError = true;
+		temErro = true;
 	}
 	public static void error(Token token, String message) {
 		if (token.type == TokenType.EOF) {
@@ -93,6 +74,6 @@ public class Principal {
 	}
 	public static void runtimeError(RuntimeError error) {
 		System.err.println(	"[linha " + error.token.line + "] " + error.getMessage() );
-		hadRuntimeError = true;
+		temRunTimeErro = true;
 	}
 }
