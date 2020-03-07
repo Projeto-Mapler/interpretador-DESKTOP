@@ -1,0 +1,16 @@
+variaveis
+
+	a, b:inteiro;
+	soma: modulo;
+
+inicio
+
+	a<-1;
+	b<-5;	
+  soma;
+
+fim
+
+modulo soma {
+	escrever a+b;
+}

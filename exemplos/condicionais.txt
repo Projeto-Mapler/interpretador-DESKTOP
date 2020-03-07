@@ -1,0 +1,29 @@
+variaveis
+	
+  idades: vetor[1..4] de inteiro;
+  i: inteiro;
+
+inicio
+	
+  idades[1] <- 9;
+  idades[2] <- 15;
+  idades[3] <- 30;
+  idades[4] <- 60;
+
+  para i de 1 ate 4 passo 1 faca {
+    se idades[i] > 11 e idades[i] < 18 entao {
+      escrever "adolescente";
+    } senao {
+      se idades[i] >= 18  e idades[i] < 60 entao {
+        escrever "adulto";
+      } senao {
+        se idades[i] >= 60 entao{
+          escrever "idoso";
+        } senao {
+          escrever "criança";
+        }
+      }
+    }
+  }
+
+fim
