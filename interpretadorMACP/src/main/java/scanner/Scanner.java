@@ -234,10 +234,10 @@ public class Scanner {
 			return;
 		}
 
-		// The closing ".
+		// a ultima aspa .
 		avancar();
 
-		// Trim the surrounding quotes.
+		// remove as aspas.
 		String value = source.substring(comeco + 1, atual - 1);
 		if (value.length() == 1) {
 			addToken(CARACTERE, value);

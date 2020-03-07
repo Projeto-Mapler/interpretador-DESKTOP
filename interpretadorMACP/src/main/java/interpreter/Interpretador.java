@@ -3,12 +3,14 @@ package interpreter;
 import static model.TokenType.ASTERISCO;
 import static model.TokenType.BARRA;
 import static model.TokenType.MAIS;
+import static model.TokenType.MENOR_IGUAL;
 import static model.TokenType.MENOS;
 import static model.TokenType.OU;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import main.Principal;
 import model.Token;
@@ -51,11 +53,19 @@ public class Interpretador
 	}
 
 	public void interpret(Declaracao.Programa programa) {
+		 long startTime = System.nanoTime();
 		try {
 			this.visitProgramaDeclaracao(programa);
 		} catch (RuntimeError error) {
 			Principal.runtimeError(error);
+		} catch (StackOverflowError e) {
+			System.out.println("Erro de memória");
+			e.printStackTrace();
 		}
+		long elapsedTime = System.nanoTime() - startTime;
+		System.out.println("Tempo de execucao: "
+                + (double)elapsedTime/1000000000);
+
 	}
 
 	// HELPERS:
@@ -400,7 +410,36 @@ public class Interpretador
 		
 		
 		evaluate(declaracao.atribuicao);
-		while (isTruthy(evaluate(declaracao.condicao))) {
+		// GAMBIARRA - se o incremento for negativo
+		// inverte o sinal da condição de <= para >=
+		Expressao.Binario condicao = (Expressao.Binario) declaracao.condicao;
+		Expressao.Atribuicao incremento = (Expressao.Atribuicao) declaracao.incremento;
+		Expressao.Binario operacaoIncremento =  (Expressao.Binario) incremento.valor;
+		Expressao exValorIncremento = operacaoIncremento.direita;
+		Object valorIncremento = evaluate(exValorIncremento);
+		
+		if(valorIncremento instanceof Integer) {
+		
+			if((int) valorIncremento < 0) {
+				condicao = new Binario(
+						condicao.esquerda,
+						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador
+								.line), 
+						condicao.direita);
+				
+			}
+		} else if( valorIncremento instanceof Double) {
+			if((double) valorIncremento < 0) {
+				condicao = new Binario(
+						condicao.esquerda,
+						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador
+								.line), 
+						condicao.direita);
+			}
+		}
+//		System.out.println(valorIncremento);
+//		System.out.println(condicao.operador);
+		while (isTruthy(evaluate(condicao))) {
 			execute(declaracao.facaBloco);
 			evaluate(declaracao.incremento);
 		}
