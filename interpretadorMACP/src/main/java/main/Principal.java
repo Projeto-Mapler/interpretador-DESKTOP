@@ -34,9 +34,10 @@ public class Principal {
 				"modulo.txt",
 				"variaveis.txt",
 				"io.txt",
+				"operações.txt"
 			};
 			String arquivo = "C:\\Users\\Kerlyson\\Desktop\\12.txt";
-			runFile(caminhoExemplos+exemplos[1]);
+			runFile(caminhoExemplos+exemplos[5]);
 	}
 	private static void runFile(String path) throws IOException {
 		byte[] bytes = Files.readAllBytes(Paths.get(path));

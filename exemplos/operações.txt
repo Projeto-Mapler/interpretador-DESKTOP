@@ -1,0 +1,34 @@
+variaveis
+	
+  // numericos
+  var_inteiro: inteiro;
+  var_real: real;
+  
+  // booleano
+  var_logico: logico;
+  
+  // literais
+  var_cadeia: cadeia;
+  var_caractere: caractere;
+
+
+inicio
+  
+  var_inteiro <- (1 + 2) - 3 * ((4-1) / 3) - 10;
+  var_logico <- var_inteiro < 0 e nao verdadeiro;
+
+  escrever var_inteiro;
+  escrever var_logico;
+
+  var_logico <- var_inteiro < 0 ou nao falso;
+  escrever var_logico;
+
+  var_real <- 3.5 * 1.4;
+  escrever var_real;
+
+  var_cadeia <- "hello";
+  var_caractere <- "!";
+
+  escrever var_cadeia, var_caractere;
+
+fim
