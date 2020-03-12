@@ -46,6 +46,8 @@ inicio
 fim
 ```
 
+Mais exemplos disponíveis na [pasta de exemplos](exemplos/).
+
 # Gramática
 ```
 programa → "variaveis" (declaracaoVariaveis)* "inicio" (declaracao)* "fim" (declaracaoModulo)* EOF 
