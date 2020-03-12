@@ -358,6 +358,8 @@ public class JavaConversorTeste
 		Object valor = expressao.valor;
 		if (valor instanceof String) {
 			valor = "\"".concat((String) valor).concat("\"");
+		} else if(valor instanceof Character) {
+			valor = "'".concat(((Character) valor).toString()).concat("'");
 		}
 		concaternarNaLinha(valor.toString(), null, false);
 		return null;
