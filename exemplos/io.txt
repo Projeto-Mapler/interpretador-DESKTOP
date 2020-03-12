@@ -1,0 +1,11 @@
+variaveis
+
+  var_nome: cadeia;
+
+inicio
+
+  escrever "Digite seu nome: ";
+  ler var_nome;
+  escrever "Olá ", var_nome;
+
+fim

@@ -327,7 +327,7 @@ public class Interpretador
 		try {
 			System.out.print(">");
 			String valor = reader.readLine();
-			System.err.println("lido: " + valor);// imprime acoes no terminal
+//			System.err.println("lido: " + valor);// imprime acoes no terminal
 			Expressao atribuicao = declaracao.atribuicao;
 			if (atribuicao instanceof Expressao.Atribuicao) {
 				Token nome = ((Expressao.Atribuicao) atribuicao).nome;

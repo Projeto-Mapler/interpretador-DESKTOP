@@ -1,0 +1,31 @@
+variaveis
+	
+  // numericos
+  var_inteiro: inteiro;
+  var_real: real;
+  
+  // booleano
+  var_logico: logico;
+  
+  // literais
+  var_cadeia: cadeia;
+  var_caractere: caractere;
+
+  // vetor
+  var_vetor: vetor[1..4] de inteiro;
+
+inicio
+  
+  var_inteiro <- -1;
+  
+  var_real <- 2.5;
+
+  var_cadeia <- "São Luís";
+
+  var_caractere <- "c";
+
+  var_logico <- verdadeiro;
+
+  var_vetor[1] <- 2;
+
+fim

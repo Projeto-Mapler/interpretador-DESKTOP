@@ -9,12 +9,20 @@ inicio
 	}
 
   escrever " "; // escreve linha em branco
-
   x<-1;
 
   enquanto x <= 5 faca {
     escrever x;
     x<- x+1;
   }
+
+  
+  escrever " "; // escreve linha em branco
+  x<-1;
+
+  repita {
+    escrever x;
+    x<- x+1;
+  } ate (x <= 5);
 
 fim

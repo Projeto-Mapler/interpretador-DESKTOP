@@ -33,9 +33,10 @@ public class Principal {
 				"laços.txt",
 				"modulo.txt",
 				"variaveis.txt",
+				"io.txt",
 			};
 			String arquivo = "C:\\Users\\Kerlyson\\Desktop\\12.txt";
-			runFile(caminhoExemplos+exemplos[3]);
+			runFile(caminhoExemplos+exemplos[1]);
 	}
 	private static void runFile(String path) throws IOException {
 		byte[] bytes = Files.readAllBytes(Paths.get(path));
