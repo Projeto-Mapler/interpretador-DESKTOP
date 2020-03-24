@@ -4,7 +4,7 @@ import java.util.List;
 
 import model.Token;
 
-public abstract class Expressao {
+public abstract class Expressao extends AstDebugNode {
 public interface Visitor<R> {
 public R visitBinarioExpressao(Binario expressao);
 public R visitGrupoExpressao(Grupo expressao);

@@ -4,7 +4,7 @@ import java.util.List;
 
 import model.Token;
 
-public abstract class Declaracao {
+public abstract class Declaracao extends AstDebugNode {
 public interface Visitor<R> {
 public R visitBlocoDeclaracao(Bloco declaracao);
 public R visitExpressaoDeclaracao(Expressao declaracao);

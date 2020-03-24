@@ -3,15 +3,14 @@ package interpreter;
 import static model.TokenType.ASTERISCO;
 import static model.TokenType.BARRA;
 import static model.TokenType.MAIS;
-import static model.TokenType.MENOR_IGUAL;
 import static model.TokenType.MENOS;
 import static model.TokenType.OU;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import debug.GerenciadorEventos;
 import main.Principal;
 import model.Token;
 import model.TokenType;
@@ -47,6 +46,7 @@ public class Interpretador
 			Declaracao.Visitor<Void> {
 	private BufferedReader reader;
 	private Environment environment = new Environment();
+	private GerenciadorEventos eventos = new GerenciadorEventos();
 
 	public Interpretador(BufferedReader reader) {
 		this.reader = reader;
@@ -70,6 +70,7 @@ public class Interpretador
 
 	// HELPERS:
 	private void execute(Declaracao declaracao) {
+		eventos.notificar(declaracao.getLinha());
 		declaracao.accept(this);
 	}
 
@@ -98,6 +99,7 @@ public class Interpretador
 	}
 
 	private Object evaluate(Expressao expressao) {
+		eventos.notificar(expressao.getLinha());
 		return expressao.accept(this);
 	}
 

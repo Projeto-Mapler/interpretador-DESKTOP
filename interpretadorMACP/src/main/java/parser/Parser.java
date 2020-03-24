@@ -1,22 +1,68 @@
 package parser;
 
+import static model.TokenType.ASTERISCO;
+import static model.TokenType.ATE;
+import static model.TokenType.ATRIBUICAO;
+import static model.TokenType.BARRA;
+import static model.TokenType.CADEIA;
+import static model.TokenType.CARACTERE;
+import static model.TokenType.DE;
+import static model.TokenType.DIFERENTE;
+import static model.TokenType.DIR_CHAVES;
+import static model.TokenType.DIR_COLCHETE;
+import static model.TokenType.DIR_PARENTESES;
+import static model.TokenType.DOIS_PONTOS;
+import static model.TokenType.E;
+import static model.TokenType.ENQUANTO;
+import static model.TokenType.ENTAO;
+import static model.TokenType.EOF;
+import static model.TokenType.ESCREVER;
+import static model.TokenType.ESQ_CHAVES;
+import static model.TokenType.ESQ_COLCHETE;
+import static model.TokenType.ESQ_PARENTESES;
+import static model.TokenType.FACA;
+import static model.TokenType.FALSO;
+import static model.TokenType.FIM;
+import static model.TokenType.IDENTIFICADOR;
+import static model.TokenType.IGUAL;
+import static model.TokenType.INICIO;
+import static model.TokenType.INTEIRO;
+import static model.TokenType.INTERVALO;
+import static model.TokenType.LER;
+import static model.TokenType.MAIOR_IQUAL;
+import static model.TokenType.MAIOR_QUE;
+import static model.TokenType.MAIS;
+import static model.TokenType.MENOR_IGUAL;
+import static model.TokenType.MENOR_QUE;
+import static model.TokenType.MENOS;
+import static model.TokenType.NAO;
+import static model.TokenType.OU;
+import static model.TokenType.PARA;
+import static model.TokenType.PASSO;
+import static model.TokenType.PONTO_VIRGULA;
+import static model.TokenType.REAL;
+import static model.TokenType.REPITA;
+import static model.TokenType.SE;
+import static model.TokenType.SENAO;
+import static model.TokenType.TIPO_CADEIA;
+import static model.TokenType.TIPO_CARACTERE;
+import static model.TokenType.TIPO_INTEIRO;
+import static model.TokenType.TIPO_LOGICO;
+import static model.TokenType.TIPO_MODULO;
+import static model.TokenType.TIPO_REAL;
+import static model.TokenType.TIPO_VETOR;
+import static model.TokenType.VARIAVEIS;
+import static model.TokenType.VERDADEIRO;
+import static model.TokenType.VIRGULA;
+
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import main.Principal;
 import model.Token;
 import model.TokenType;
-
-import static model.TokenType.*;
-
 import tree.Declaracao;
 import tree.Expressao;
-import tree.Declaracao.Bloco;
-import tree.Declaracao.Var;
-import tree.Declaracao.VariavelArray;
-import tree.Expressao.AtribuicaoArray;
-import tree.Expressao.Binario;
 
 public class Parser {
 	private final List<Token> tokens;
@@ -143,12 +189,16 @@ public class Parser {
 			consume(DE, "Esperado de");
 			Token tipoDoVetor = tipoDado();
 			for(Token nome : nomes) {
-				retorno.add(declaracaoVariavelArray(nome, intervaloI, intervaloF, tipoDoVetor));
+				Declaracao declaracaoVariavelArray = declaracaoVariavelArray(nome, intervaloI, intervaloF, tipoDoVetor);
+				declaracaoVariavelArray.setLinha(nome.line);
+				retorno.add(declaracaoVariavelArray);
 			}
 		} else {
 			Token tipo = tipoDado();
 			for(Token nome : nomes) {
-				retorno.add(new Declaracao.Var(nome, tipo));
+				Declaracao.Var declaracao = new Declaracao.Var(nome, tipo);
+				declaracao.setLinha(nome.line);
+				retorno.add(declaracao);
 			}
 		}
 		consume(PONTO_VIRGULA, "Esperado ;");
@@ -227,9 +277,11 @@ public class Parser {
 			Expressao index = ((Expressao.VariavelArray) expressao).index;
 			retorno = new Declaracao.Ler(
 					new Expressao.AtribuicaoArray(nome, index, null));
+			retorno.setLinha(nome.line);
 		} else if (expressao instanceof Expressao.Variavel) {
 			Token nome = ((Expressao.Variavel) expressao).nome;
 			retorno = new Declaracao.Ler(new Expressao.Atribuicao(nome, null));
+			retorno.setLinha(nome.line);
 		} else {
 			error(previous(), "Esperado uma variável");
 		}
