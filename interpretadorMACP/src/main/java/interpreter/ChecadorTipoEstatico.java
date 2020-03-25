@@ -1,7 +1,7 @@
 package interpreter;
 
+import model.RuntimeError;
 import model.TokenType;
-import parser.RuntimeError;
 import tree.Declaracao.Modulo;
 
 

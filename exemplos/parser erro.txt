@@ -1,0 +1,5 @@
+variaveis
+  &var: inteiro;
+inicio
+
+fim

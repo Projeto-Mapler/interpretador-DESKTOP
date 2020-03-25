@@ -8,21 +8,37 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import debug.Debugador;
+import debug.GerenciadorEventos;
+import debug.TipoEvento;
 import interpreter.Interpretador;
 import interpreter.JavaConversorTeste;
+import model.ParserError;
+import model.RuntimeError;
 import model.Token;
 import model.TokenType;
 import parser.Parser;
-import parser.RuntimeError;
 import scanner.Scanner;
 import tree.Declaracao;
 
 public class Principal {
-	static boolean temErro = false;
-	static boolean temRunTimeErro = false;
-	static final InputStreamReader input = new InputStreamReader(System.in);
-	static final BufferedReader reader = new BufferedReader(input);
-	private static final Interpretador interpreter = new Interpretador(reader);
+	private static boolean temErro = false;
+	private static boolean temRunTimeErro = false;
+	private static InputStreamReader input;
+	private static BufferedReader reader;
+	private static GerenciadorEventos ge;
+	private static Interpretador interpreter;
+	private static Debugador debugador;	
+	
+	static {
+		input = new InputStreamReader(System.in);
+		reader = new BufferedReader(input);
+		ge = new GerenciadorEventos();
+		debugador = new Debugador();
+		ge.inscrever(TipoEvento.DEBUG, debugador);
+		
+		interpreter = new Interpretador(reader, ge);
+	}
 
 	/*
 	 * public static void main(String[] args) throws IOException { String
@@ -40,7 +56,7 @@ public class Principal {
 		if (temRunTimeErro)
 			System.exit(70);
 	}
-	
+
 	private static void run(String source) {
 		Scanner scanner = new Scanner(source);
 		List<Token> tokens = scanner.scanTokens();
@@ -57,24 +73,27 @@ public class Principal {
 		System.out.println(t.converter(programa));
 
 	}
-	public static void error(int line, String message) {
-		report(line, "", message);
-	}
 
-	private static void report(int line, String where, String message) {
-		System.err
-				.println("[linha " + line + "] Erro" + where + ": " + message);
+
+	private static void report(int line, String onde, String msg) {
+		System.err.println("[Parser Erro | linha " + line + "] Erro" + onde + ": " + msg);
 		temErro = true;
 	}
-	public static void error(Token token, String message) {
-		if (token.type == TokenType.EOF) {
-			report(token.line, " no fim", message);
+
+	public static void error(ParserError erro) {
+		if(erro.token != null) {			
+			if (erro.token.type == TokenType.EOF) {
+				report(erro.linha, " no fim", erro.mensagem);
+			} else {
+				report(erro.linha, " em '" + erro.token.lexeme + "'", erro.mensagem);
+			}
 		} else {
-			report(token.line, " em '" + token.lexeme + "'", message);
+			report(erro.linha, "", erro.mensagem);
 		}
 	}
+
 	public static void runtimeError(RuntimeError error) {
-		System.err.println(	"[linha " + error.token.line + "] " + error.getMessage() );
+		System.err.println("[Runtime Erro | linha " + error.token.line + "] " + error.getMessage());
 		temRunTimeErro = true;
 	}
 }

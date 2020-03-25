@@ -4,9 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import model.Modulo;
+import model.RuntimeError;
 import model.Token;
 import model.TokenType;
-import parser.RuntimeError;
 
 public class Environment {
 	private final Map<String, Object> valores = new HashMap<>();

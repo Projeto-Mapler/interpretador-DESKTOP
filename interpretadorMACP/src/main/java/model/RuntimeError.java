@@ -1,6 +1,4 @@
-package parser;
-
-import model.Token;
+package model;
 
 public class RuntimeError extends RuntimeException {
 	public final Token token;

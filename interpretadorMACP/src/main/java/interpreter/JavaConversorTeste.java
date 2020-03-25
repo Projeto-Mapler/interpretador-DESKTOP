@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.Map;
 
 import main.Principal;
+import model.RuntimeError;
 import model.Token;
 import model.TokenType;
-import parser.RuntimeError;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;

@@ -2,9 +2,9 @@ package util;
 import java.util.List;
 
 import main.Principal;
+import model.RuntimeError;
 import model.Token;
 import model.TokenType;
-import parser.RuntimeError;
 import scala.reflect.Print;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;

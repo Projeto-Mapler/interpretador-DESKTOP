@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import main.Principal;
+import model.ParserError;
 import model.Token;
 import model.TokenType;
 
@@ -165,7 +166,7 @@ public class Scanner {
 				} else if (isLetra(c)) {
 					identificador();
 				} else {
-					Principal.error(linha, "caractere não identificado.");
+					Principal.error(new ParserError( linha, "caractere '"+ c +"' não identificado."));
 				}
 				break;
 		}
@@ -230,7 +231,7 @@ public class Scanner {
 
 		// Unterminated string.
 		if (isFinal()) {
-			Principal.error(linha, "cadeia não determinada.");
+			Principal.error(new ParserError(linha, "cadeia não determinada."));
 			return;
 		}
 
