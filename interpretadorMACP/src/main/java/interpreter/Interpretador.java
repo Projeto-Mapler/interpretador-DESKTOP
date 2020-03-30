@@ -71,6 +71,11 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		gerenciadorEventos.notificar(TipoEvento.DEBUG, declaracao);
 		declaracao.accept(this);
 	}
+	
+	private Object evaluate(Expressao expressao) {
+		gerenciadorEventos.notificar(TipoEvento.DEBUG, expressao);
+		return expressao.accept(this);
+	}
 
 	private String stringify(Object object) {
 		if (object == null)
@@ -96,10 +101,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		return object.toString();
 	}
 
-	private Object evaluate(Expressao expressao) {
-		gerenciadorEventos.notificar(TipoEvento.DEBUG, expressao);
-		return expressao.accept(this);
-	}
+	
 
 	private boolean isTruthy(Object object) {
 		if (object == null)
@@ -404,13 +406,13 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		if (valorIncremento instanceof Integer) {
 
 			if ((int) valorIncremento < 0) {
-				condicao = new Binario(condicao.esquerda,
+				condicao = new Binario(condicao.operador.line, condicao.esquerda,
 						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
 
 			}
 		} else if (valorIncremento instanceof Double) {
 			if ((double) valorIncremento < 0) {
-				condicao = new Binario(condicao.esquerda,
+				condicao = new Binario(condicao.operador.line, condicao.esquerda,
 						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
 			}
 		}

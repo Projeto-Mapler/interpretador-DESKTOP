@@ -5,6 +5,9 @@ import java.util.List;
 import model.Token;
 
 public abstract class Declaracao extends AstDebugNode {
+    public Declaracao( int linha) {
+super(linha);
+}
 public interface Visitor<R> {
 public R visitBlocoDeclaracao(Bloco declaracao);
 public R visitExpressaoDeclaracao(Expressao declaracao);
@@ -22,7 +25,8 @@ public R visitChamadaModuloDeclaracao(ChamadaModulo declaracao);
 public R visitProgramaDeclaracao(Programa declaracao);
   }
 public static class Bloco extends Declaracao {
-    public Bloco(List<Declaracao> declaracoes) {
+    public Bloco( int linha, List<Declaracao> declaracoes) {
+super(linha);
       this.declaracoes = declaracoes;
     }
 
@@ -33,7 +37,8 @@ public static class Bloco extends Declaracao {
     public final List<Declaracao> declaracoes;
   }
 public static class Expressao extends Declaracao {
-    public Expressao(tree.Expressao expressao) {
+    public Expressao( int linha, tree.Expressao expressao) {
+super(linha);
       this.expressao = expressao;
     }
 
@@ -44,7 +49,8 @@ public static class Expressao extends Declaracao {
     public final tree.Expressao expressao;
   }
 public static class Escreva extends Declaracao {
-    public Escreva(List<tree.Expressao> expressoes) {
+    public Escreva( int linha, List<tree.Expressao> expressoes) {
+super(linha);
       this.expressoes = expressoes;
     }
 
@@ -55,7 +61,8 @@ public static class Escreva extends Declaracao {
     public final List<tree.Expressao> expressoes;
   }
 public static class Se extends Declaracao {
-    public Se(tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco) {
+    public Se( int linha, tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco) {
+super(linha);
       this.condicao = condicao;
       this.entaoBloco = entaoBloco;
       this.senaoBloco = senaoBloco;
@@ -70,7 +77,8 @@ public static class Se extends Declaracao {
     public final Bloco senaoBloco;
   }
 public static class Ler extends Declaracao {
-    public Ler(tree.Expressao atribuicao) {
+    public Ler( int linha, tree.Expressao atribuicao) {
+super(linha);
       this.atribuicao = atribuicao;
     }
 
@@ -81,7 +89,8 @@ public static class Ler extends Declaracao {
     public final tree.Expressao atribuicao;
   }
 public static class Var extends Declaracao {
-    public Var(Token nome, Token tipo) {
+    public Var( int linha, Token nome, Token tipo) {
+super(linha);
       this.nome = nome;
       this.tipo = tipo;
     }
@@ -94,7 +103,8 @@ public static class Var extends Declaracao {
     public final Token tipo;
   }
 public static class VarDeclaracoes extends Declaracao {
-    public VarDeclaracoes(List<Declaracao> variaveis) {
+    public VarDeclaracoes( int linha, List<Declaracao> variaveis) {
+super(linha);
       this.variaveis = variaveis;
     }
 
@@ -105,7 +115,8 @@ public static class VarDeclaracoes extends Declaracao {
     public final List<Declaracao> variaveis;
   }
 public static class VariavelArray extends Declaracao {
-    public VariavelArray(Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo) {
+    public VariavelArray( int linha, Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo) {
+super(linha);
       this.nome = nome;
       this.intervaloI = intervaloI;
       this.intervaloF = intervaloF;
@@ -122,7 +133,8 @@ public static class VariavelArray extends Declaracao {
     public final Token tipo;
   }
 public static class Para extends Declaracao {
-    public Para(tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco) {
+    public Para( int linha, tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco) {
+super(linha);
       this.atribuicao = atribuicao;
       this.condicao = condicao;
       this.incremento = incremento;
@@ -139,7 +151,8 @@ public static class Para extends Declaracao {
     public final Bloco facaBloco;
   }
 public static class Enquanto extends Declaracao {
-    public Enquanto(tree.Expressao condicao, Bloco corpo) {
+    public Enquanto( int linha, tree.Expressao condicao, Bloco corpo) {
+super(linha);
       this.condicao = condicao;
       this.corpo = corpo;
     }
@@ -152,7 +165,8 @@ public static class Enquanto extends Declaracao {
     public final Bloco corpo;
   }
 public static class Repita extends Declaracao {
-    public Repita(Bloco corpo, tree.Expressao condicao) {
+    public Repita( int linha, Bloco corpo, tree.Expressao condicao) {
+super(linha);
       this.corpo = corpo;
       this.condicao = condicao;
     }
@@ -165,7 +179,8 @@ public static class Repita extends Declaracao {
     public final tree.Expressao condicao;
   }
 public static class Modulo extends Declaracao {
-    public Modulo(Token nome, Bloco corpo) {
+    public Modulo( int linha, Token nome, Bloco corpo) {
+super(linha);
       this.nome = nome;
       this.corpo = corpo;
     }
@@ -178,7 +193,8 @@ public static class Modulo extends Declaracao {
     public final Bloco corpo;
   }
 public static class ChamadaModulo extends Declaracao {
-    public ChamadaModulo(Token identificador) {
+    public ChamadaModulo( int linha, Token identificador) {
+super(linha);
       this.identificador = identificador;
     }
 
@@ -189,7 +205,8 @@ public static class ChamadaModulo extends Declaracao {
     public final Token identificador;
   }
 public static class Programa extends Declaracao {
-    public Programa(List<Declaracao> variaveis, List<Declaracao> corpo, List<Declaracao> modulos) {
+    public Programa( int linha, List<Declaracao> variaveis, List<Declaracao> corpo, List<Declaracao> modulos) {
+super(linha);
       this.variaveis = variaveis;
       this.corpo = corpo;
       this.modulos = modulos;
