@@ -41,8 +41,10 @@ public class JavaConversorTeste
 	private StringBuilder builder;
 	private int indexIdentacao = 0;
 	private Map<String, VariavelVetor> mapaVariaveisArray;
+	private Principal runTimer;
 
-	public JavaConversorTeste() {
+	public JavaConversorTeste(Principal runTimer) {
+		this.runTimer = runTimer;
 		this.builder = new StringBuilder();
 		this.mapaVariaveisArray = new HashMap<String, VariavelVetor>();
 	}
@@ -56,7 +58,7 @@ public class JavaConversorTeste
 				return programaJava;
 			}
 		} catch (RuntimeError error) {
-			Principal.runtimeError(error);
+			runTimer.runtimeError(error);
 		} finally {
 			this.reset();
 		}

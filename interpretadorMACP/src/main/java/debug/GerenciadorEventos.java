@@ -26,7 +26,7 @@ public class GerenciadorEventos {
 	public void notificar(TipoEvento te, Object payload) {
 
 		for (EventoListener ev : this.inscritos.get(te)) {
-			ev.update(payload);
+			ev.update(te, payload);
 		}
 	}
 }

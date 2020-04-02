@@ -41,22 +41,27 @@ import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
-public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visitor<Void> {
+public class Interpretador implements Runnable, Expressao.Visitor<Object>, Declaracao.Visitor<Void> {
 	private BufferedReader reader;
 	private Environment environment = new Environment();
 	private GerenciadorEventos gerenciadorEventos;
+	private Principal runTimer;
+	private Declaracao.Programa programa;
 
-	public Interpretador(BufferedReader reader, GerenciadorEventos ge) {
+	public Interpretador(Principal runTimer, BufferedReader reader, GerenciadorEventos ge) {
 		this.reader = reader;
 		this.gerenciadorEventos = ge;
 	}
 
-	public void interpret(Declaracao.Programa programa) {
+	public void setPrograma(Declaracao.Programa programa) {
+		this.programa = programa;
+	}
+	private void interpret(Declaracao.Programa programa) {
 		long startTime = System.nanoTime();
 		try {
 			this.visitProgramaDeclaracao(programa);
 		} catch (RuntimeError error) {
-			Principal.runtimeError(error);
+			runTimer.runtimeError(error);
 		} catch (StackOverflowError e) {
 			System.out.println("Erro de memória");
 			e.printStackTrace();
@@ -68,12 +73,12 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	// HELPERS:
 	private void execute(Declaracao declaracao) {
-		gerenciadorEventos.notificar(TipoEvento.DEBUG, declaracao);
+		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, declaracao);
 		declaracao.accept(this);
 	}
 	
 	private Object evaluate(Expressao expressao) {
-		gerenciadorEventos.notificar(TipoEvento.DEBUG, expressao);
+		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, expressao);
 		return expressao.accept(this);
 	}
 
@@ -521,6 +526,11 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 			execute(variavel);
 		}
 		return null;
+	}
+
+	@Override
+	public void run() {
+		this.interpret(programa);		
 	}
 
 }

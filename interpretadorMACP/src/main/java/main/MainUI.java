@@ -1,5 +1,6 @@
 package main;
 
+import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -13,14 +14,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JSeparator;
 import javax.swing.border.EmptyBorder;
 
-public class MainUI extends JFrame{
+import debug.EstadosDebug;
+import debug.EventoListener;
+import debug.GerenciadorEventos;
+import debug.TipoEvento;
+
+public class MainUI extends JFrame implements EventoListener{
  
 	/**
 	 * 
@@ -30,14 +38,19 @@ public class MainUI extends JFrame{
 	private final String PATH_EXEMPLOS = "..\\exemplos\\";
 
 	private JPanel panel;
-	private JButton botaoArquivo, botaoIniciarExemplo;
+	private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar,  botaoDebugContinuar;
 	private JLabel labelOu;
 	private JComboBox<String> comboBoxExemplos;
 	private JFileChooser fileChooser;
+	private JCheckBox checkBoxDebugAtivo;
+	
+	private GerenciadorEventos ge = new GerenciadorEventos();
 	
 	public MainUI() {
 		this.setup();
 		this.setVisible(true);
+		
+		this.ge.inscrever(TipoEvento.MUDANCA_ESTADO_DEBUG, this);
 	}
 	
 	public static void main(String[] args) {
@@ -68,18 +81,35 @@ public class MainUI extends JFrame{
 		cons.weightx = 1;
 		cons.gridy = 0;
 		this.panel.add(this.botaoArquivo, cons);
-		
-		cons.weightx = 1;
-		cons.gridy = 1;
+
+		cons.gridy++;
 		this.panel.add(this.labelOu, cons);
-		
-		cons.weightx = 1;
-		cons.gridy = 2;
+
+		cons.gridy++;
 		this.panel.add(this.comboBoxExemplos, cons);
-		
-		cons.weightx = 1;
-		cons.gridy = 3;
+
+		cons.gridy++;
 		this.panel.add(this.botaoIniciarExemplo, cons);
+
+		cons.gridy++;
+		this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
+		
+		cons.gridy++;
+		this.panel.add(this.checkBoxDebugAtivo, cons);
+		
+		JPanel p = new JPanel();
+		p.setLayout(new GridBagLayout());
+		GridBagConstraints cons2 = new GridBagConstraints();
+		cons2.fill = GridBagConstraints.HORIZONTAL;
+		cons2.insets = new Insets(0, 5, 5, 5);
+		cons2.gridx = 0;
+		cons2.gridy = 0;
+		p.add(this.botaoDebugContinuar, cons2);
+		cons2.gridx = 1;
+		p.add(this.botaoDebugParar, cons2);
+		
+		cons.gridy++;
+		this.panel.add(p, cons);
 		
 		this.add(panel);
 		
@@ -122,6 +152,39 @@ public class MainUI extends JFrame{
 				
 			}
 		});
+		
+		this.checkBoxDebugAtivo = new JCheckBox("Debug ativo", true);
+		this.checkBoxDebugAtivo.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				 JCheckBox cbLog = (JCheckBox) e.getSource();
+			        ge.notificar(TipoEvento.TOGGLE_DEBUG, cbLog.isSelected());
+				
+			}
+		});
+		
+		this.botaoDebugContinuar = new JButton("|>");
+	
+		this.botaoDebugParar = new JButton("X");
+	
+		this.botaoDebugContinuar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ge.notificar(TipoEvento.CONTINUAR_DEBUG, null);
+				
+			}
+		});
+		
+		this.botaoDebugParar.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ge.notificar(TipoEvento.FINALIZAR_DEBUG, null);
+				
+			}
+		});
 	}
 	
 	private String[] getNomeArquivosExemplo() {
@@ -143,10 +206,36 @@ public class MainUI extends JFrame{
 	}
 	private void rodarArquivo(String caminho) {
 		try {
-			Principal.runFile(caminho);
+			new Principal(ge).runFile(caminho);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	@Override
+	public void update(TipoEvento tipoEvento, Object payload) {
+		if(payload instanceof EstadosDebug ) {
+			EstadosDebug estado = (EstadosDebug)payload;
+			
+			switch (estado) {
+			case DESATIVO:
+			case ATIVO:
+				this.botaoDebugContinuar.setEnabled(false);
+				this.botaoDebugParar.setEnabled(false);
+				break;
+			case PAUSADO:
+				this.botaoDebugContinuar.setEnabled(true);
+				break;
+			case EXECUTANDO:
+				this.botaoDebugContinuar.setEnabled(false);
+				this.botaoDebugParar.setEnabled(true);
+				break;
+
+			default:
+				break;
+			}
+		}
+		
 	}
 }

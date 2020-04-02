@@ -68,8 +68,10 @@ import tree.Expressao;
 public class Parser {
 	private final List<Token> tokens;
 	private int current = 0;
+	private Principal runTimer;
 
-	public Parser(List<Token> tokens) {
+	public Parser(Principal runTimer, List<Token> tokens) {
+		this.runTimer = runTimer;
 		this.tokens = tokens;
 	}
 
@@ -170,7 +172,7 @@ public class Parser {
 
 	private ParserError error(Token token, String mensagem) {
 		ParserError erro = new ParserError(token, mensagem);
-		Principal.error(erro);
+		runTimer.error(erro);
 		return erro;
 	}
 

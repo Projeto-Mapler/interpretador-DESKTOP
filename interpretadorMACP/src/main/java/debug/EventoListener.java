@@ -1,5 +1,5 @@
 package debug;
 
 public interface EventoListener {
-	void update(Object payload);
+	void update(TipoEvento tipoEvento, Object payload);
 }
