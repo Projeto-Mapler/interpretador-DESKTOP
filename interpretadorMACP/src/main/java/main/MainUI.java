@@ -185,6 +185,9 @@ public class MainUI extends JFrame implements EventoListener{
 				
 			}
 		});
+		
+		this.botaoDebugContinuar.setEnabled(false);
+		this.botaoDebugParar.setEnabled(false);
 	}
 	
 	private String[] getNomeArquivosExemplo() {
@@ -221,13 +224,17 @@ public class MainUI extends JFrame implements EventoListener{
 			switch (estado) {
 			case DESATIVO:
 			case ATIVO:
+				this.checkBoxDebugAtivo.setEnabled(true);
 				this.botaoDebugContinuar.setEnabled(false);
 				this.botaoDebugParar.setEnabled(false);
 				break;
 			case PAUSADO:
+				this.checkBoxDebugAtivo.setEnabled(false);
 				this.botaoDebugContinuar.setEnabled(true);
+				this.botaoDebugParar.setEnabled(true);
 				break;
 			case EXECUTANDO:
+				this.checkBoxDebugAtivo.setEnabled(false);
 				this.botaoDebugContinuar.setEnabled(false);
 				this.botaoDebugParar.setEnabled(true);
 				break;

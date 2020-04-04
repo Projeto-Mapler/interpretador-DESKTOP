@@ -41,34 +41,73 @@ import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
-public class Interpretador implements Runnable, Expressao.Visitor<Object>, Declaracao.Visitor<Void> {
+public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visitor<Void> {
 	private BufferedReader reader;
 	private Environment environment = new Environment();
 	private GerenciadorEventos gerenciadorEventos;
 	private Principal runTimer;
-	private Declaracao.Programa programa;
+	private Thread thread;
+	private boolean parada, terminada;
 
 	public Interpretador(Principal runTimer, BufferedReader reader, GerenciadorEventos ge) {
+		this.runTimer = runTimer;
 		this.reader = reader;
 		this.gerenciadorEventos = ge;
+
 	}
 
-	public void setPrograma(Declaracao.Programa programa) {
-		this.programa = programa;
+	public void interpret(Declaracao.Programa programa) {
+		this.parada = false;
+		this.terminada = false;
+		thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				long startTime = System.nanoTime();
+				try {
+					visitProgramaDeclaracao(programa);
+				} catch (RuntimeError error) {
+					runTimer.runtimeError(error);
+				} catch (StackOverflowError e) {
+					e.printStackTrace();
+				}
+				long elapsedTime = System.nanoTime() - startTime;
+				System.out.println("Tempo de execucao: " + (double) elapsedTime / 1000000000);
+			}
+		});
+		thread.start();
+
 	}
-	private void interpret(Declaracao.Programa programa) {
-		long startTime = System.nanoTime();
+
+	// THREAD CONTROLE
+
+	public void suspender() {
+		this.parada = true;
 		try {
-			this.visitProgramaDeclaracao(programa);
-		} catch (RuntimeError error) {
-			runTimer.runtimeError(error);
-		} catch (StackOverflowError e) {
-			System.out.println("Erro de memória");
+			synchronized (thread) {
+				
+				thread.wait();
+
+			}
+		} catch (InterruptedException e) {
+			thread.interrupt();
 			e.printStackTrace();
 		}
-		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("Tempo de execucao: " + (double) elapsedTime / 1000000000);
 
+	}
+
+	public void resumir() {
+		this.parada = false;
+		synchronized (thread) {
+			thread.notify();
+		}
+	}
+
+	public void terminar() {
+		this.terminada = true;
+		synchronized (thread) {
+			thread.stop();
+
+		}
 	}
 
 	// HELPERS:
@@ -76,7 +115,7 @@ public class Interpretador implements Runnable, Expressao.Visitor<Object>, Decla
 		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, declaracao);
 		declaracao.accept(this);
 	}
-	
+
 	private Object evaluate(Expressao expressao) {
 		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, expressao);
 		return expressao.accept(this);
@@ -105,8 +144,6 @@ public class Interpretador implements Runnable, Expressao.Visitor<Object>, Decla
 
 		return object.toString();
 	}
-
-	
 
 	private boolean isTruthy(Object object) {
 		if (object == null)
@@ -526,11 +563,6 @@ public class Interpretador implements Runnable, Expressao.Visitor<Object>, Decla
 			execute(variavel);
 		}
 		return null;
-	}
-
-	@Override
-	public void run() {
-		this.interpret(programa);		
 	}
 
 }

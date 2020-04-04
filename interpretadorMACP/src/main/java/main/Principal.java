@@ -11,7 +11,6 @@ import java.util.List;
 import debug.Debugador;
 import debug.GerenciadorEventos;
 import interpreter.Interpretador;
-import interpreter.JavaConversorTeste;
 import model.ParserError;
 import model.RuntimeError;
 import model.Token;
@@ -33,10 +32,10 @@ public class Principal {
 		input = new InputStreamReader(System.in);
 		reader = new BufferedReader(input);
 		this.ge = ge;
-		debugador = new Debugador(ge, true);
-		debugador.addBreakPoint(13);
 		
 		interpreter = new Interpretador(this, reader, ge);
+		debugador = new Debugador(interpreter, ge, true);
+		debugador.addBreakPoint(13);
 	}
 
 	/*
@@ -66,13 +65,16 @@ public class Principal {
 			return;
 //		System.out.println(declaracoes.size());
 //		new ImpressoraAST().print(declaracoes);// imprime arvore
-		JavaConversorTeste t = new JavaConversorTeste(this);
-		interpreter.setPrograma(programa);
-		Thread i = new Thread(interpreter);
-		debugador.setInterpretadorThread(i);
-		i.run();
-		System.out.println("\n\n===>>Conversor Java:\n");
-		System.out.println(t.converter(programa));
+//		JavaConversorTeste t = new JavaConversorTeste(this);
+		
+		this.interpreter.interpret(programa);
+		
+		
+		
+		
+
+//		System.out.println("\n\n===>>Conversor Java:\n");
+//		System.out.println(t.converter(programa));
 
 	}
 

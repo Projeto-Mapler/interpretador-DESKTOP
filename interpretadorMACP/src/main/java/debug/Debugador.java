@@ -3,17 +3,19 @@ package debug;
 import java.util.HashSet;
 import java.util.Set;
 
+import interpreter.Interpretador;
 import tree.AstDebugNode;
 
 public class Debugador implements EventoListener {
 
-	private Thread interpretadorThread;
+	private Interpretador interpretador;
 	private Set<Integer> breakpoints;
 	private EstadosDebug estado;
 	private Integer breakpoint = 0, linhaAnterior = 0;
 	private GerenciadorEventos ge;
 
-	public Debugador(GerenciadorEventos ge, boolean ativo) {
+	public Debugador(Interpretador i, GerenciadorEventos ge, boolean ativo) {
+		this.interpretador = i;
 		this.ge = ge;
 		this.ge.inscrever(TipoEvento.NODE_DEBUG, this);
 		this.ge.inscrever(TipoEvento.CONTINUAR_DEBUG, this);
@@ -29,12 +31,12 @@ public class Debugador implements EventoListener {
 			return;
 		switch (tipoEvento) {
 		case TOGGLE_DEBUG:
-			this.setDebugadorAtivo((Boolean)payload);
-		case NODE_DEBUG: 
+			this.setDebugadorAtivo((Boolean) payload);
+		case NODE_DEBUG:
 			this.updateNodeDebug(payload);
-			
+
 			break;
-		case CONTINUAR_DEBUG: 
+		case CONTINUAR_DEBUG:
 			this.continuarExecucao();
 			break;
 		case FINALIZAR_DEBUG:
@@ -46,10 +48,11 @@ public class Debugador implements EventoListener {
 		}
 
 	}
-	
+
 	private void updateNodeDebug(Object payload) {
-	
-		if(estado == EstadosDebug.ATIVO) this.setEstado(EstadosDebug.EXECUTANDO);
+
+		if (estado == EstadosDebug.ATIVO)
+			this.setEstado(EstadosDebug.EXECUTANDO);
 		if (payload instanceof AstDebugNode) {
 			AstDebugNode node = (AstDebugNode) payload;
 			if (node.getLinha() < 1)
@@ -60,9 +63,9 @@ public class Debugador implements EventoListener {
 		}
 	}
 
-	public void setInterpretadorThread(Thread thread) {
-		this.interpretadorThread = thread;
-	}
+//	public void setInterpretadorThread(Thread thread) {
+//		this.interpretadorThread = thread;
+//	}
 
 	public void addBreakPoint(int linha) {
 		this.breakpoints.add(linha);
@@ -86,36 +89,34 @@ public class Debugador implements EventoListener {
 				return;
 			this.breakpoint = linha;
 			this.pausaExecucao();
-			
+
 		}
 	}
 
-	private void  pausaExecucao() {
-		 
-		try {
-			this.setEstado(EstadosDebug.PAUSADO);
-			 
-				this.interpretadorThread.wait();			    
-			
-		} catch (InterruptedException e) {
-			e.printStackTrace();
-		}
+	private void pausaExecucao() {
+
+		this.setEstado(EstadosDebug.PAUSADO);
+
+		interpretador.suspender();
 
 	}
-	
+
 	private void terminarExecucao() {
-		this.interpretadorThread.interrupt();
 		this.setEstado(EstadosDebug.ATIVO);
+		this.interpretador.terminar();
 	}
 
 	private void continuarExecucao() {
-		if(this.estado == EstadosDebug.PAUSADO) {			
-			this.interpretadorThread.notify();
+
+		if (this.estado == EstadosDebug.PAUSADO) {
+
 			this.setEstado(EstadosDebug.EXECUTANDO);
+		this.interpretador.resumir();
+
 		}
 
 	}
-	
+
 	private void setEstado(EstadosDebug estado) {
 		this.estado = estado;
 		this.ge.notificar(TipoEvento.MUDANCA_ESTADO_DEBUG, this.estado);
