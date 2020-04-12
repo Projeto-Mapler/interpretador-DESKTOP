@@ -24,20 +24,14 @@ public class Principal {
 	static final BufferedReader reader = new BufferedReader(input);
 	private static final Interpretador interpreter = new Interpretador(reader);
 
-	public static void main(String[] args) throws IOException {
-			String caminhoExemplos = "..\\exemplos\\"; 
-			String exemplos[] = {
-				"condicionais.txt",
-				"laços.txt",
-				"modulo.txt",
-				"variaveis.txt",
-				"io.txt",
-				"operações.txt"
-			};
-			String arquivo = "C:\\Users\\Kerlyson\\Desktop\\12.txt";
-			runFile(caminhoExemplos+exemplos[2]);
-	}
-	private static void runFile(String path) throws IOException {
+	/*
+	 * public static void main(String[] args) throws IOException { String
+	 * caminhoExemplos = "..\\exemplos\\"; String exemplos[] = { "condicionais.txt",
+	 * "laços.txt", "modulo.txt", "variaveis.txt", "io.txt", "operações.txt" };
+	 * String arquivo = "C:\\Users\\Kerlyson\\Desktop\\12.txt";
+	 * runFile(caminhoExemplos+exemplos[5]); }
+	 */
+	public static void runFile(String path) throws IOException {
 		byte[] bytes = Files.readAllBytes(Paths.get(path));
 		run(new String(bytes, Charset.defaultCharset()));
 		// Indicate an error in the exit code.
