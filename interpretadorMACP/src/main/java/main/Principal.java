@@ -8,16 +8,14 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import conversores.ConversorJava;
 import interpreter.Interpretador;
-import interpreter.JavaConversorTeste;
 import model.Token;
 import model.TokenType;
 import parser.Parser;
 import parser.RuntimeError;
 import scanner.Scanner;
 import tree.Declaracao;
-import tree.Expressao;
-import util.ImpressoraAST;
 
 public class Principal {
 	static boolean temErro = false;
@@ -37,7 +35,7 @@ public class Principal {
 				"operações.txt"
 			};
 			String arquivo = "C:\\Users\\Kerlyson\\Desktop\\12.txt";
-			runFile(caminhoExemplos+exemplos[5]);
+			runFile(caminhoExemplos+exemplos[2]);
 	}
 	private static void runFile(String path) throws IOException {
 		byte[] bytes = Files.readAllBytes(Paths.get(path));
@@ -59,10 +57,13 @@ public class Principal {
 			return;
 //		System.out.println(declaracoes.size());
 //		new ImpressoraAST().print(declaracoes);// imprime arvore
-		JavaConversorTeste t = new JavaConversorTeste();
-		interpreter.interpret(programa);
+//		JavaConversorTeste t = new JavaConversorTeste();
+//		interpreter.interpret(programa);
 		System.out.println("\n\n===>>Conversor Java:\n");
-		System.out.println(t.converter(programa));
+//		System.out.println(t.converter(programa));
+		
+		ConversorJava cj = new ConversorJava(programa);
+		System.out.println(cj.converter());
 
 	}
 	public static void error(int line, String message) {
