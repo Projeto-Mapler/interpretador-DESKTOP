@@ -13,6 +13,7 @@ public class Debugador implements EventoListener {
 	private EstadosDebug estado;
 	private Integer breakpoint = 0, linhaAnterior = 0;
 	private GerenciadorEventos ge;
+	private DebugStrategy strategy;
 
 	public Debugador(Interpretador i, GerenciadorEventos ge, boolean ativo) {
 		this.interpretador = i;
@@ -57,15 +58,14 @@ public class Debugador implements EventoListener {
 			AstDebugNode node = (AstDebugNode) payload;
 			if (node.getLinha() < 1)
 				return;
-			this.checkBreakPoint(node.getLinha());
-			System.out.println("[debug] linha: " + node.getLinha() + " .. " + payload.getClass().getName());
-			this.linhaAnterior = node.getLinha();
+		
+			this.linhaAnterior = this.strategy.executar(node, this);
 		}
 	}
 
-//	public void setInterpretadorThread(Thread thread) {
-//		this.interpretadorThread = thread;
-//	}
+	public void setDebugStrategy(DebugStrategy strategy) {
+		this.strategy = strategy;
+	}
 
 	public void addBreakPoint(int linha) {
 		this.breakpoints.add(linha);
@@ -83,17 +83,23 @@ public class Debugador implements EventoListener {
 		this.setEstado(ativo ? EstadosDebug.ATIVO : EstadosDebug.DESATIVO);
 	}
 
-	private void checkBreakPoint(int linha) {
-		if (this.breakpoints.contains(linha)) {
-			if (this.breakpoint == linha && this.linhaAnterior == this.breakpoint)
-				return;
-			this.breakpoint = linha;
-			this.pausaExecucao();
-
+	
+	protected int getBreakpoint() {
+		return this.breakpoint;
+	}
+	
+	protected void setBreakPoint(int breakpoint) {
+		this.breakpoint = breakpoint;
+	}
+	
+	protected boolean checkContainsBreakPoint(int breakpoint) {
+		if(this.breakpoints.contains(breakpoint)) {
+			return true;
 		}
+		return false;
 	}
 
-	private void pausaExecucao() {
+	protected void pausaExecucao() {
 
 		this.setEstado(EstadosDebug.PAUSADO);
 
@@ -101,12 +107,12 @@ public class Debugador implements EventoListener {
 
 	}
 
-	private void terminarExecucao() {
+	protected void terminarExecucao() {
 		this.setEstado(EstadosDebug.ATIVO);
 		this.interpretador.terminar();
 	}
 
-	private void continuarExecucao() {
+	protected void continuarExecucao() {
 
 		if (this.estado == EstadosDebug.PAUSADO) {
 
@@ -117,9 +123,14 @@ public class Debugador implements EventoListener {
 
 	}
 
-	private void setEstado(EstadosDebug estado) {
+	protected void setEstado(EstadosDebug estado) {
 		this.estado = estado;
 		this.ge.notificar(TipoEvento.MUDANCA_ESTADO_DEBUG, this.estado);
 	}
+	
+	protected int getLinha() {
+		return this.linhaAnterior;
+	}
+	
 
 }

@@ -8,8 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import debug.BreakpointsDebugStrategy;
 import debug.Debugador;
 import debug.GerenciadorEventos;
+import debug.PassoAPassoDebugStrategy;
 import interpreter.Interpretador;
 import model.ParserError;
 import model.RuntimeError;
@@ -35,6 +37,8 @@ public class Principal {
 		
 		interpreter = new Interpretador(this, reader, ge);
 		debugador = new Debugador(interpreter, ge, true);
+//		debugador.setDebugStrategy(new BreakpointsDebugStrategy());
+		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 		debugador.addBreakPoint(13);
 	}
 
