@@ -16,6 +16,7 @@ import main.Principal;
 import model.RuntimeError;
 import model.Token;
 import model.TokenType;
+import model.VariavelVetor;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
@@ -154,7 +155,6 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	}
 
 	private boolean isEqual(Object a, Object b) {
-		// nil is only equal to nil.
 		if (a == null && b == null)
 			return true;
 		if (a == null)
@@ -238,6 +238,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 //			this.environment = previous;
 		}
 	}
+	
 
 	// Nodes:
 

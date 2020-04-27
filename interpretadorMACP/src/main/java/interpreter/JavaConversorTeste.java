@@ -8,6 +8,7 @@ import main.Principal;
 import model.RuntimeError;
 import model.Token;
 import model.TokenType;
+import model.VariavelVetor;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;

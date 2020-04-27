@@ -37,9 +37,11 @@ public class Principal {
 		
 		interpreter = new Interpretador(this, reader, ge);
 		debugador = new Debugador(interpreter, ge, true);
-//		debugador.setDebugStrategy(new BreakpointsDebugStrategy());
-		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
-		debugador.addBreakPoint(13);
+		BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
+		breakpointsDebugStrategy.addBreakPoint(13);
+		debugador.setDebugStrategy(breakpointsDebugStrategy);
+//		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
+	
 	}
 
 	/*

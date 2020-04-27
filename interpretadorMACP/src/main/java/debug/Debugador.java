@@ -1,17 +1,14 @@
 package debug;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import interpreter.Interpretador;
 import tree.AstDebugNode;
 
 public class Debugador implements EventoListener {
 
 	private Interpretador interpretador;
-	private Set<Integer> breakpoints;
+	
 	private EstadosDebug estado;
-	private Integer breakpoint = 0, linhaAnterior = 0;
+	private Integer linhaAnterior = 0;
 	private GerenciadorEventos ge;
 	private DebugStrategy strategy;
 
@@ -22,7 +19,7 @@ public class Debugador implements EventoListener {
 		this.ge.inscrever(TipoEvento.CONTINUAR_DEBUG, this);
 		this.ge.inscrever(TipoEvento.FINALIZAR_DEBUG, this);
 		this.ge.inscrever(TipoEvento.TOGGLE_DEBUG, this);
-		this.breakpoints = new HashSet<Integer>();
+		
 		this.setDebugadorAtivo(ativo);
 	}
 
@@ -67,37 +64,13 @@ public class Debugador implements EventoListener {
 		this.strategy = strategy;
 	}
 
-	public void addBreakPoint(int linha) {
-		this.breakpoints.add(linha);
-	}
-
-	public void removeBreakPoint(int linha) {
-		this.breakpoints.remove(linha);
-	}
-
-	public void removeTodosBreakPoins() {
-		this.breakpoints.clear();
-	}
+	
 
 	public void setDebugadorAtivo(boolean ativo) {
 		this.setEstado(ativo ? EstadosDebug.ATIVO : EstadosDebug.DESATIVO);
 	}
 
 	
-	protected int getBreakpoint() {
-		return this.breakpoint;
-	}
-	
-	protected void setBreakPoint(int breakpoint) {
-		this.breakpoint = breakpoint;
-	}
-	
-	protected boolean checkContainsBreakPoint(int breakpoint) {
-		if(this.breakpoints.contains(breakpoint)) {
-			return true;
-		}
-		return false;
-	}
 
 	protected void pausaExecucao() {
 

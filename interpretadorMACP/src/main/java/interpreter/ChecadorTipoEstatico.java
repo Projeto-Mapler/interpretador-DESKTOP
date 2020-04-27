@@ -1,8 +1,6 @@
 package interpreter;
 
-import model.RuntimeError;
 import model.TokenType;
-import tree.Declaracao.Modulo;
 
 
 public class ChecadorTipoEstatico {
