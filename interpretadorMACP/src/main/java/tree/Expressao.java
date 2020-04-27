@@ -4,7 +4,10 @@ import java.util.List;
 
 import model.Token;
 
-public abstract class Expressao {
+public abstract class Expressao extends AstDebugNode {
+    public Expressao( int linha) {
+super(linha);
+}
 public interface Visitor<R> {
 public R visitBinarioExpressao(Binario expressao);
 public R visitGrupoExpressao(Grupo expressao);
@@ -18,7 +21,8 @@ public R visitVariavelArrayExpressao(VariavelArray expressao);
 public R visitVariavelExpressao(Variavel expressao);
   }
 public static class Binario extends Expressao {
-    public Binario(Expressao esquerda, Token operador, Expressao direita) {
+    public Binario( int linha, Expressao esquerda, Token operador, Expressao direita) {
+super(linha);
       this.esquerda = esquerda;
       this.operador = operador;
       this.direita = direita;
@@ -33,7 +37,8 @@ public static class Binario extends Expressao {
     public final Expressao direita;
   }
 public static class Grupo extends Expressao {
-    public Grupo(Expressao expressao) {
+    public Grupo( int linha, Expressao expressao) {
+super(linha);
       this.expressao = expressao;
     }
 
@@ -44,7 +49,8 @@ public static class Grupo extends Expressao {
     public final Expressao expressao;
   }
 public static class ExpParentizada extends Expressao {
-    public ExpParentizada(Grupo grupo) {
+    public ExpParentizada( int linha, Grupo grupo) {
+super(linha);
       this.grupo = grupo;
     }
 
@@ -55,7 +61,8 @@ public static class ExpParentizada extends Expressao {
     public final Grupo grupo;
   }
 public static class Literal extends Expressao {
-    public Literal(Object valor) {
+    public Literal( int linha, Object valor) {
+super(linha);
       this.valor = valor;
     }
 
@@ -66,7 +73,8 @@ public static class Literal extends Expressao {
     public final Object valor;
   }
 public static class Logico extends Expressao {
-    public Logico(Expressao esquerda, Token operador, Expressao direita) {
+    public Logico( int linha, Expressao esquerda, Token operador, Expressao direita) {
+super(linha);
       this.esquerda = esquerda;
       this.operador = operador;
       this.direita = direita;
@@ -81,7 +89,8 @@ public static class Logico extends Expressao {
     public final Expressao direita;
   }
 public static class Unario extends Expressao {
-    public Unario(Token operador, Expressao direira) {
+    public Unario( int linha, Token operador, Expressao direira) {
+super(linha);
       this.operador = operador;
       this.direira = direira;
     }
@@ -94,7 +103,8 @@ public static class Unario extends Expressao {
     public final Expressao direira;
   }
 public static class Atribuicao extends Expressao {
-    public Atribuicao(Token nome, Expressao valor) {
+    public Atribuicao( int linha, Token nome, Expressao valor) {
+super(linha);
       this.nome = nome;
       this.valor = valor;
     }
@@ -107,7 +117,8 @@ public static class Atribuicao extends Expressao {
     public final Expressao valor;
   }
 public static class AtribuicaoArray extends Expressao {
-    public AtribuicaoArray(Token nome, Expressao index, Expressao valor) {
+    public AtribuicaoArray( int linha, Token nome, Expressao index, Expressao valor) {
+super(linha);
       this.nome = nome;
       this.index = index;
       this.valor = valor;
@@ -122,7 +133,8 @@ public static class AtribuicaoArray extends Expressao {
     public final Expressao valor;
   }
 public static class VariavelArray extends Expressao {
-    public VariavelArray(Token nome, Expressao index) {
+    public VariavelArray( int linha, Token nome, Expressao index) {
+super(linha);
       this.nome = nome;
       this.index = index;
     }
@@ -135,7 +147,8 @@ public static class VariavelArray extends Expressao {
     public final Expressao index;
   }
 public static class Variavel extends Expressao {
-    public Variavel(Token nome) {
+    public Variavel( int linha, Token nome) {
+super(linha);
       this.nome = nome;
     }
 

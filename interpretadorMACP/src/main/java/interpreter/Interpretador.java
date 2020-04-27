@@ -3,19 +3,20 @@ package interpreter;
 import static model.TokenType.ASTERISCO;
 import static model.TokenType.BARRA;
 import static model.TokenType.MAIS;
-import static model.TokenType.MENOR_IGUAL;
 import static model.TokenType.MENOS;
 import static model.TokenType.OU;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
+import debug.GerenciadorEventos;
+import debug.TipoEvento;
 import main.Principal;
+import model.RuntimeError;
 import model.Token;
 import model.TokenType;
-import parser.RuntimeError;
+import model.VariavelVetor;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
@@ -41,36 +42,84 @@ import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
-public class Interpretador
-		implements
-			Expressao.Visitor<Object>,
-			Declaracao.Visitor<Void> {
+public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visitor<Void> {
 	private BufferedReader reader;
 	private Environment environment = new Environment();
+	private GerenciadorEventos gerenciadorEventos;
+	private Principal runTimer;
+	private Thread thread;
+	private boolean parada, terminada;
 
-	public Interpretador(BufferedReader reader) {
+	public Interpretador(Principal runTimer, BufferedReader reader, GerenciadorEventos ge) {
+		this.runTimer = runTimer;
 		this.reader = reader;
+		this.gerenciadorEventos = ge;
+
 	}
 
 	public void interpret(Declaracao.Programa programa) {
-		 long startTime = System.nanoTime();
+		this.parada = false;
+		this.terminada = false;
+		thread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				long startTime = System.nanoTime();
+				try {
+					visitProgramaDeclaracao(programa);
+				} catch (RuntimeError error) {
+					runTimer.runtimeError(error);
+				} catch (StackOverflowError e) {
+					e.printStackTrace();
+				}
+				long elapsedTime = System.nanoTime() - startTime;
+				System.out.println("Tempo de execucao: " + (double) elapsedTime / 1000000000);
+			}
+		});
+		thread.start();
+
+	}
+
+	// THREAD CONTROLE
+
+	public void suspender() {
+		this.parada = true;
 		try {
-			this.visitProgramaDeclaracao(programa);
-		} catch (RuntimeError error) {
-			Principal.runtimeError(error);
-		} catch (StackOverflowError e) {
-			System.out.println("Erro de memória");
+			synchronized (thread) {
+				
+				thread.wait();
+
+			}
+		} catch (InterruptedException e) {
+			thread.interrupt();
 			e.printStackTrace();
 		}
-		long elapsedTime = System.nanoTime() - startTime;
-		System.out.println("Tempo de execucao: "
-                + (double)elapsedTime/1000000000);
 
+	}
+
+	public void resumir() {
+		this.parada = false;
+		synchronized (thread) {
+			thread.notify();
+		}
+	}
+
+	public void terminar() {
+		this.terminada = true;
+		synchronized (thread) {
+			thread.stop();
+
+		}
 	}
 
 	// HELPERS:
 	private void execute(Declaracao declaracao) {
+		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, declaracao);
 		declaracao.accept(this);
+	}
+
+	private Object evaluate(Expressao expressao) {
+		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, expressao);
+		return expressao.accept(this);
 	}
 
 	private String stringify(Object object) {
@@ -97,10 +146,6 @@ public class Interpretador
 		return object.toString();
 	}
 
-	private Object evaluate(Expressao expressao) {
-		return expressao.accept(this);
-	}
-
 	private boolean isTruthy(Object object) {
 		if (object == null)
 			return false;
@@ -110,7 +155,6 @@ public class Interpretador
 	}
 
 	private boolean isEqual(Object a, Object b) {
-		// nil is only equal to nil.
 		if (a == null && b == null)
 			return true;
 		if (a == null)
@@ -127,54 +171,46 @@ public class Interpretador
 		throw new RuntimeError(operator, "Operador deve ser um número.");
 	}
 
-	private void checkNumberOperands(Token operator, Object left,
-			Object right) {
-		boolean leftDoubleInt = left instanceof Double
-				|| left instanceof Integer;
-		boolean rightDoubleInt = right instanceof Double
-				|| right instanceof Integer;
+	private void checkNumberOperands(Token operator, Object left, Object right) {
+		boolean leftDoubleInt = left instanceof Double || left instanceof Integer;
+		boolean rightDoubleInt = right instanceof Double || right instanceof Integer;
 		if (leftDoubleInt && rightDoubleInt)
 			return;
 
 		throw new RuntimeError(operator, "Operadores devem ser números.");
 	}
 
-	private Object retornaValorNumericoTipoCorreto(TokenType op, Object left,
-			Object right) {
+	private Object retornaValorNumericoTipoCorreto(TokenType op, Object left, Object right) {
 		if (left instanceof Integer && right instanceof Integer) {
 			switch (op) {
-				case MAIS :
-					return (int) left + (int) right;
-				case MENOS :
+			case MAIS:
+				return (int) left + (int) right;
+			case MENOS:
 
-					return (int) left - (int) right;
-				case ASTERISCO :
+				return (int) left - (int) right;
+			case ASTERISCO:
 
-					return (int) left * (int) right;
-				case BARRA :
+				return (int) left * (int) right;
+			case BARRA:
 
-					return (int) left / (int) right;
+				return (int) left / (int) right;
 
 			}
 		}
-		double l = (left instanceof Integer)
-				? ((int) left) / 1.0
-				: (double) left;
-		double r = (right instanceof Integer)
-				? ((int) right) / 1.0
-				: (double) right;
+		double l = (left instanceof Integer) ? ((int) left) / 1.0 : (double) left;
+		double r = (right instanceof Integer) ? ((int) right) / 1.0 : (double) right;
 		switch (op) {
-			case MAIS :
-				return l + r;
-			case MENOS :
+		case MAIS:
+			return l + r;
+		case MENOS:
 
-				return l - r;
-			case ASTERISCO :
+			return l - r;
+		case ASTERISCO:
 
-				return l * r;
-			case BARRA :
+			return l * r;
+		case BARRA:
 
-				return l / r;
+			return l / r;
 		}
 		return null;
 
@@ -187,11 +223,10 @@ public class Interpretador
 		return (double) valor;
 	}
 
-	// TODO: analisar remoção da variavel enviroment 
+	// TODO: analisar remoção da variavel enviroment
 	// nao usada pois existe apenas o escopo local
-	public void executeBlock(List<Declaracao> statements,
-			Environment environment) {
-	
+	public void executeBlock(List<Declaracao> statements, Environment environment) {
+
 //		Environment previous = this.environment; // uselles?
 		try {
 //			this.environment = environment;// uselles?
@@ -203,6 +238,7 @@ public class Interpretador
 //			this.environment = previous;
 		}
 	}
+	
 
 	// Nodes:
 
@@ -212,49 +248,43 @@ public class Interpretador
 		Object direita = evaluate(expressao.direita);
 
 		switch (expressao.operador.type) {
-			case MENOS :
-				checkNumberOperands(expressao.operador, esquerda, direita);
-				return retornaValorNumericoTipoCorreto(MENOS, esquerda,
-						direita);
-			case BARRA :
-				checkNumberOperands(expressao.operador, esquerda, direita);
-				return retornaValorNumericoTipoCorreto(BARRA, esquerda,
-						direita);
-			case ASTERISCO :
-				checkNumberOperands(expressao.operador, esquerda, direita);
-				return retornaValorNumericoTipoCorreto(ASTERISCO, esquerda,
-						direita);
-			case MAIS :
-				if (esquerda instanceof String && direita instanceof String) {
-					return (String) esquerda + (String) direita;
-				}
-				if ((esquerda instanceof Double || esquerda instanceof Integer)
-						&& (direita instanceof Double
-								|| direita instanceof Integer)) {
-					return retornaValorNumericoTipoCorreto(MAIS, esquerda,
-							direita);
-				}
-				throw new RuntimeError(expressao.operador,
-						"Operadores devem ser números ou cadeia de caracteres.");
-			case MAIOR_QUE :
-				checkNumberOperands(expressao.operador, esquerda, direita);
-				return toDouble(esquerda) > toDouble(direita);
-			case MAIOR_IQUAL :
-				checkNumberOperands(expressao.operador, esquerda, direita);
-				return toDouble(esquerda) >= toDouble(direita);
-			case MENOR_QUE :
-				checkNumberOperands(expressao.operador, esquerda, direita);
-				return toDouble(esquerda) < toDouble(direita);
-			case MENOR_IGUAL :
-				checkNumberOperands(expressao.operador, esquerda, direita);
+		case MENOS:
+			checkNumberOperands(expressao.operador, esquerda, direita);
+			return retornaValorNumericoTipoCorreto(MENOS, esquerda, direita);
+		case BARRA:
+			checkNumberOperands(expressao.operador, esquerda, direita);
+			return retornaValorNumericoTipoCorreto(BARRA, esquerda, direita);
+		case ASTERISCO:
+			checkNumberOperands(expressao.operador, esquerda, direita);
+			return retornaValorNumericoTipoCorreto(ASTERISCO, esquerda, direita);
+		case MAIS:
+			if (esquerda instanceof String && direita instanceof String) {
+				return (String) esquerda + (String) direita;
+			}
+			if ((esquerda instanceof Double || esquerda instanceof Integer)
+					&& (direita instanceof Double || direita instanceof Integer)) {
+				return retornaValorNumericoTipoCorreto(MAIS, esquerda, direita);
+			}
+			throw new RuntimeError(expressao.operador, "Operadores devem ser números ou cadeia de caracteres.");
+		case MAIOR_QUE:
+			checkNumberOperands(expressao.operador, esquerda, direita);
+			return toDouble(esquerda) > toDouble(direita);
+		case MAIOR_IQUAL:
+			checkNumberOperands(expressao.operador, esquerda, direita);
+			return toDouble(esquerda) >= toDouble(direita);
+		case MENOR_QUE:
+			checkNumberOperands(expressao.operador, esquerda, direita);
+			return toDouble(esquerda) < toDouble(direita);
+		case MENOR_IGUAL:
+			checkNumberOperands(expressao.operador, esquerda, direita);
 
-				return toDouble(esquerda) <= toDouble(direita);
-			case DIFERENTE :
-				return !isEqual(esquerda, direita);
-			case IGUAL :
-				return isEqual(esquerda, direita);
-			default :
-				break;
+			return toDouble(esquerda) <= toDouble(direita);
+		case DIFERENTE:
+			return !isEqual(esquerda, direita);
+		case IGUAL:
+			return isEqual(esquerda, direita);
+		default:
+			break;
 		}
 		return null;
 	}
@@ -274,20 +304,20 @@ public class Interpretador
 		Object direita = evaluate(expressao.direira);
 
 		switch (expressao.operador.type) {
-			case NAO :
-				return !isTruthy(direita);
-			case MENOS :
-				checkNumberOperand(expressao.operador, direita);
-				if (direita instanceof Integer) {
-					return -(int) direita;
-				}
-				if (direita instanceof Double) {
-					return -(double) direita;
-				}
-				break;
+		case NAO:
+			return !isTruthy(direita);
+		case MENOS:
+			checkNumberOperand(expressao.operador, direita);
+			if (direita instanceof Integer) {
+				return -(int) direita;
+			}
+			if (direita instanceof Double) {
+				return -(double) direita;
+			}
+			break;
 
-			default :
-				break;
+		default:
+			break;
 		}
 		return null;
 	}
@@ -301,8 +331,8 @@ public class Interpretador
 	@Override
 	public Void visitEscrevaDeclaracao(Escreva declaracao) {
 		StringBuilder output = new StringBuilder();
-		
-		for(tree.Expressao expressao : declaracao.expressoes) {
+
+		for (tree.Expressao expressao : declaracao.expressoes) {
 			Object valor = evaluate(expressao);
 			if (valor instanceof VariavelVetor) {
 				Object v[] = ((VariavelVetor) valor).getValores();
@@ -316,7 +346,7 @@ public class Interpretador
 				output.append("]");
 				return null;
 			}
-			output.append(stringify(valor)); 
+			output.append(stringify(valor));
 		}
 		System.out.println(output.toString());// imprime acoes no terminal
 		return null;
@@ -335,8 +365,7 @@ public class Interpretador
 			}
 			if (atribuicao instanceof Expressao.AtribuicaoArray) {
 				Token nome = ((Expressao.AtribuicaoArray) atribuicao).nome;
-				Object index = evaluate(
-						((Expressao.AtribuicaoArray) atribuicao).index);
+				Object index = evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
 				environment.assignLer(nome, valor, index);
 			}
 
@@ -367,7 +396,7 @@ public class Interpretador
 
 	@Override
 	public Void visitBlocoDeclaracao(Bloco declaracao) {
-		
+
 		executeBlock(declaracao.declaracoes, null);
 		return null;
 	}
@@ -407,34 +436,27 @@ public class Interpretador
 
 	@Override
 	public Void visitParaDeclaracao(Para declaracao) {
-		
-		
+
 		evaluate(declaracao.atribuicao);
 		// GAMBIARRA - se o incremento for negativo
 		// inverte o sinal da condição de <= para >=
 		Expressao.Binario condicao = (Expressao.Binario) declaracao.condicao;
 		Expressao.Atribuicao incremento = (Expressao.Atribuicao) declaracao.incremento;
-		Expressao.Binario operacaoIncremento =  (Expressao.Binario) incremento.valor;
+		Expressao.Binario operacaoIncremento = (Expressao.Binario) incremento.valor;
 		Expressao exValorIncremento = operacaoIncremento.direita;
 		Object valorIncremento = evaluate(exValorIncremento);
-		
-		if(valorIncremento instanceof Integer) {
-		
-			if((int) valorIncremento < 0) {
-				condicao = new Binario(
-						condicao.esquerda,
-						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador
-								.line), 
-						condicao.direita);
-				
+
+		if (valorIncremento instanceof Integer) {
+
+			if ((int) valorIncremento < 0) {
+				condicao = new Binario(condicao.operador.line, condicao.esquerda,
+						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
+
 			}
-		} else if( valorIncremento instanceof Double) {
-			if((double) valorIncremento < 0) {
-				condicao = new Binario(
-						condicao.esquerda,
-						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador
-								.line), 
-						condicao.direita);
+		} else if (valorIncremento instanceof Double) {
+			if ((double) valorIncremento < 0) {
+				condicao = new Binario(condicao.operador.line, condicao.esquerda,
+						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
 			}
 		}
 //		System.out.println(valorIncremento);
@@ -452,15 +474,15 @@ public class Interpretador
 		for (Declaracao variaveis : declaracao.variaveis) {
 			execute(variaveis);
 		}
-		
-		for(Declaracao modulo : declaracao.modulos) {
+
+		for (Declaracao modulo : declaracao.modulos) {
 			execute(modulo);
 		}
-		
+
 		for (Declaracao corpo : declaracao.corpo) {
 			execute(corpo);
 		}
-		
+
 		return null;
 	}
 
@@ -474,15 +496,12 @@ public class Interpretador
 		// negativos");
 		// }
 		if (intervaloI > intervaloF) {
-			throw new RuntimeError(declaracao.nome,
-					"Intervalo inicial não pode ser maior que o intervalo final");
+			throw new RuntimeError(declaracao.nome, "Intervalo inicial não pode ser maior que o intervalo final");
 		}
-		if(declaracao.tipo.type == TokenType.TIPO_MODULO) {
-    		throw new RuntimeError(declaracao.nome,
-					"vetor não pode ter o tipo modulo.");
-    	}
-		environment.defineArray(declaracao.nome, new VariavelVetor(
-				declaracao.tipo.type, intervaloI, intervaloF));
+		if (declaracao.tipo.type == TokenType.TIPO_MODULO) {
+			throw new RuntimeError(declaracao.nome, "vetor não pode ter o tipo modulo.");
+		}
+		environment.defineArray(declaracao.nome, new VariavelVetor(declaracao.tipo.type, intervaloI, intervaloF));
 		return null;
 	}
 
@@ -497,23 +516,17 @@ public class Interpretador
 	}
 
 	@Override
-	public Object visitVariavelArrayExpressao(
-			Expressao.VariavelArray expressao) {
-		VariavelVetor variavel = (VariavelVetor) environment
-				.get(expressao.nome);
+	public Object visitVariavelArrayExpressao(Expressao.VariavelArray expressao) {
+		VariavelVetor variavel = (VariavelVetor) environment.get(expressao.nome);
 		Object index = evaluate(expressao.index);
 		if (index == null) {
-			throw new RuntimeError(expressao.nome,
-					"Index informado não pode ser nulo.");
+			throw new RuntimeError(expressao.nome, "Index informado não pode ser nulo.");
 		}
 		if (!(index instanceof Integer)) {
-			throw new RuntimeError(expressao.nome,
-					"Index informado não pode ser resolvido.");
+			throw new RuntimeError(expressao.nome, "Index informado não pode ser resolvido.");
 		}
-		if ((int) index < 0 || (int) index > variavel.getIntervaloF()
-				|| (int) index < variavel.getIntervaloI()) {
-			throw new RuntimeError(expressao.nome,
-					"Index informado não encontrado");
+		if ((int) index < 0 || (int) index > variavel.getIntervaloF() || (int) index < variavel.getIntervaloI()) {
+			throw new RuntimeError(expressao.nome, "Index informado não encontrado");
 		}
 		return variavel.getValorNoIndex((int) index);
 	}
@@ -527,7 +540,7 @@ public class Interpretador
 	public Void visitRepitaDeclaracao(Repita declaracao) {
 		do {
 			execute(declaracao.corpo);
-		} while(isTruthy(evaluate(declaracao.condicao)));
+		} while (isTruthy(evaluate(declaracao.condicao)));
 		return null;
 	}
 
@@ -547,7 +560,7 @@ public class Interpretador
 
 	@Override
 	public Void visitVarDeclaracoesDeclaracao(VarDeclaracoes declaracao) {
-		for(Declaracao variavel : declaracao.variaveis) {
+		for (Declaracao variavel : declaracao.variaveis) {
 			execute(variavel);
 		}
 		return null;

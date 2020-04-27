@@ -1,9 +1,4 @@
-package interpreter;
-
-import java.util.Arrays;
-
-import model.TokenType;
-import parser.RuntimeError;
+package model;
 
 public class VariavelVetor {
     private Object[] valores;
