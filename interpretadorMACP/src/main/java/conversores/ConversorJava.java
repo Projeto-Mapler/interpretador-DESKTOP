@@ -2,11 +2,11 @@ package conversores;
 
 import java.util.List;
 
-import interpreter.VariavelVetor;
 import main.Principal;
+import model.RuntimeError;
 import model.Token;
 import model.TokenType;
-import parser.RuntimeError;
+import model.VariavelVetor;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
@@ -69,7 +69,7 @@ Declaracao.Visitor<Void> {
 				return programaJava;
 			}
 		} catch (RuntimeError error) {
-			Principal.runtimeError(error);
+			// Principal.runtimeError(error); fixme
 		} finally {
 			escritor.reset();
 		}

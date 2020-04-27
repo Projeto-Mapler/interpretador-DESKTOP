@@ -8,10 +8,10 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import conversores.ConversorJava;
 import debug.BreakpointsDebugStrategy;
 import debug.Debugador;
 import debug.GerenciadorEventos;
-import debug.PassoAPassoDebugStrategy;
 import interpreter.Interpretador;
 import model.ParserError;
 import model.RuntimeError;
@@ -72,7 +72,7 @@ public class Principal {
 //		System.out.println(declaracoes.size());
 //		new ImpressoraAST().print(declaracoes);// imprime arvore
 //		JavaConversorTeste t = new JavaConversorTeste();
-//		interpreter.interpret(programa);
+		interpreter.interpret(programa);
 		System.out.println("\n\n===>>Conversor Java:\n");
 //		System.out.println(t.converter(programa));
 		

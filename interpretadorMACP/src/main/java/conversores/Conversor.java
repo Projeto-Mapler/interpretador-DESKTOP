@@ -3,10 +3,8 @@ package conversores;
 import java.util.HashMap;
 import java.util.Map;
 
-import interpreter.VariavelVetor;
 import model.TokenType;
-import tree.Declaracao;
-import tree.Expressao;
+import model.VariavelVetor;
 import tree.Declaracao.Programa;
 
 public abstract class Conversor {
