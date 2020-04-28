@@ -8,8 +8,8 @@ public class PassoAPassoDebugStrategy implements DebugStrategy{
 	public int executar(AstDebugNode node, Debugador debugador) {
 		int linhaAnterior = debugador.getLinha();
 		
-		if(linhaAnterior == node.getLinha()) return linhaAnterior;
 		System.out.println("[debug] linha: " + node.getLinha() + " .. " + node.getClass().getName());
+		if(linhaAnterior == node.getLinha()) return linhaAnterior;
 		debugador.pausaExecucao();
 		return node.getLinha();
 	}

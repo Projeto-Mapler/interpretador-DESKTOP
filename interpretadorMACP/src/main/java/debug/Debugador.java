@@ -25,12 +25,14 @@ public class Debugador implements EventoListener {
 
 	@Override
 	public void update(TipoEvento tipoEvento, Object payload) {
-		if (estado == EstadosDebug.DESATIVO)
-			return;
+	
 		switch (tipoEvento) {
 		case TOGGLE_DEBUG:
 			this.setDebugadorAtivo((Boolean) payload);
+			break;
 		case NODE_DEBUG:
+			if (estado == EstadosDebug.DESATIVO)
+				return;
 			this.updateNodeDebug(payload);
 
 			break;
@@ -67,6 +69,7 @@ public class Debugador implements EventoListener {
 	
 
 	public void setDebugadorAtivo(boolean ativo) {
+		System.out.println("esta: " + ativo);
 		this.setEstado(ativo ? EstadosDebug.ATIVO : EstadosDebug.DESATIVO);
 	}
 

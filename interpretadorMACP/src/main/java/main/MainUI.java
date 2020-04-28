@@ -153,15 +153,17 @@ public class MainUI extends JFrame implements EventoListener{
 		});
 		
 		this.checkBoxDebugAtivo = new JCheckBox("Debug ativo", true);
-		this.checkBoxDebugAtivo.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				 JCheckBox cbLog = (JCheckBox) e.getSource();
-			        ge.notificar(TipoEvento.TOGGLE_DEBUG, cbLog.isSelected());
-				
-			}
-		});
+		// n usado: degug eh instanciado apenas apos o botao de executar eh clicado
+//		this.checkBoxDebugAtivo.addActionListener(new ActionListener() {
+//			
+//			@Override
+//			public void actionPerformed(ActionEvent e) {
+//				System.out.println("jeje");
+//				 JCheckBox cbLog = (JCheckBox) e.getSource();
+//			        ge.notificar(TipoEvento.TOGGLE_DEBUG, cbLog.isSelected());
+//				
+//			}
+//		});
 		
 		this.botaoDebugContinuar = new JButton("|>");
 	
@@ -208,7 +210,7 @@ public class MainUI extends JFrame implements EventoListener{
 	}
 	private void rodarArquivo(String caminho) {
 		try {
-			new Principal(ge).runFile(caminho);
+			new Principal(ge, checkBoxDebugAtivo.isSelected()).runFile(caminho);
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

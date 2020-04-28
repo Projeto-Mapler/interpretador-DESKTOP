@@ -36,8 +36,11 @@ public class ConversorJava extends Conversor implements
 Expressao.Visitor<Void>,
 Declaracao.Visitor<Void> {
 	
-	public ConversorJava(Declaracao.Programa programa) {
+	private Principal principal;
+	
+	public ConversorJava(Principal principal, Declaracao.Programa programa) {
 		super(programa);
+		this.principal = principal;
 	}
 	
 	private void evaluate(Expressao expressao) {
@@ -69,7 +72,7 @@ Declaracao.Visitor<Void> {
 				return programaJava;
 			}
 		} catch (RuntimeError error) {
-			// Principal.runtimeError(error); fixme
+			this.principal.runtimeError(error); 
 		} finally {
 			escritor.reset();
 		}

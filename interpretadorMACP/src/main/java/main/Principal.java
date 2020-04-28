@@ -12,6 +12,7 @@ import conversores.ConversorJava;
 import debug.BreakpointsDebugStrategy;
 import debug.Debugador;
 import debug.GerenciadorEventos;
+import debug.PassoAPassoDebugStrategy;
 import interpreter.Interpretador;
 import model.ParserError;
 import model.RuntimeError;
@@ -30,17 +31,17 @@ public class Principal {
 	private  Interpretador interpreter;
 	private  Debugador debugador;	
 	
-	public Principal(GerenciadorEventos ge) {
+	public Principal(GerenciadorEventos ge, boolean debugAtivo) {
 		input = new InputStreamReader(System.in);
 		reader = new BufferedReader(input);
 		this.ge = ge;
 		
 		interpreter = new Interpretador(this, reader, ge);
-		debugador = new Debugador(interpreter, ge, true);
+		debugador = new Debugador(interpreter, ge, debugAtivo);
 		BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
 		breakpointsDebugStrategy.addBreakPoint(13);
 		debugador.setDebugStrategy(breakpointsDebugStrategy);
-//		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
+		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 	
 	}
 
@@ -73,11 +74,11 @@ public class Principal {
 //		new ImpressoraAST().print(declaracoes);// imprime arvore
 //		JavaConversorTeste t = new JavaConversorTeste();
 		interpreter.interpret(programa);
-		System.out.println("\n\n===>>Conversor Java:\n");
 //		System.out.println(t.converter(programa));
 		
-		ConversorJava cj = new ConversorJava(programa);
-		System.out.println(cj.converter());
+		ConversorJava cj = new ConversorJava(this, programa);
+//		System.out.println("\n\n===>>Conversor Java:\n");
+//		System.out.println(cj.converter());
 
 	}
 
