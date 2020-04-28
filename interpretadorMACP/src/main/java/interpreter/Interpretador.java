@@ -389,7 +389,9 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	@Override
 	public Object visitAtribuicaoExpressao(Atribuicao expressao) {
 		Object value = evaluate(expressao.valor);
-
+		if(value instanceof model.Modulo) {
+			throw new RuntimeError(expressao.nome, "Módulo não pode ser atribuido para variável");
+		}
 		environment.assign(expressao.nome, value);
 		return value;
 	}

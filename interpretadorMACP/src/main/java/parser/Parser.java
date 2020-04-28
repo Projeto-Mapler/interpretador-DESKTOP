@@ -186,7 +186,6 @@ public class Parser {
 	private Declaracao declaracaoVariaveis() {
 		List<Declaracao> retorno = new ArrayList<Declaracao>();
 		List<Token> nomes = new ArrayList<Token>();
-		Token primeiro;
 		do {
 			nomes.add(consume(IDENTIFICADOR, "Esperado nome da variavel."));
 		} while (match(VIRGULA));

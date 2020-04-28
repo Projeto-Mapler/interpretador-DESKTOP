@@ -18,7 +18,7 @@ public class Debugador implements EventoListener {
 		this.ge.inscrever(TipoEvento.NODE_DEBUG, this);
 		this.ge.inscrever(TipoEvento.CONTINUAR_DEBUG, this);
 		this.ge.inscrever(TipoEvento.FINALIZAR_DEBUG, this);
-		this.ge.inscrever(TipoEvento.TOGGLE_DEBUG, this);
+//		this.ge.inscrever(TipoEvento.TOGGLE_DEBUG, this); // nao usado
 		
 		this.setDebugadorAtivo(ativo);
 	}
@@ -27,9 +27,10 @@ public class Debugador implements EventoListener {
 	public void update(TipoEvento tipoEvento, Object payload) {
 	
 		switch (tipoEvento) {
-		case TOGGLE_DEBUG:
-			this.setDebugadorAtivo((Boolean) payload);
-			break;
+// nao usado
+//		case TOGGLE_DEBUG:
+//			this.setDebugadorAtivo((Boolean) payload);
+//			break;
 		case NODE_DEBUG:
 			if (estado == EstadosDebug.DESATIVO)
 				return;
@@ -69,7 +70,6 @@ public class Debugador implements EventoListener {
 	
 
 	public void setDebugadorAtivo(boolean ativo) {
-		System.out.println("esta: " + ativo);
 		this.setEstado(ativo ? EstadosDebug.ATIVO : EstadosDebug.DESATIVO);
 	}
 

@@ -84,7 +84,7 @@ public class Principal {
 
 
 	private void report(int line, String onde, String msg) {
-		System.err.println("[Parser Erro | linha " + line + "] Erro" + onde + ": " + msg);
+		System.err.println("[Parser Erro | linha " + line + "] Erro em '" + onde + "': " + msg);
 		temErro = true;
 	}
 
@@ -101,7 +101,7 @@ public class Principal {
 	}
 
 	public void runtimeError(RuntimeError error) {
-		System.err.println("[Runtime Erro | linha " + error.token.line + "] " + error.getMessage());
+		System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
 		temRunTimeErro = true;
 	}
 
