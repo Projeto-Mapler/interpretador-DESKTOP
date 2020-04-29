@@ -8,9 +8,9 @@
 	</classpathentry>
 	<classpathentry kind="src" output="target/test-classes" path="src/test/java">
 		<attributes>
+			<attribute name="test" value="true"/>
 			<attribute name="optional" value="true"/>
 			<attribute name="maven.pomderived" value="true"/>
-			<attribute name="test" value="true"/>
 		</attributes>
 	</classpathentry>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.8">
@@ -23,5 +23,14 @@
 			<attribute name="maven.pomderived" value="true"/>
 		</attributes>
 	</classpathentry>
+	<classpathentry kind="lib" path="src/main/java/libs/charm-glisten-4.4.1.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/flowless-0.6.1.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/fontawesomefx-8.2.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/jfoenix-8.0.7.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/reactfx-2.0-M5.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/richtextfx-0.10.3.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/undofx-2.1.0.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/undofx-fat-2.1.0.jar"/>
+	<classpathentry kind="lib" path="src/main/java/libs/wellbehavedfx-0.3.3.jar"/>
 	<classpathentry kind="output" path="target/classes"/>
 </classpath>
