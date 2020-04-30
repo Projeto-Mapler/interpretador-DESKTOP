@@ -65,9 +65,14 @@ import model.TokenType;
 import tree.Declaracao;
 import tree.Expressao;
 
+/**
+ * Análise Sintática
+ * @author Kerlyson
+ *
+ */
 public class Parser {
 	private final List<Token> tokens;
-	private int current = 0;
+	private int indexTokenAtual = 0;
 	private Principal runTimer;
 
 	public Parser(Principal runTimer, List<Token> tokens) {
@@ -81,18 +86,18 @@ public class Parser {
 		List<Declaracao> modulos = new ArrayList<Declaracao>();
 		try {
 
-			Token variaveisToken = consume(VARIAVEIS, "Esperado \"variaveis\"");
-			while (!isAtEnd() && peek().type != INICIO) {
+			Token variaveisToken = consumirToken(VARIAVEIS, "Esperado \"variaveis\"");
+			while (!isFimDoArquivo() && espiar().type != INICIO) {
 				variaveis.add(declaracaoVariaveis());
 			}
-			consume(INICIO, "Esperado \"inicio\"");
+			consumirToken(INICIO, "Esperado \"inicio\"");
 
-			while (!isAtEnd() && peek().type != FIM) {
+			while (!isFimDoArquivo() && espiar().type != FIM) {
 				corpo.add(declaracao());
 			}
-			consume(FIM, "Esperado \"fim\"");
+			consumirToken(FIM, "Esperado \"fim\"");
 
-			while (!isAtEnd()) {
+			while (!isFimDoArquivo()) {
 				modulos.add(declaracaoModulo());
 			}
 			return new Declaracao.Programa(variaveisToken.line, variaveis, corpo, modulos);
@@ -104,34 +109,34 @@ public class Parser {
 	}
 
 	// NAVEGADORES:
-	private boolean isAtEnd() {
-		return peek().type == EOF;
+	private boolean isFimDoArquivo() {
+		return espiar().type == EOF;
 	}
 
-	private Token peek() {
-		return tokens.get(current);
+	private Token espiar() {
+		return tokens.get(indexTokenAtual);
 	}
 
-	private Token previous() {
-		return tokens.get(current - 1);
+	private Token anterior() {
+		return tokens.get(indexTokenAtual - 1);
 	}
 
-	private Token advance() {
-		if (!isAtEnd())
-			current++;
-		return previous();
+	private Token avancar() {
+		if (!isFimDoArquivo())
+			indexTokenAtual++;
+		return anterior();
 	}
 
-	private boolean check(TokenType type) {
-		if (isAtEnd())
+	private boolean checar(TokenType type) {
+		if (isFimDoArquivo())
 			return false;
-		return peek().type == type;
+		return espiar().type == type;
 	}
 
-	private boolean match(TokenType... types) {
+	private boolean isTokenTypeIgualA(TokenType... types) {
 		for (TokenType type : types) {
-			if (check(type)) {
-				advance();
+			if (checar(type)) {
+				avancar();
 				return true;
 			}
 		}
@@ -139,21 +144,27 @@ public class Parser {
 		return false;
 	}
 
-	private Token consume(TokenType type, String message) {
-		if (check(type))
-			return advance();
+	private Token consumirToken(TokenType type, String message) {
+		if (checar(type))
+			return avancar();
 
-		throw error(peek(), message);
+		throw error(espiar(), message);
 	}
 
-	private void synchronize() {
-		advance();
+	/**
+	 * Permite 'sincronizar' a execução. Ao encontrar um erro a execução continua
+	 * até todo o arquivo passar pelo parser.
+	 * 
+	 * Assim, é possivel achar todos os erros no arquivo em vez de um por um.
+	 */
+	private void sincronizar() {
+		avancar();
 
-		while (!isAtEnd()) {
-			if (previous().type == PONTO_VIRGULA)
+		while (!isFimDoArquivo()) {
+			if (anterior().type == PONTO_VIRGULA)
 				return;
 
-			switch (peek().type) {
+			switch (espiar().type) {
 			case VARIAVEIS:
 			case INICIO:
 			case FIM:
@@ -166,7 +177,7 @@ public class Parser {
 				return;
 			}
 
-			advance();
+			avancar();
 		}
 	}
 
@@ -187,17 +198,17 @@ public class Parser {
 		List<Declaracao> retorno = new ArrayList<Declaracao>();
 		List<Token> nomes = new ArrayList<Token>();
 		do {
-			nomes.add(consume(IDENTIFICADOR, "Esperado nome da variavel."));
-		} while (match(VIRGULA));
-		consume(DOIS_PONTOS, "Esperado ':' ");
+			nomes.add(consumirToken(IDENTIFICADOR, "Esperado nome da variavel."));
+		} while (isTokenTypeIgualA(VIRGULA));
+		consumirToken(DOIS_PONTOS, "Esperado ':' ");
 
-		if (match(TIPO_VETOR)) {
-			consume(ESQ_COLCHETE, "Esperado [");
-			Token intervaloI = consume(INTEIRO, "Esperado valor inteiro positivo");
-			consume(INTERVALO, "Esperado ..");
-			Token intervaloF = consume(INTEIRO, "Esperado valor inteiro positivo");
-			consume(DIR_COLCHETE, "Esperado ]");
-			consume(DE, "Esperado de");
+		if (isTokenTypeIgualA(TIPO_VETOR)) {
+			consumirToken(ESQ_COLCHETE, "Esperado [");
+			Token intervaloI = consumirToken(INTEIRO, "Esperado valor inteiro positivo");
+			consumirToken(INTERVALO, "Esperado ..");
+			Token intervaloF = consumirToken(INTEIRO, "Esperado valor inteiro positivo");
+			consumirToken(DIR_COLCHETE, "Esperado ]");
+			consumirToken(DE, "Esperado de");
 			Token tipoDoVetor = tipoDado();
 			for (Token nome : nomes) {
 				Declaracao declaracaoVariavelArray = declaracaoVariavelArray(nome, intervaloI, intervaloF, tipoDoVetor);
@@ -210,7 +221,7 @@ public class Parser {
 				retorno.add(declaracao);
 			}
 		}
-		consume(PONTO_VIRGULA, "Esperado ;");
+		consumirToken(PONTO_VIRGULA, "Esperado ;");
 		return new Declaracao.VarDeclaracoes(nomes.get(0).line, retorno);
 	}
 
@@ -222,23 +233,23 @@ public class Parser {
 	 */
 	private Declaracao declaracao() {
 		try {
-			if (match(SE))
+			if (isTokenTypeIgualA(SE))
 				return seDeclaracao();
-			if (match(PARA))
+			if (isTokenTypeIgualA(PARA))
 				return paraDeclaracao();
-			if (match(ENQUANTO))
+			if (isTokenTypeIgualA(ENQUANTO))
 				return enquantoDeclaracao();
-			if (match(ESCREVER))
+			if (isTokenTypeIgualA(ESCREVER))
 				return escreverDeclaracao();
-			if (match(LER))
+			if (isTokenTypeIgualA(LER))
 				return lerDeclaracao();
-			if (match(ESQ_CHAVES))
-				return new Declaracao.Bloco(previous().line, bloco());
-			if (match(REPITA))
+			if (isTokenTypeIgualA(ESQ_CHAVES))
+				return new Declaracao.Bloco(anterior().line, bloco());
+			if (isTokenTypeIgualA(REPITA))
 				return repitaDeclaracao();
 			return expressaoDeclaracao();
 		} catch (ParserError error) {
-			synchronize();
+			sincronizar();
 			return null;
 		}
 	}
@@ -251,11 +262,11 @@ public class Parser {
 	private List<Declaracao> bloco() {
 		List<Declaracao> declaracoes = new ArrayList<>();
 
-		while (!check(DIR_CHAVES) && !isAtEnd()) {
+		while (!checar(DIR_CHAVES) && !isFimDoArquivo()) {
 			declaracoes.add(declaracao());
 		}
 
-		consume(DIR_CHAVES, "Esperado '}' depois do bloco.");
+		consumirToken(DIR_CHAVES, "Esperado '}' depois do bloco.");
 		return declaracoes;
 	}
 
@@ -268,9 +279,9 @@ public class Parser {
 		List<Expressao> expressoes = new ArrayList<Expressao>();
 		do {
 			expressoes.add(expressao());
-		} while (match(VIRGULA));
-		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
-		return new Declaracao.Escreva(previous().line, expressoes);
+		} while (isTokenTypeIgualA(VIRGULA));
+		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		return new Declaracao.Escreva(anterior().line, expressoes);
 	}
 
 	/**
@@ -289,10 +300,10 @@ public class Parser {
 			Token nome = ((Expressao.Variavel) expressao).nome;
 			retorno = new Declaracao.Ler(nome.line, new Expressao.Atribuicao(nome.line, nome, null));
 		} else {
-			error(previous(), "Esperado uma variável");
+			error(anterior(), "Esperado uma variável");
 		}
 
-		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
 		return retorno;
 	}
 
@@ -303,11 +314,11 @@ public class Parser {
 	 */
 	private Declaracao expressaoDeclaracao() {
 		Expressao expressao = expressao();
-		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
 		if (expressao instanceof Expressao.Variavel) {
 			return chamadaModulo(((Expressao.Variavel) expressao).nome);
 		}
-		return new Declaracao.Expressao(previous().line, expressao);
+		return new Declaracao.Expressao(anterior().line, expressao);
 	}
 
 	/**
@@ -326,8 +337,8 @@ public class Parser {
 	 */
 	private Expressao expParentizada() {
 		Expressao expressao = expressao();
-		consume(DIR_PARENTESES, "Esperado ')' depois da expressao.");
-		return new Expressao.ExpParentizada(previous().line,new Expressao.Grupo(previous().line,expressao));
+		consumirToken(DIR_PARENTESES, "Esperado ')' depois da expressao.");
+		return new Expressao.ExpParentizada(anterior().line,new Expressao.Grupo(anterior().line,expressao));
 	}
 
 	/**
@@ -337,8 +348,8 @@ public class Parser {
 	 */
 	private Expressao atribuicao() {
 		Expressao expressao = ou();
-		if (match(ATRIBUICAO)) {
-			Token atribuicao = previous();
+		if (isTokenTypeIgualA(ATRIBUICAO)) {
+			Token atribuicao = anterior();
 			Expressao valor = atribuicao();
 
 			if (expressao instanceof Expressao.Variavel) {
@@ -363,8 +374,8 @@ public class Parser {
 	private Expressao ou() {
 		Expressao expressao = e();
 
-		while (match(OU)) {
-			Token operador = previous();
+		while (isTokenTypeIgualA(OU)) {
+			Token operador = anterior();
 			Expressao direita = e();
 			expressao = new Expressao.Logico(operador.line, expressao, operador, direita);
 		}
@@ -379,8 +390,8 @@ public class Parser {
 	private Expressao e() {
 		Expressao expressao = igualdade();
 
-		while (match(E)) {
-			Token operador = previous();
+		while (isTokenTypeIgualA(E)) {
+			Token operador = anterior();
 			Expressao direita = igualdade();
 			expressao = new Expressao.Logico(operador.line, expressao, operador, direita);
 		}
@@ -395,8 +406,8 @@ public class Parser {
 	private Expressao igualdade() {
 		Expressao expressao = comparacao(); // esquerda
 
-		while (match(DIFERENTE, IGUAL)) {
-			Token operador = previous();
+		while (isTokenTypeIgualA(DIFERENTE, IGUAL)) {
+			Token operador = anterior();
 			Expressao direita = comparacao();
 			expressao = new Expressao.Binario(operador.line, expressao, operador, direita);
 		}
@@ -412,8 +423,8 @@ public class Parser {
 	private Expressao comparacao() {
 		Expressao expressao = adicao(); // esquerda
 
-		while (match(MAIOR_QUE, MAIOR_IQUAL, MENOR_QUE, MENOR_IGUAL)) {
-			Token operador = previous();
+		while (isTokenTypeIgualA(MAIOR_QUE, MAIOR_IQUAL, MENOR_QUE, MENOR_IGUAL)) {
+			Token operador = anterior();
 			Expressao direita = adicao();
 			expressao = new Expressao.Binario(operador.line, expressao, operador, direita);
 		}
@@ -429,8 +440,8 @@ public class Parser {
 	private Expressao adicao() {
 		Expressao expressao = multiplicacao(); // esquerda
 
-		while (match(MENOS, MAIS)) {
-			Token operador = previous();
+		while (isTokenTypeIgualA(MENOS, MAIS)) {
+			Token operador = anterior();
 			Expressao direita = multiplicacao();
 			expressao = new Expressao.Binario(operador.line, expressao, operador, direita);
 		}
@@ -446,8 +457,8 @@ public class Parser {
 	private Expressao multiplicacao() {
 		Expressao expressao = unario(); // esquerda
 
-		while (match(BARRA, ASTERISCO)) {
-			Token operador = previous();
+		while (isTokenTypeIgualA(BARRA, ASTERISCO)) {
+			Token operador = anterior();
 			Expressao direita = unario();
 			expressao = new Expressao.Binario(operador.line, expressao, operador, direita);
 		}
@@ -461,8 +472,8 @@ public class Parser {
 	 * @return
 	 */
 	private Expressao unario() {
-		if (match(NAO, MENOS)) {
-			Token operador = previous();
+		if (isTokenTypeIgualA(NAO, MENOS)) {
+			Token operador = anterior();
 			Expressao direita = unario();
 			return new Expressao.Unario(operador.line, operador, direita);
 		}
@@ -476,28 +487,28 @@ public class Parser {
 	 * @return
 	 */
 	private Expressao primario() {
-		if (match(IDENTIFICADOR)) {
-			Token identificador = previous();
-			if (match(ESQ_COLCHETE)) {
+		if (isTokenTypeIgualA(IDENTIFICADOR)) {
+			Token identificador = anterior();
+			if (isTokenTypeIgualA(ESQ_COLCHETE)) {
 				Expressao index = ou();
-				consume(DIR_COLCHETE, "Esperado ]");
+				consumirToken(DIR_COLCHETE, "Esperado ]");
 				return new Expressao.VariavelArray(identificador.line, identificador, index);
 			}
 			return new Expressao.Variavel(identificador.line, identificador);
 		}
-		if (match(FALSO))
-			return new Expressao.Literal(previous().line,false);
-		if (match(VERDADEIRO))
-			return new Expressao.Literal(previous().line,true);
+		if (isTokenTypeIgualA(FALSO))
+			return new Expressao.Literal(anterior().line,false);
+		if (isTokenTypeIgualA(VERDADEIRO))
+			return new Expressao.Literal(anterior().line,true);
 
-		if (match(INTEIRO, REAL, CADEIA, CARACTERE)) {
-			return new Expressao.Literal(previous().line,previous().literal);
+		if (isTokenTypeIgualA(INTEIRO, REAL, CADEIA, CARACTERE)) {
+			return new Expressao.Literal(anterior().line,anterior().literal);
 		}
 
-		if (match(ESQ_PARENTESES)) {
+		if (isTokenTypeIgualA(ESQ_PARENTESES)) {
 			return expParentizada();
 		}
-		throw error(peek(), "Esperado expressao.");
+		throw error(espiar(), "Esperado expressao.");
 	}
 
 	/**
@@ -506,10 +517,10 @@ public class Parser {
 	 * @return
 	 */
 	private Token tipoDado() {
-		if (match(TIPO_INTEIRO, TIPO_CADEIA, TIPO_CARACTERE, TIPO_LOGICO, TIPO_REAL, TIPO_MODULO)) {
-			return previous();
+		if (isTokenTypeIgualA(TIPO_INTEIRO, TIPO_CADEIA, TIPO_CARACTERE, TIPO_LOGICO, TIPO_REAL, TIPO_MODULO)) {
+			return anterior();
 		}
-		throw error(peek(), "Tipo inválido.");
+		throw error(espiar(), "Tipo inválido.");
 	}
 
 	/**
@@ -519,13 +530,13 @@ public class Parser {
 	 */
 	private Declaracao seDeclaracao() {
 		Expressao condicao = ou();
-		Token inicio = consume(ENTAO, "Esperado 'entao' depois da expressao.");
-		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
-		Declaracao.Bloco entaoBloco = new Declaracao.Bloco(previous().line,bloco());
+		Token inicio = consumirToken(ENTAO, "Esperado 'entao' depois da expressao.");
+		consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+		Declaracao.Bloco entaoBloco = new Declaracao.Bloco(anterior().line,bloco());
 		Declaracao.Bloco senaoBloco = null;
-		if (match(SENAO)) {
-			consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
-			senaoBloco = new Declaracao.Bloco(previous().line,bloco());
+		if (isTokenTypeIgualA(SENAO)) {
+			consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+			senaoBloco = new Declaracao.Bloco(anterior().line,bloco());
 		}
 		return new Declaracao.Se(inicio.line,condicao, entaoBloco, senaoBloco);
 
@@ -538,9 +549,9 @@ public class Parser {
 	 */
 	private Declaracao enquantoDeclaracao() {
 		Expressao condicao = ou();
-		Token inicio = consume(FACA, "Esperado 'faca' depois da expressao.");
-		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
-		Declaracao.Bloco corpo = new Declaracao.Bloco(previous().line,bloco());
+		Token inicio = consumirToken(FACA, "Esperado 'faca' depois da expressao.");
+		consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+		Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line,bloco());
 		return new Declaracao.Enquanto(inicio.line,condicao, corpo);
 	}
 
@@ -552,15 +563,15 @@ public class Parser {
 	 */
 	private Declaracao paraDeclaracao() {
 
-		Token identificador = consume(IDENTIFICADOR, "Esperado 'identificador' depois da expressao.");
-		consume(DE, "Esperado 'de' depois da expressao.");
+		Token identificador = consumirToken(IDENTIFICADOR, "Esperado 'identificador' depois da expressao.");
+		consumirToken(DE, "Esperado 'de' depois da expressao.");
 		Expressao de = adicao();
-		int linhaOperador = consume(ATE, "Esperado 'ate' depois da expressao.").line;
+		int linhaOperador = consumirToken(ATE, "Esperado 'ate' depois da expressao.").line;
 		Expressao ate = adicao();
-		consume(PASSO, "Esperado 'passo' depois da expressao.");
+		consumirToken(PASSO, "Esperado 'passo' depois da expressao.");
 		Expressao passo = adicao();
-		consume(FACA, "Esperado 'faca' depois da expressao.");
-		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+		consumirToken(FACA, "Esperado 'faca' depois da expressao.");
+		consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(identificador.line,bloco());
 
 		Expressao.Variavel variavel = new Expressao.Variavel(identificador.line,identificador);
@@ -587,12 +598,12 @@ public class Parser {
 	 * @return
 	 */
 	private Declaracao repitaDeclaracao() {
-		Token inicio = previous();
-		consume(ESQ_CHAVES, "Esperado '{' depois da expressao.");
-		Declaracao.Bloco corpo = new Declaracao.Bloco(previous().line,bloco());
-		consume(ATE, "Esperado 'ate' depois da expressão.");
+		Token inicio = anterior();
+		consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+		Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line,bloco());
+		consumirToken(ATE, "Esperado 'ate' depois da expressão.");
 		Expressao condicao = ou();
-		consume(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
 
 		return new Declaracao.Repita(inicio.line,corpo, condicao);
 
@@ -616,11 +627,11 @@ public class Parser {
 	 * @return
 	 */
 	private Declaracao declaracaoModulo() {
-		Token inicio = previous();
-		consume(TIPO_MODULO, "Esperado 'modulo'");
-		Token nome = consume(IDENTIFICADOR, "Esperado nome do módulo");
-		consume(ESQ_CHAVES, "Esperado {");
-		Declaracao.Bloco corpo = new Declaracao.Bloco(previous().line,bloco());
+		Token inicio = anterior();
+		consumirToken(TIPO_MODULO, "Esperado 'modulo'");
+		Token nome = consumirToken(IDENTIFICADOR, "Esperado nome do módulo");
+		consumirToken(ESQ_CHAVES, "Esperado {");
+		Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line,bloco());
 
 		return new Declaracao.Modulo(inicio.line,nome, corpo);
 

@@ -20,6 +20,8 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
+import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
 import debug.EstadosDebug;
@@ -46,6 +48,21 @@ public class MainUI extends JFrame implements EventoListener{
 	private GerenciadorEventos ge = new GerenciadorEventos();
 	
 	public MainUI() {
+		try {
+			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+		} catch (ClassNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (InstantiationException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IllegalAccessException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedLookAndFeelException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 		this.setup();
 		this.setVisible(true);
 		
@@ -212,7 +229,6 @@ public class MainUI extends JFrame implements EventoListener{
 		try {
 			new Principal(ge, checkBoxDebugAtivo.isSelected()).runFile(caminho);
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}

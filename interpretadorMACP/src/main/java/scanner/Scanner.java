@@ -12,6 +12,11 @@ import model.TokenType;
 
 import static model.TokenType.*;
 
+/**
+ * Análise Léxica
+ * @author Kerlyson
+ *
+ */
 public class Scanner {
 	private final String source;
 	private final List<Token> tokens = new ArrayList<>();

@@ -27,35 +27,27 @@ public class Principal {
 	private  boolean temRunTimeErro = false;
 	private  InputStreamReader input;
 	private  BufferedReader reader;
-	private  GerenciadorEventos ge;
 	private  Interpretador interpreter;
 	private  Debugador debugador;	
 	
 	public Principal(GerenciadorEventos ge, boolean debugAtivo) {
 		input = new InputStreamReader(System.in);
 		reader = new BufferedReader(input);
-		this.ge = ge;
 		
 		interpreter = new Interpretador(this, reader, ge);
+		
 		debugador = new Debugador(interpreter, ge, debugAtivo);
 		BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
 		breakpointsDebugStrategy.addBreakPoint(13);
 		debugador.setDebugStrategy(breakpointsDebugStrategy);
-		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
+//		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 	
 	}
 
-	/*
-	 * public static void main(String[] args) throws IOException { String
-	 * caminhoExemplos = "..\\exemplos\\"; String exemplos[] = { "condicionais.txt",
-	 * "laços.txt", "modulo.txt", "variaveis.txt", "io.txt", "operações.txt" };
-	 * String arquivo = "C:\\Users\\Kerlyson\\Desktop\\12.txt";
-	 * runFile(caminhoExemplos+exemplos[5]); }
-	 */
 	public void runFile(String path) throws IOException {
 		byte[] bytes = Files.readAllBytes(Paths.get(path));
 		run(new String(bytes, Charset.defaultCharset()));
-		// Indicate an error in the exit code.
+		
 		if (temErro)
 			System.exit(65);
 		if (temRunTimeErro)
@@ -70,11 +62,7 @@ public class Principal {
 
 		if (temErro)
 			return;
-//		System.out.println(declaracoes.size());
-//		new ImpressoraAST().print(declaracoes);// imprime arvore
-//		JavaConversorTeste t = new JavaConversorTeste();
 		interpreter.interpret(programa);
-//		System.out.println(t.converter(programa));
 		
 		ConversorJava cj = new ConversorJava(this, programa);
 //		System.out.println("\n\n===>>Conversor Java:\n");

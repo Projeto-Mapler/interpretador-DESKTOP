@@ -146,7 +146,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		return object.toString();
 	}
 
-	private boolean isTruthy(Object object) {
+	private boolean isLogico(Object object) {
 		if (object == null)
 			return false;
 		if (object instanceof Boolean)
@@ -154,7 +154,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		return true;
 	}
 
-	private boolean isEqual(Object a, Object b) {
+	private boolean isIgual(Object a, Object b) {
 		if (a == null && b == null)
 			return true;
 		if (a == null)
@@ -280,9 +280,9 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 			return toDouble(esquerda) <= toDouble(direita);
 		case DIFERENTE:
-			return !isEqual(esquerda, direita);
+			return !isIgual(esquerda, direita);
 		case IGUAL:
-			return isEqual(esquerda, direita);
+			return isIgual(esquerda, direita);
 		default:
 			break;
 		}
@@ -305,7 +305,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 		switch (expressao.operador.type) {
 		case NAO:
-			return !isTruthy(direita);
+			return !isLogico(direita);
 		case MENOS:
 			checkNumberOperand(expressao.operador, direita);
 			if (direita instanceof Integer) {
@@ -405,7 +405,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	@Override
 	public Void visitSeDeclaracao(Se declaracao) {
-		if (isTruthy(evaluate(declaracao.condicao))) {
+		if (isLogico(evaluate(declaracao.condicao))) {
 			execute(declaracao.entaoBloco);
 		} else if (declaracao.senaoBloco != null) {
 			execute(declaracao.senaoBloco);
@@ -418,11 +418,11 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		Object esquerda = evaluate(expressao.esquerda);
 
 		if (expressao.operador.type == OU) {
-			if (isTruthy(esquerda)) {
+			if (isLogico(esquerda)) {
 				return esquerda;
 			}
 		} else {
-			if (!isTruthy(esquerda))
+			if (!isLogico(esquerda))
 				return esquerda;
 		}
 		return evaluate(expressao.direita);
@@ -430,7 +430,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	@Override
 	public Void visitEnquantoDeclaracao(Enquanto declaracao) {
-		while (isTruthy(evaluate(declaracao.condicao))) {
+		while (isLogico(evaluate(declaracao.condicao))) {
 			execute(declaracao.corpo);
 		}
 		return null;
@@ -463,7 +463,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		}
 //		System.out.println(valorIncremento);
 //		System.out.println(condicao.operador);
-		while (isTruthy(evaluate(condicao))) {
+		while (isLogico(evaluate(condicao))) {
 			execute(declaracao.facaBloco);
 			evaluate(declaracao.incremento);
 		}
@@ -542,7 +542,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	public Void visitRepitaDeclaracao(Repita declaracao) {
 		do {
 			execute(declaracao.corpo);
-		} while (isTruthy(evaluate(declaracao.condicao)));
+		} while (isLogico(evaluate(declaracao.condicao)));
 		return null;
 	}
 
