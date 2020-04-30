@@ -1,6 +1,8 @@
 package debug;
 
 public enum TipoEvento {
+	LER_EVENTO,				// quando o node 'ler' eh processado
+	ESCREVER_EVENTO,			// quando o node 'escrever' eh processado
 	NODE_DEBUG, 				// quando um node executa o metodo visit
 	ERRO_RUNTIME, 				// quando um runtime erro eh lancado
 	ERRO_PARSE, 				// quando um parse erro eh lancado

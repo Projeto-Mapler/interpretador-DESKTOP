@@ -7,8 +7,10 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +30,7 @@ import debug.EstadosDebug;
 import debug.EventoListener;
 import debug.GerenciadorEventos;
 import debug.TipoEvento;
+import model.LeitorEntradaConsole;
 
 public class MainUI extends JFrame implements EventoListener{
  
@@ -46,6 +49,7 @@ public class MainUI extends JFrame implements EventoListener{
 	private JCheckBox checkBoxDebugAtivo;
 	
 	private GerenciadorEventos ge = new GerenciadorEventos();
+	
 	
 	public MainUI() {
 		try {
@@ -67,6 +71,8 @@ public class MainUI extends JFrame implements EventoListener{
 		this.setVisible(true);
 		
 		this.ge.inscrever(TipoEvento.MUDANCA_ESTADO_DEBUG, this);
+		this.ge.inscrever(TipoEvento.ESCREVER_EVENTO, this);
+		this.ge.inscrever(TipoEvento.LER_EVENTO, this);
 	}
 	
 	public static void main(String[] args) {
@@ -235,6 +241,23 @@ public class MainUI extends JFrame implements EventoListener{
 
 	@Override
 	public void update(TipoEvento tipoEvento, Object payload) {
+		if(tipoEvento == TipoEvento.ESCREVER_EVENTO) {
+			String msg = (String) payload;
+			System.out.println(msg);
+			return;
+		}
+		if(tipoEvento == TipoEvento.LER_EVENTO) {
+			LeitorEntradaConsole leitor = (LeitorEntradaConsole) payload;
+			System.out.println(">");
+			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+			try {
+				leitor.setValor(reader.readLine());
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			return;
+		}
 		if(payload instanceof EstadosDebug ) {
 			EstadosDebug estado = (EstadosDebug)payload;
 			

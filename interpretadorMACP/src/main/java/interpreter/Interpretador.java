@@ -13,6 +13,7 @@ import java.util.List;
 import debug.GerenciadorEventos;
 import debug.TipoEvento;
 import main.Principal;
+import model.LeitorEntradaConsole;
 import model.RuntimeError;
 import model.Token;
 import model.TokenType;
@@ -49,6 +50,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	private Principal runTimer;
 	private Thread thread;
 	private boolean parada, terminada;
+	private LeitorEntradaConsole entradaConsole = new LeitorEntradaConsole();
 
 	public Interpretador(Principal runTimer, BufferedReader reader, GerenciadorEventos ge) {
 		this.runTimer = runTimer;
@@ -348,15 +350,21 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 			}
 			output.append(stringify(valor));
 		}
-		System.out.println(output.toString());// imprime acoes no terminal
+		gerenciadorEventos.notificar(TipoEvento.ESCREVER_EVENTO, output.toString());
+//		System.out.println(output.toString());// imprime acoes no terminal
 		return null;
 	}
 
 	@Override
 	public Void visitLerDeclaracao(Ler declaracao) {
-		try {
-			System.out.print(">");
-			String valor = reader.readLine();
+	
+			this.gerenciadorEventos.notificar(TipoEvento.LER_EVENTO, this.entradaConsole);
+		
+			while(!this.entradaConsole.getValorSetado()) {
+				// espera o valor ser setado 
+			}
+			String valor = this.entradaConsole.getValor();
+			this.entradaConsole.reset();
 //			System.err.println("lido: " + valor);// imprime acoes no terminal
 			Expressao atribuicao = declaracao.atribuicao;
 			if (atribuicao instanceof Expressao.Atribuicao) {
@@ -369,9 +377,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 				environment.assignLer(nome, valor, index);
 			}
 
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
+		
 		return null;
 	}
 
