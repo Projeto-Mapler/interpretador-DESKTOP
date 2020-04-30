@@ -21,9 +21,7 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 
 # Como rodar
 
-Executar classe Principal.java no pacote main.
-
-Passar o caminho do arquivo de texto contendo o pseudocódigo na variável arquivo do método main.
+Executar classe MainUI.java no pacote main.
 
 # Exemplo de código
 
