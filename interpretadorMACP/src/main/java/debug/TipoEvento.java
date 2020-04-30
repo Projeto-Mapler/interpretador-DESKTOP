@@ -1,14 +1,66 @@
 package debug;
 
 public enum TipoEvento {
-	LER_EVENTO,				// quando o node 'ler' eh processado
-	ESCREVER_EVENTO,			// quando o node 'escrever' eh processado
-	NODE_DEBUG, 				// quando um node executa o metodo visit
-	ERRO_RUNTIME, 				// quando um runtime erro eh lancado
-	ERRO_PARSE, 				// quando um parse erro eh lancado
-	TOGGLE_DEBUG, 				// informa se o debug deve ser executado
-	MUDANCA_ESTADO_DEBUG, 	// quando o debugador muda de estado 
-	CONTINUAR_DEBUG, 			// informa o debugador a continuar a execucao
-	FINALIZAR_DEBUG, 			// informa o debugador a terminar a execucao
-	;
+	/**
+	 * quando o node 'ler' eh processado
+	 * 
+	 * @payload - LeitorEntradaConsole
+	 */
+	LER_EVENTO,
+	
+	/**
+	 * quando o node 'escrever' eh processado
+	 * 
+	 * @payload - String
+	 */
+	ESCREVER_EVENTO,
+	
+	/**
+	 * quando um node executa o metodo visit
+	 * 
+	 * @payload - AstDebugNode
+	 */
+	NODE_DEBUG,
+	
+	/**
+	 * quando um runtime erro eh lancado
+	 * 
+	 * @payload - RuntimeError
+	 */
+	ERRO_RUNTIME,
+	
+	/**
+	 * quando um parse erro eh lancado
+	 * 
+	 * @payload - ParserError
+	 */
+	ERRO_PARSE,
+	
+	/**
+	 * informa se o debug deve ser executado
+	 * 
+	 * @payload - Boolean
+	 */
+	TOGGLE_DEBUG,
+	
+	/**
+	 * Quando o debugador muda de estado
+	 * 
+	 * @payload - EstadosDebug
+	 */
+	MUDANCA_ESTADO_DEBUG,
+	
+	/**
+	 * informa o debugador a continuar a execucao
+	 * 
+	 * @payload - null
+	 */
+	CONTINUAR_DEBUG,
+	
+	/**
+	 * informa o debugador a terminar a execucao
+	 * 
+	 * @payload - null
+	 */
+	FINALIZAR_DEBUG,;
 }
