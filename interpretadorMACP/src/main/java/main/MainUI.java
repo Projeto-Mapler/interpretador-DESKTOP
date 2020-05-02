@@ -29,8 +29,8 @@ import javax.swing.border.EmptyBorder;
 import debug.EstadosDebug;
 import debug.EventoListener;
 import debug.GerenciadorEventos;
-import debug.TipoEvento;
-import model.LeitorEntradaConsole;
+import debug.TiposEvento;
+import modelos.LeitorEntradaConsole;
 
 public class MainUI extends JFrame implements EventoListener{
  
@@ -70,9 +70,9 @@ public class MainUI extends JFrame implements EventoListener{
 		this.setup();
 		this.setVisible(true);
 		
-		this.ge.inscrever(TipoEvento.MUDANCA_ESTADO_DEBUG, this);
-		this.ge.inscrever(TipoEvento.ESCREVER_EVENTO, this);
-		this.ge.inscrever(TipoEvento.LER_EVENTO, this);
+		this.ge.inscrever(TiposEvento.MUDANCA_ESTADO_DEBUG, this);
+		this.ge.inscrever(TiposEvento.ESCREVER_EVENTO, this);
+		this.ge.inscrever(TiposEvento.LER_EVENTO, this);
 	}
 	
 	public static void main(String[] args) {
@@ -196,7 +196,7 @@ public class MainUI extends JFrame implements EventoListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ge.notificar(TipoEvento.CONTINUAR_DEBUG, null);
+				ge.notificar(TiposEvento.CONTINUAR_DEBUG, null);
 				
 			}
 		});
@@ -205,7 +205,7 @@ public class MainUI extends JFrame implements EventoListener{
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ge.notificar(TipoEvento.FINALIZAR_DEBUG, null);
+				ge.notificar(TiposEvento.FINALIZAR_DEBUG, null);
 				
 			}
 		});
@@ -240,13 +240,13 @@ public class MainUI extends JFrame implements EventoListener{
 	}
 
 	@Override
-	public void update(TipoEvento tipoEvento, Object payload) {
-		if(tipoEvento == TipoEvento.ESCREVER_EVENTO) {
+	public void update(TiposEvento tipoEvento, Object payload) {
+		if(tipoEvento == TiposEvento.ESCREVER_EVENTO) {
 			String msg = (String) payload;
 			System.out.println(msg);
 			return;
 		}
-		if(tipoEvento == TipoEvento.LER_EVENTO) {
+		if(tipoEvento == TiposEvento.LER_EVENTO) {
 			LeitorEntradaConsole leitor = (LeitorEntradaConsole) payload;
 			System.out.println(">");
 			BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));

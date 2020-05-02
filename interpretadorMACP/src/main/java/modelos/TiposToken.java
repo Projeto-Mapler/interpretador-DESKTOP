@@ -1,6 +1,6 @@
-package model;
+package modelos;
 
-public enum TokenType {
+public enum TiposToken {
     // tokens de um caractere
     ESQ_PARENTESES, DIR_PARENTESES, ESQ_CHAVES, DIR_CHAVES, VIRGULA, PONTO, MENOS, MAIS, PONTO_VIRGULA, BARRA,
     ASTERISCO, DOIS_PONTOS, ESQ_COLCHETE, DIR_COLCHETE,

@@ -1,12 +1,12 @@
-package model;
+package modelos;
 
 public class VariavelVetor {
     private Object[] valores;
-    private TokenType tipo;
+    private TiposToken tipo;
     private int tamanho, intervaloI, intervaloF;
     
     
-    public VariavelVetor(TokenType tipo, int intervaloI, int intervaloF) {
+    public VariavelVetor(TiposToken tipo, int intervaloI, int intervaloF) {
     	
 		this.tipo = tipo;
 		this.intervaloI = intervaloI;
@@ -49,10 +49,10 @@ public class VariavelVetor {
     public void setValores(Object[] valores) {
         this.valores = valores;
     }
-    public TokenType getTipo() {
+    public TiposToken getTipo() {
         return tipo;
     }
-    public void setTipo(TokenType tipo) {
+    public void setTipo(TiposToken tipo) {
         this.tipo = tipo;
     }
     public int getTamanho() {

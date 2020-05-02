@@ -1,4 +1,4 @@
-package model;
+package modelos;
 
 public class RuntimeError extends RuntimeException {
 	public final Token token;

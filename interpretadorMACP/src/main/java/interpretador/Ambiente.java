@@ -1,40 +1,38 @@
-package interpreter;
+package interpretador;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import model.RuntimeError;
-import model.Token;
-import model.TokenType;
-import model.VariavelVetor;
+import modelos.RuntimeError;
+import modelos.Token;
+import modelos.TiposToken;
+import modelos.VariavelVetor;
 
-public class Environment {
-	private final Map<String, Object> valores = new HashMap<>();
-	private final Map<String, TokenType> definicoes = new HashMap<>();
+/**
+ * Gerencia variaveis e seus valores  durante a interpretação do programa
+ * @author Kerlyson
+ *
+ */
+public class Ambiente {
+	private final Map<String, Object> valores = new HashMap<>(); // valores das variaveis <Nome da variavel, valor>
+	private final Map<String, TiposToken> definicoes = new HashMap<>(); // variaveis declaradas <nome, tipo>
 	private ChecadorTipoEstatico checadorTipo = new ChecadorTipoEstatico();
 
-	public void define(Token nome, Token tipo) {
-//		System.err.println(nome.lexeme + " - " + tipo.lexeme + " definido");
-//		if(!isNomeVariavelValido(nome.lexeme)) {
-//			throw new RuntimeError(nome,
-//					"variável '" + nome.lexeme + "' possue um nome inválido.");
-//		}
+	public void definirVariavel(Token nome, Token tipo) {
+
 		definicoes.put(nome.lexeme, tipo.type);
 		valores.put(nome.lexeme, null);
 	}
 
-	public void defineArray(Token nome, VariavelVetor vetor) {
-//		if(!isNomeVariavelValido(nome.lexeme)) {
-//			throw new RuntimeError(nome,
-//					"variável '" + nome.lexeme + "' possue um nome inválido.");
-//		}
-		definicoes.put(nome.lexeme, TokenType.TIPO_VETOR);
+	public void definirVariavelVetor(Token nome, VariavelVetor vetor) {
+
+		definicoes.put(nome.lexeme, TiposToken.TIPO_VETOR);
 		valores.put(nome.lexeme, vetor);
 	}
 
-	public Object get(Token nome) {
+	public Object getValorVariavel(Token nome) {
 		if (valores.containsKey(nome.lexeme)) {
-			if (getVarTipo(nome) == TokenType.TIPO_MODULO
+			if (getTipoVariavel(nome) == TiposToken.TIPO_MODULO
 					&& valores.get(nome.lexeme) == null) {
 				throw new RuntimeError(nome,
 						"modulo não declarado '" + nome.lexeme + "'.");
@@ -46,9 +44,9 @@ public class Environment {
 				"variavel indefinida '" + nome.lexeme + "'.");
 	}
 
-	public void assign(Token nome, Object valor) {
+	public void setValorVariavel(Token nome, Object valor) {
 		if (valores.containsKey(nome.lexeme)) {
-			if (checadorTipo.isTipoValorValido(getVarTipo(nome), valor)) {
+			if (checadorTipo.isTipoValorValido(getTipoVariavel(nome), valor)) {
 				valores.put(nome.lexeme, valor);
 				return;
 			} else {
@@ -57,7 +55,7 @@ public class Environment {
 						"atribuição inválida para '" + nome.lexeme + "'.");
 			}
 		}
-		if (checadorTipo.isTipoValorValido(TokenType.TIPO_MODULO, valor)) {
+		if (checadorTipo.isTipoValorValido(TiposToken.TIPO_MODULO, valor)) {
 			throw new RuntimeError(nome,
 					"modulo não declarado '" + nome.lexeme + "'.");
 		}
@@ -65,9 +63,9 @@ public class Environment {
 				"variavel indefinida '" + nome.lexeme + "'.");
 	}
 
-	public void assignVetor(Token nome, Object index, Object valor) {
+	public void setValorVariavelVetor(Token nome, Object index, Object valor) {
 		if (valores.containsKey(nome.lexeme)) {
-			VariavelVetor variavel = (VariavelVetor) this.get(nome);
+			VariavelVetor variavel = (VariavelVetor) this.getValorVariavel(nome);
 
 			if (!(index instanceof Integer)) {
 				throw new RuntimeError(nome,
@@ -103,11 +101,11 @@ public class Environment {
 	 * @param index
 	 *            - nulo se a variavel a ser atribuida nao for um vetor
 	 */
-	public void assignLer(Token nome, String valorLido, Object index) {
-		TokenType tipo = getVarTipo(nome);
+	public void setVariavelPorFuncaoLer(Token nome, String valorLido, Object index) {
+		TiposToken tipo = getTipoVariavel(nome);
 
-		if (tipo == TokenType.TIPO_VETOR) {
-			tipo = ((VariavelVetor) this.get(nome)).getTipo();
+		if (tipo == TiposToken.TIPO_VETOR) {
+			tipo = ((VariavelVetor) this.getValorVariavel(nome)).getTipo();
 		}
 
 		Object valor;
@@ -118,13 +116,13 @@ public class Environment {
 					"atribuição inválida '" + nome.lexeme + "'.");
 		}
 		if (index != null) {
-			this.assignVetor(nome, index, valor);
+			this.setValorVariavelVetor(nome, index, valor);
 		} else {
-			this.assign(nome, valor);
+			this.setValorVariavel(nome, valor);
 		}
 	}
 
-	public TokenType getVarTipo(Token nome) {
+	public TiposToken getTipoVariavel(Token nome) {
 		return definicoes.get(nome.lexeme);
 	}
 	

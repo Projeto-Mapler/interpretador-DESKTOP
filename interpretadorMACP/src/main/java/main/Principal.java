@@ -1,8 +1,6 @@
 package main;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -13,12 +11,12 @@ import debug.BreakpointsDebugStrategy;
 import debug.Debugador;
 import debug.GerenciadorEventos;
 import debug.PassoAPassoDebugStrategy;
-import debug.TipoEvento;
-import interpreter.Interpretador;
-import model.ParserError;
-import model.RuntimeError;
-import model.Token;
-import model.TokenType;
+import debug.TiposEvento;
+import interpretador.Interpretador;
+import modelos.ParserError;
+import modelos.RuntimeError;
+import modelos.TiposToken;
+import modelos.Token;
 import parser.Parser;
 import scanner.Scanner;
 import tree.Declaracao;
@@ -26,17 +24,15 @@ import tree.Declaracao;
 public class Principal {
 	private  boolean temErro = false;
 	private  boolean temRunTimeErro = false;
-	private  InputStreamReader input;
-	private  BufferedReader reader;
+	
 	private  Interpretador interpreter;
 	private  Debugador debugador;	
 	private GerenciadorEventos eventos;
 	
 	public Principal(GerenciadorEventos ge, boolean debugAtivo) {
-		input = new InputStreamReader(System.in);
-		reader = new BufferedReader(input);
+		
 		eventos = ge;
-		interpreter = new Interpretador(this, reader, ge);
+		interpreter = new Interpretador(this, ge);
 		
 		debugador = new Debugador(interpreter, ge, debugAtivo);
 		BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
@@ -79,10 +75,10 @@ public class Principal {
 	}
 
 	public void error(ParserError erro) {
-		this.eventos.notificar(TipoEvento.ERRO_PARSE, erro);
+		this.eventos.notificar(TiposEvento.ERRO_PARSE, erro);
 
 		if(erro.token != null) {			
-			if (erro.token.type == TokenType.EOF) {
+			if (erro.token.type == TiposToken.EOF) {
 				report(erro.linha, " no fim", erro.mensagem);
 			} else {
 				report(erro.linha, " em '" + erro.token.lexeme + "'", erro.mensagem);
@@ -93,7 +89,7 @@ public class Principal {
 	}
 
 	public void runtimeError(RuntimeError error) {
-		this.eventos.notificar(TipoEvento.ERRO_RUNTIME, error);
+		this.eventos.notificar(TiposEvento.ERRO_RUNTIME, error);
 		System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
 		temRunTimeErro = true;
 	}

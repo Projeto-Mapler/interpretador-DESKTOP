@@ -1,8 +1,8 @@
-package model;
+package modelos;
 
 import java.util.List;
 
-import interpreter.Interpretador;
+import interpretador.Interpretador;
 
 public interface Chamavel {
 	Object chamar(Interpretador interpretador, List<Object> argumentos);

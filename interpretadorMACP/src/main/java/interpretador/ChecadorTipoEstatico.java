@@ -1,27 +1,27 @@
-package interpreter;
+package interpretador;
 
-import model.TokenType;
+import modelos.TiposToken;
 
 public class ChecadorTipoEstatico {
 
-	public TokenType tipoDoValor(Object valor) {
+	public TiposToken tipoDoValor(Object valor) {
 		if (valor instanceof Integer) {
-			return TokenType.TIPO_INTEIRO;
+			return TiposToken.TIPO_INTEIRO;
 		}
 		if (valor instanceof Double) {
-			return TokenType.TIPO_REAL;
+			return TiposToken.TIPO_REAL;
 		}
 		if (valor instanceof Boolean) {
-			return TokenType.TIPO_LOGICO;
+			return TiposToken.TIPO_LOGICO;
 		}
 		if (valor instanceof Character) {
-			return TokenType.TIPO_CARACTERE;
+			return TiposToken.TIPO_CARACTERE;
 		}
 		if (valor instanceof String) {
-			return TokenType.TIPO_CADEIA;
+			return TiposToken.TIPO_CADEIA;
 		}
-		if (valor instanceof model.Modulo) {
-			return TokenType.TIPO_MODULO;
+		if (valor instanceof modelos.Modulo) {
+			return TiposToken.TIPO_MODULO;
 		}
 		// if(valor instanceof Arrays) {
 		// return TokenType.TIPO_VETOR;
@@ -30,7 +30,7 @@ public class ChecadorTipoEstatico {
 		return null;
 	}
 
-	public Object castLerValor(String valor, TokenType tipo) throws Exception {
+	public Object castLerValor(String valor, TiposToken tipo) throws Exception {
 
 		switch (tipo) {
 			case TIPO_INTEIRO :
@@ -55,7 +55,7 @@ public class ChecadorTipoEstatico {
 		// throw error?
 	}
 
-	public boolean isTipoValorValido(TokenType tipo, Object valor) {
+	public boolean isTipoValorValido(TiposToken tipo, Object valor) {
 		return tipo == tipoDoValor(valor);
 	}
 

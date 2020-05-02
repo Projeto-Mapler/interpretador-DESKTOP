@@ -1,6 +1,6 @@
 package debug;
 
-public enum TipoEvento {
+public enum TiposEvento {
 	/**
 	 * quando o node 'ler' eh processado
 	 * 

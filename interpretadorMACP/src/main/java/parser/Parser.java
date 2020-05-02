@@ -1,67 +1,67 @@
 package parser;
 
-import static model.TokenType.ASTERISCO;
-import static model.TokenType.ATE;
-import static model.TokenType.ATRIBUICAO;
-import static model.TokenType.BARRA;
-import static model.TokenType.CADEIA;
-import static model.TokenType.CARACTERE;
-import static model.TokenType.DE;
-import static model.TokenType.DIFERENTE;
-import static model.TokenType.DIR_CHAVES;
-import static model.TokenType.DIR_COLCHETE;
-import static model.TokenType.DIR_PARENTESES;
-import static model.TokenType.DOIS_PONTOS;
-import static model.TokenType.E;
-import static model.TokenType.ENQUANTO;
-import static model.TokenType.ENTAO;
-import static model.TokenType.EOF;
-import static model.TokenType.ESCREVER;
-import static model.TokenType.ESQ_CHAVES;
-import static model.TokenType.ESQ_COLCHETE;
-import static model.TokenType.ESQ_PARENTESES;
-import static model.TokenType.FACA;
-import static model.TokenType.FALSO;
-import static model.TokenType.FIM;
-import static model.TokenType.IDENTIFICADOR;
-import static model.TokenType.IGUAL;
-import static model.TokenType.INICIO;
-import static model.TokenType.INTEIRO;
-import static model.TokenType.INTERVALO;
-import static model.TokenType.LER;
-import static model.TokenType.MAIOR_IQUAL;
-import static model.TokenType.MAIOR_QUE;
-import static model.TokenType.MAIS;
-import static model.TokenType.MENOR_IGUAL;
-import static model.TokenType.MENOR_QUE;
-import static model.TokenType.MENOS;
-import static model.TokenType.NAO;
-import static model.TokenType.OU;
-import static model.TokenType.PARA;
-import static model.TokenType.PASSO;
-import static model.TokenType.PONTO_VIRGULA;
-import static model.TokenType.REAL;
-import static model.TokenType.REPITA;
-import static model.TokenType.SE;
-import static model.TokenType.SENAO;
-import static model.TokenType.TIPO_CADEIA;
-import static model.TokenType.TIPO_CARACTERE;
-import static model.TokenType.TIPO_INTEIRO;
-import static model.TokenType.TIPO_LOGICO;
-import static model.TokenType.TIPO_MODULO;
-import static model.TokenType.TIPO_REAL;
-import static model.TokenType.TIPO_VETOR;
-import static model.TokenType.VARIAVEIS;
-import static model.TokenType.VERDADEIRO;
-import static model.TokenType.VIRGULA;
+import static modelos.TiposToken.ASTERISCO;
+import static modelos.TiposToken.ATE;
+import static modelos.TiposToken.ATRIBUICAO;
+import static modelos.TiposToken.BARRA;
+import static modelos.TiposToken.CADEIA;
+import static modelos.TiposToken.CARACTERE;
+import static modelos.TiposToken.DE;
+import static modelos.TiposToken.DIFERENTE;
+import static modelos.TiposToken.DIR_CHAVES;
+import static modelos.TiposToken.DIR_COLCHETE;
+import static modelos.TiposToken.DIR_PARENTESES;
+import static modelos.TiposToken.DOIS_PONTOS;
+import static modelos.TiposToken.E;
+import static modelos.TiposToken.ENQUANTO;
+import static modelos.TiposToken.ENTAO;
+import static modelos.TiposToken.EOF;
+import static modelos.TiposToken.ESCREVER;
+import static modelos.TiposToken.ESQ_CHAVES;
+import static modelos.TiposToken.ESQ_COLCHETE;
+import static modelos.TiposToken.ESQ_PARENTESES;
+import static modelos.TiposToken.FACA;
+import static modelos.TiposToken.FALSO;
+import static modelos.TiposToken.FIM;
+import static modelos.TiposToken.IDENTIFICADOR;
+import static modelos.TiposToken.IGUAL;
+import static modelos.TiposToken.INICIO;
+import static modelos.TiposToken.INTEIRO;
+import static modelos.TiposToken.INTERVALO;
+import static modelos.TiposToken.LER;
+import static modelos.TiposToken.MAIOR_IQUAL;
+import static modelos.TiposToken.MAIOR_QUE;
+import static modelos.TiposToken.MAIS;
+import static modelos.TiposToken.MENOR_IGUAL;
+import static modelos.TiposToken.MENOR_QUE;
+import static modelos.TiposToken.MENOS;
+import static modelos.TiposToken.NAO;
+import static modelos.TiposToken.OU;
+import static modelos.TiposToken.PARA;
+import static modelos.TiposToken.PASSO;
+import static modelos.TiposToken.PONTO_VIRGULA;
+import static modelos.TiposToken.REAL;
+import static modelos.TiposToken.REPITA;
+import static modelos.TiposToken.SE;
+import static modelos.TiposToken.SENAO;
+import static modelos.TiposToken.TIPO_CADEIA;
+import static modelos.TiposToken.TIPO_CARACTERE;
+import static modelos.TiposToken.TIPO_INTEIRO;
+import static modelos.TiposToken.TIPO_LOGICO;
+import static modelos.TiposToken.TIPO_MODULO;
+import static modelos.TiposToken.TIPO_REAL;
+import static modelos.TiposToken.TIPO_VETOR;
+import static modelos.TiposToken.VARIAVEIS;
+import static modelos.TiposToken.VERDADEIRO;
+import static modelos.TiposToken.VIRGULA;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import main.Principal;
-import model.ParserError;
-import model.Token;
-import model.TokenType;
+import modelos.ParserError;
+import modelos.Token;
+import modelos.TiposToken;
 import tree.Declaracao;
 import tree.Expressao;
 
@@ -127,14 +127,14 @@ public class Parser {
 		return anterior();
 	}
 
-	private boolean checar(TokenType type) {
+	private boolean checar(TiposToken type) {
 		if (isFimDoArquivo())
 			return false;
 		return espiar().type == type;
 	}
 
-	private boolean isTokenTypeIgualA(TokenType... types) {
-		for (TokenType type : types) {
+	private boolean isTokenTypeIgualA(TiposToken... types) {
+		for (TiposToken type : types) {
 			if (checar(type)) {
 				avancar();
 				return true;
@@ -144,7 +144,7 @@ public class Parser {
 		return false;
 	}
 
-	private Token consumirToken(TokenType type, String message) {
+	private Token consumirToken(TiposToken type, String message) {
 		if (checar(type))
 			return avancar();
 

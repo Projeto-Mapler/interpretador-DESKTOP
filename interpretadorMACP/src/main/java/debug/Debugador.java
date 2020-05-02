@@ -1,6 +1,6 @@
 package debug;
 
-import interpreter.Interpretador;
+import interpretador.Interpretador;
 import tree.AstDebugNode;
 
 public class Debugador implements EventoListener {
@@ -15,16 +15,16 @@ public class Debugador implements EventoListener {
 	public Debugador(Interpretador i, GerenciadorEventos ge, boolean ativo) {
 		this.interpretador = i;
 		this.ge = ge;
-		this.ge.inscrever(TipoEvento.NODE_DEBUG, this);
-		this.ge.inscrever(TipoEvento.CONTINUAR_DEBUG, this);
-		this.ge.inscrever(TipoEvento.FINALIZAR_DEBUG, this);
+		this.ge.inscrever(TiposEvento.NODE_DEBUG, this);
+		this.ge.inscrever(TiposEvento.CONTINUAR_DEBUG, this);
+		this.ge.inscrever(TiposEvento.FINALIZAR_DEBUG, this);
 //		this.ge.inscrever(TipoEvento.TOGGLE_DEBUG, this); // nao usado
 		
 		this.setDebugadorAtivo(ativo);
 	}
 
 	@Override
-	public void update(TipoEvento tipoEvento, Object payload) {
+	public void update(TiposEvento tipoEvento, Object payload) {
 	
 		switch (tipoEvento) {
 // nao usado
@@ -101,7 +101,7 @@ public class Debugador implements EventoListener {
 
 	protected void setEstado(EstadosDebug estado) {
 		this.estado = estado;
-		this.ge.notificar(TipoEvento.MUDANCA_ESTADO_DEBUG, this.estado);
+		this.ge.notificar(TiposEvento.MUDANCA_ESTADO_DEBUG, this.estado);
 	}
 	
 	protected int getLinha() {

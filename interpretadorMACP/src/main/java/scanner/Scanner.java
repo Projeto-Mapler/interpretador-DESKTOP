@@ -1,16 +1,16 @@
 package scanner;
 
+import static modelos.TiposToken.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import main.Principal;
-import model.ParserError;
-import model.Token;
-import model.TokenType;
-
-import static model.TokenType.*;
+import modelos.ParserError;
+import modelos.Token;
+import modelos.TiposToken;
 
 /**
  * Análise Léxica
@@ -20,7 +20,7 @@ import static model.TokenType.*;
 public class Scanner {
 	private final String source;
 	private final List<Token> tokens = new ArrayList<>();
-	private static final Map<String, TokenType> keywords;
+	private static final Map<String, TiposToken> keywords;
 
 	static {
 		keywords = new HashMap<>();
@@ -188,7 +188,7 @@ public class Scanner {
 			avancar();
 		String text = source.substring(comeco, atual);
 
-		TokenType type = keywords.get(text);
+		TiposToken type = keywords.get(text);
 		if (type == null)
 			type = IDENTIFICADOR;
 		addToken(type);
@@ -273,11 +273,11 @@ public class Scanner {
 		return source.charAt(atual - 1);
 	}
 
-	private void addToken(TokenType type) {
+	private void addToken(TiposToken type) {
 		addToken(type, null);
 	}
 
-	private void addToken(TokenType type, Object literal) {
+	private void addToken(TiposToken type, Object literal) {
 		String text = source.substring(comeco, atual);
 		tokens.add(new Token(type, text, literal, linha));
 	}

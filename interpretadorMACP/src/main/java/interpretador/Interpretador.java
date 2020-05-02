@@ -1,23 +1,21 @@
-package interpreter;
+package interpretador;
 
-import static model.TokenType.ASTERISCO;
-import static model.TokenType.BARRA;
-import static model.TokenType.MAIS;
-import static model.TokenType.MENOS;
-import static model.TokenType.OU;
+import static modelos.TiposToken.ASTERISCO;
+import static modelos.TiposToken.BARRA;
+import static modelos.TiposToken.MAIS;
+import static modelos.TiposToken.MENOS;
+import static modelos.TiposToken.OU;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.util.List;
 
 import debug.GerenciadorEventos;
-import debug.TipoEvento;
+import debug.TiposEvento;
 import main.Principal;
-import model.LeitorEntradaConsole;
-import model.RuntimeError;
-import model.Token;
-import model.TokenType;
-import model.VariavelVetor;
+import modelos.LeitorEntradaConsole;
+import modelos.RuntimeError;
+import modelos.TiposToken;
+import modelos.Token;
+import modelos.VariavelVetor;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
@@ -43,18 +41,23 @@ import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
+/**
+ * Interpreta e gera a saída do pseudocodigo representado no Declaração.Programa passado
+ * @author Kerlyson
+ *
+ */
 public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visitor<Void> {
-	private BufferedReader reader;
-	private Environment environment = new Environment();
-	private GerenciadorEventos gerenciadorEventos;
-	private Principal runTimer;
-	private Thread thread;
-	private boolean parada, terminada;
+	
+	private Ambiente environment = new Ambiente();
+	private GerenciadorEventos gerenciadorEventos; 
+	private Principal runTimer; // usado para reportar erros
+	private Thread thread; // thread para executar o processo de interpretação
+	private boolean parada, terminada; // FLAGS com o estado da execução da thread
 	private LeitorEntradaConsole entradaConsole = new LeitorEntradaConsole();
 
-	public Interpretador(Principal runTimer, BufferedReader reader, GerenciadorEventos ge) {
+	public Interpretador(Principal runTimer, GerenciadorEventos ge) {
 		this.runTimer = runTimer;
-		this.reader = reader;
+
 		this.gerenciadorEventos = ge;
 
 	}
@@ -115,12 +118,12 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	// HELPERS:
 	private void execute(Declaracao declaracao) {
-		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, declaracao);
+		gerenciadorEventos.notificar(TiposEvento.NODE_DEBUG, declaracao);
 		declaracao.accept(this);
 	}
 
 	private Object evaluate(Expressao expressao) {
-		gerenciadorEventos.notificar(TipoEvento.NODE_DEBUG, expressao);
+		gerenciadorEventos.notificar(TiposEvento.NODE_DEBUG, expressao);
 		return expressao.accept(this);
 	}
 
@@ -182,7 +185,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		throw new RuntimeError(operator, "Operadores devem ser números.");
 	}
 
-	private Object retornaValorNumericoTipoCorreto(TokenType op, Object left, Object right) {
+	private Object retornaValorNumericoTipoCorreto(TiposToken op, Object left, Object right) {
 		if (left instanceof Integer && right instanceof Integer) {
 			switch (op) {
 			case MAIS:
@@ -227,7 +230,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	// TODO: analisar remoção da variavel enviroment
 	// nao usada pois existe apenas o escopo local
-	public void executeBlock(List<Declaracao> statements, Environment environment) {
+	public void executeBlock(List<Declaracao> statements, Ambiente environment) {
 
 //		Environment previous = this.environment; // uselles?
 		try {
@@ -350,7 +353,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 			}
 			output.append(stringify(valor));
 		}
-		gerenciadorEventos.notificar(TipoEvento.ESCREVER_EVENTO, output.toString());
+		gerenciadorEventos.notificar(TiposEvento.ESCREVER_EVENTO, output.toString());
 //		System.out.println(output.toString());// imprime acoes no terminal
 		return null;
 	}
@@ -358,7 +361,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	@Override
 	public Void visitLerDeclaracao(Ler declaracao) {
 	
-			this.gerenciadorEventos.notificar(TipoEvento.LER_EVENTO, this.entradaConsole);
+			this.gerenciadorEventos.notificar(TiposEvento.LER_EVENTO, this.entradaConsole);
 		
 			while(!this.entradaConsole.getValorSetado()) {
 				// espera o valor ser setado 
@@ -369,12 +372,12 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 			Expressao atribuicao = declaracao.atribuicao;
 			if (atribuicao instanceof Expressao.Atribuicao) {
 				Token nome = ((Expressao.Atribuicao) atribuicao).nome;
-				environment.assignLer(nome, valor, null);
+				environment.setVariavelPorFuncaoLer(nome, valor, null);
 			}
 			if (atribuicao instanceof Expressao.AtribuicaoArray) {
 				Token nome = ((Expressao.AtribuicaoArray) atribuicao).nome;
 				Object index = evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
-				environment.assignLer(nome, valor, index);
+				environment.setVariavelPorFuncaoLer(nome, valor, index);
 			}
 
 		
@@ -383,22 +386,22 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	@Override
 	public Void visitVarDeclaracao(Var declaracao) {
-		environment.define(declaracao.nome, declaracao.tipo);
+		environment.definirVariavel(declaracao.nome, declaracao.tipo);
 		return null;
 	}
 
 	@Override
 	public Object visitVariavelExpressao(Variavel expressao) {
-		return environment.get(expressao.nome);
+		return environment.getValorVariavel(expressao.nome);
 	}
 
 	@Override
 	public Object visitAtribuicaoExpressao(Atribuicao expressao) {
 		Object value = evaluate(expressao.valor);
-		if(value instanceof model.Modulo) {
+		if(value instanceof modelos.Modulo) {
 			throw new RuntimeError(expressao.nome, "Módulo não pode ser atribuido para variável");
 		}
-		environment.assign(expressao.nome, value);
+		environment.setValorVariavel(expressao.nome, value);
 		return value;
 	}
 
@@ -458,13 +461,13 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 			if ((int) valorIncremento < 0) {
 				condicao = new Binario(condicao.operador.line, condicao.esquerda,
-						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
+						new Token(TiposToken.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
 
 			}
 		} else if (valorIncremento instanceof Double) {
 			if ((double) valorIncremento < 0) {
 				condicao = new Binario(condicao.operador.line, condicao.esquerda,
-						new Token(TokenType.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
+						new Token(TiposToken.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
 			}
 		}
 //		System.out.println(valorIncremento);
@@ -506,10 +509,10 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		if (intervaloI > intervaloF) {
 			throw new RuntimeError(declaracao.nome, "Intervalo inicial não pode ser maior que o intervalo final");
 		}
-		if (declaracao.tipo.type == TokenType.TIPO_MODULO) {
+		if (declaracao.tipo.type == TiposToken.TIPO_MODULO) {
 			throw new RuntimeError(declaracao.nome, "vetor não pode ter o tipo modulo.");
 		}
-		environment.defineArray(declaracao.nome, new VariavelVetor(declaracao.tipo.type, intervaloI, intervaloF));
+		environment.definirVariavelVetor(declaracao.nome, new VariavelVetor(declaracao.tipo.type, intervaloI, intervaloF));
 		return null;
 	}
 
@@ -518,14 +521,14 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		Object index = evaluate(expressao.index);
 		Object valor = evaluate(expressao.valor);
 
-		this.environment.assignVetor(expressao.nome, index, valor);
+		this.environment.setValorVariavelVetor(expressao.nome, index, valor);
 
 		return null;
 	}
 
 	@Override
 	public Object visitVariavelArrayExpressao(Expressao.VariavelArray expressao) {
-		VariavelVetor variavel = (VariavelVetor) environment.get(expressao.nome);
+		VariavelVetor variavel = (VariavelVetor) environment.getValorVariavel(expressao.nome);
 		Object index = evaluate(expressao.index);
 		if (index == null) {
 			throw new RuntimeError(expressao.nome, "Index informado não pode ser nulo.");
@@ -554,14 +557,14 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	@Override
 	public Void visitModuloDeclaracao(Modulo declaracao) {
-		model.Modulo modulo = new model.Modulo(declaracao);
-		this.environment.assign(declaracao.nome, modulo);
+		modelos.Modulo modulo = new modelos.Modulo(declaracao);
+		this.environment.setValorVariavel(declaracao.nome, modulo);
 		return null;
 	}
 
 	@Override
 	public Void visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
-		model.Modulo modulo = (model.Modulo) environment.get(declaracao.identificador);
+		modelos.Modulo modulo = (modelos.Modulo) environment.getValorVariavel(declaracao.identificador);
 		modulo.chamar(this, null);
 		return null;
 	}

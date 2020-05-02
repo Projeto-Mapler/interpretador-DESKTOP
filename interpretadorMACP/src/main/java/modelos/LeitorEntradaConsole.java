@@ -1,5 +1,10 @@
-package model;
+package modelos;
 
+/**
+ * Esse objeto é usado para passar valores de entrada para o interprador quando um evento de TiposEventos.LER_EVENTO é disparado
+ * @author Kerlyson
+ *
+ */
 public class LeitorEntradaConsole {
 	private String valor;
 	private boolean valorSetado;

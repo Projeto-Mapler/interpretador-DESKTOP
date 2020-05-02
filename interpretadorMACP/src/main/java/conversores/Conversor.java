@@ -3,10 +3,16 @@ package conversores;
 import java.util.HashMap;
 import java.util.Map;
 
-import model.TokenType;
-import model.VariavelVetor;
+import modelos.TiposToken;
+import modelos.VariavelVetor;
 import tree.Declaracao.Programa;
 
+/**
+ * Base para Classes conversoras para outras linguagens
+ * Classes conversoras devem implementar as Interfaces Visitor para Declaração e Expressao também.
+ * @author Kerlyson
+ *
+ */
 public abstract class Conversor {
 	
 	protected Escritor escritor;
@@ -42,12 +48,12 @@ public abstract class Conversor {
 	 * @param tipo - tipo de dado do pseudoCodigo (cadeia, inteiro, real, ...)
 	 * @return - String com o tipo equivalente na linguagem alvo
 	 */
-	protected abstract String tipoVariavel(TokenType tipo);
+	protected abstract String tipoVariavel(TiposToken tipo);
 	
 	/**
 	 * Retorna o operador lógico equivalente na linguagem alvo
 	 * @param op - Operação logica em pseudoCodigo (e, ou, nao)
 	 * @return - String com o operador lógico equivalente na linguagem alvo
 	 */
-	protected abstract String getOperadorLogico(TokenType op);
+	protected abstract String getOperadorLogico(TiposToken op);
 }

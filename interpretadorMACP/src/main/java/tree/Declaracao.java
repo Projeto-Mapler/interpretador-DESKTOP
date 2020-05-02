@@ -2,7 +2,7 @@ package tree;
 
 import java.util.List;
 
-import model.Token;
+import modelos.Token;
 
 public abstract class Declaracao extends AstDebugNode {
     public Declaracao( int linha) {

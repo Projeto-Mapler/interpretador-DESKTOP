@@ -3,10 +3,10 @@ package conversores;
 import java.util.List;
 
 import main.Principal;
-import model.RuntimeError;
-import model.Token;
-import model.TokenType;
-import model.VariavelVetor;
+import modelos.RuntimeError;
+import modelos.Token;
+import modelos.TiposToken;
+import modelos.VariavelVetor;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
@@ -32,6 +32,11 @@ import tree.Expressao.Logico;
 import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
+/**
+ * Converte pseudoCodigo para Java
+ * @author Kerlyson
+ *
+ */
 public class ConversorJava extends Conversor implements
 Expressao.Visitor<Void>,
 Declaracao.Visitor<Void> {
@@ -52,7 +57,7 @@ Declaracao.Visitor<Void> {
 	}
 	
 	@Override
-	protected String getOperadorLogico(TokenType op) {
+	protected String getOperadorLogico(TiposToken op) {
 		switch (op) {
 			case OU :
 				return "||";
@@ -64,7 +69,7 @@ Declaracao.Visitor<Void> {
 	}
 	
 	@Override
-	protected String tipoVariavel(TokenType tipo) {
+	protected String tipoVariavel(TiposToken tipo) {
 		switch (tipo) {
 			case TIPO_CADEIA :
 				return "String";
@@ -169,7 +174,7 @@ Declaracao.Visitor<Void> {
 
 	@Override
 	public Void visitVarDeclaracao(Var declaracao) {
-		if (declaracao.tipo.type == TokenType.TIPO_MODULO) {
+		if (declaracao.tipo.type == TiposToken.TIPO_MODULO) {
 			return null;
 		}
 		String tipo = this.tipoVariavel(declaracao.tipo.type);
@@ -190,7 +195,7 @@ Declaracao.Visitor<Void> {
 
 		if (primeiro instanceof Declaracao.Var) {
 			Token tipoVar = ((Declaracao.Var) primeiro).tipo;
-			if (tipoVar.type == TokenType.TIPO_MODULO) {
+			if (tipoVar.type == TiposToken.TIPO_MODULO) {
 				return null;
 			}
 			String tipo = this.tipoVariavel(tipoVar.type);
