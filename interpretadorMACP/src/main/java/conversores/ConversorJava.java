@@ -51,13 +51,34 @@ Declaracao.Visitor<Void> {
 		declaracao.accept(this);
 	}
 	
-	private String getOperadorLogico(TokenType op) {
+	@Override
+	protected String getOperadorLogico(TokenType op) {
 		switch (op) {
 			case OU :
 				return "||";
 			case E :
 				return "&&";
 			default :
+				return "";
+		}
+	}
+	
+	@Override
+	protected String tipoVariavel(TokenType tipo) {
+		switch (tipo) {
+			case TIPO_CADEIA :
+				return "String";
+			case TIPO_INTEIRO :
+				return "int";
+			case TIPO_REAL :
+				return "double";
+			case TIPO_CARACTERE :
+				return "char";
+			// case TIPO_VETOR : return "arrya";
+			case TIPO_LOGICO :
+				return "boolean";
+			default :
+				// throw error?
 				return "";
 		}
 	}

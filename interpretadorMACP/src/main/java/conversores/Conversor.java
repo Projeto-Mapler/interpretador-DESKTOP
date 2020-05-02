@@ -19,7 +19,7 @@ public abstract class Conversor {
 		this.mapaVariaveisVetor = new HashMap<String, VariavelVetor>();
 	}
 	
-	public abstract String converter();
+	
 	
 	protected void addVariavelVetor(String nome, VariavelVetor variavel) {
 		this.mapaVariaveisVetor.put(nome, variavel);
@@ -31,22 +31,23 @@ public abstract class Conversor {
 		return null;
 	}
 	
-	protected String tipoVariavel(TokenType tipo) {
-		switch (tipo) {
-			case TIPO_CADEIA :
-				return "String";
-			case TIPO_INTEIRO :
-				return "int";
-			case TIPO_REAL :
-				return "double";
-			case TIPO_CARACTERE :
-				return "char";
-			// case TIPO_VETOR : return "arrya";
-			case TIPO_LOGICO :
-				return "boolean";
-			default :
-				// throw error?
-				return "";
-		}
-	}
+	/**
+	 * Converte o pseudocodigo para a linguagem da Classe
+	 * @return - String com o programa convertido
+	 */
+	public abstract String converter();
+	
+	/**
+	 * Retorna o tipo equivalente na linguagem alvo
+	 * @param tipo - tipo de dado do pseudoCodigo (cadeia, inteiro, real, ...)
+	 * @return - String com o tipo equivalente na linguagem alvo
+	 */
+	protected abstract String tipoVariavel(TokenType tipo);
+	
+	/**
+	 * Retorna o operador lógico equivalente na linguagem alvo
+	 * @param op - Operação logica em pseudoCodigo (e, ou, nao)
+	 * @return - String com o operador lógico equivalente na linguagem alvo
+	 */
+	protected abstract String getOperadorLogico(TokenType op);
 }
