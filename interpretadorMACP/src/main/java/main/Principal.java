@@ -39,8 +39,8 @@ public class Principal {
 		debugador = new Debugador(interpreter, ge, debugAtivo);
 		BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
 		breakpointsDebugStrategy.addBreakPoint(13);
-		debugador.setDebugStrategy(breakpointsDebugStrategy);
-//		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
+//		debugador.setDebugStrategy(breakpointsDebugStrategy);
+		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 	
 	}
 

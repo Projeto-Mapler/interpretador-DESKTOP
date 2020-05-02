@@ -633,7 +633,7 @@ public class Parser {
 		consumirToken(ESQ_CHAVES, "Esperado {");
 		Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line,bloco());
 
-		return new Declaracao.Modulo(inicio.line,nome, corpo);
+		return new Declaracao.Modulo(nome.line,nome, corpo);
 
 	}
 
