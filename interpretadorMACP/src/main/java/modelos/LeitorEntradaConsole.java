@@ -7,6 +7,10 @@ package modelos;
  */
 public class LeitorEntradaConsole {
 	private String valor;
+	/**
+	 * se o valor foi setado, interpretador espera esse valor ser verdadeiro para 
+	 * continuar a execução após lançar o evento LER
+	 */
 	private boolean valorSetado;
 	
 	public LeitorEntradaConsole() {

@@ -21,6 +21,11 @@ import parser.Parser;
 import scanner.Scanner;
 import tree.Declaracao;
 
+/**
+ * Responsável por executar as etapas do interpretador na ordem correta, disparar os eventos de erros;
+ * @author Kerlyson
+ *
+ */
 public class Principal {
 	private  boolean temErro = false;
 	private  boolean temRunTimeErro = false;

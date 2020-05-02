@@ -2,6 +2,11 @@ package debug;
 
 import tree.AstDebugNode;
 
+/**
+ * Estratégia para pausar a execução do código em cada linha
+ * @author Kerlyson
+ *
+ */
 public class PassoAPassoDebugStrategy implements DebugStrategy{
 
 	@Override

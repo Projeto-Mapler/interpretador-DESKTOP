@@ -1,5 +1,10 @@
 package modelos;
 
+/**
+ * Erro Léxico - palavra errada
+ * @author Kerlyson
+ *
+ */
 public class ParserError extends RuntimeException {
 	
 	/**

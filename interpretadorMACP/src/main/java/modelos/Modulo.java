@@ -5,6 +5,11 @@ import java.util.List;
 import interpretador.Interpretador;
 import tree.Declaracao;
 
+/**
+ * Representa objeto chamavel módulo da pseudolinguagem
+ * @author Kerlyson
+ *
+ */
 public class Modulo implements Chamavel{
 
 	private final Declaracao.Modulo modulo;
