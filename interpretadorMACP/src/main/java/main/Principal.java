@@ -63,8 +63,8 @@ public class Principal {
 		interpreter.interpret(programa);
 		
 		ConversorJava cj = new ConversorJava(this, programa);
-		System.out.println("\n\n===>>Conversor Java:\n");
-		System.out.println(cj.converter());
+//		System.out.println("\n\n===>>Conversor Java:\n");
+//		System.out.println(cj.converter());
 
 	}
 

@@ -78,6 +78,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 				}
 				long elapsedTime = System.nanoTime() - startTime;
 				System.out.println("Tempo de execucao: " + (double) elapsedTime / 1000000000);
+				gerenciadorEventos.notificar(TiposEvento.INTERPRETACAO_CONCLUIDA, null);
 			}
 		});
 		thread.start();
@@ -110,6 +111,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 	public void terminar() {
 		this.terminada = true;
+		this.parada = true;
 		synchronized (thread) {
 			thread.stop();
 

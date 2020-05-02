@@ -10,7 +10,7 @@ public class PassoAPassoDebugStrategy implements DebugStrategy{
 		
 		System.out.println("[debug] linha: " + node.getLinha() + " .. " + node.getClass().getName());
 		if(linhaAnterior == node.getLinha()) return linhaAnterior;
-		debugador.pausaExecucao();
+		debugador.pausarExecucao();
 		return node.getLinha();
 	}
 

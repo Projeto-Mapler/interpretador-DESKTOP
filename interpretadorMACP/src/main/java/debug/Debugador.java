@@ -3,22 +3,34 @@ package debug;
 import interpretador.Interpretador;
 import tree.AstDebugNode;
 
+/**
+ * Realiza o processo de Debug do pseudoCodigo
+ * @author Kerlyson
+ *
+ */
 public class Debugador implements EventoListener {
 
 	private Interpretador interpretador;
 	
-	private EstadosDebug estado;
-	private Integer linhaAnterior = 0;
+	private EstadosDebug estado;// estado em que se encontra o Debugador
+	private Integer linhaAnterior = 0; // linha do node verificado
 	private GerenciadorEventos ge;
-	private DebugStrategy strategy;
+	private DebugStrategy strategy; 
 
+	/**
+	 * 
+	 * @param i -  instancia do interpretador que está executando o codigo
+	 * @param ge - Gerenciador de Eventos compartilhado
+	 * @param ativo - SE o debugador deve ser executado quando o codigo for interpretado
+	 */
 	public Debugador(Interpretador i, GerenciadorEventos ge, boolean ativo) {
 		this.interpretador = i;
 		this.ge = ge;
 		this.ge.inscrever(TiposEvento.NODE_DEBUG, this);
-		this.ge.inscrever(TiposEvento.CONTINUAR_DEBUG, this);
+		this.ge.inscrever(TiposEvento.CONTINUAR_DEBUG_ATIVO, this);
+		this.ge.inscrever(TiposEvento.CONTINUAR_DEBUG_DESATIVADO, this);
 		this.ge.inscrever(TiposEvento.FINALIZAR_DEBUG, this);
-//		this.ge.inscrever(TipoEvento.TOGGLE_DEBUG, this); // nao usado
+		this.ge.inscrever(TiposEvento.TOGGLE_DEBUG, this); // nao usado
 		
 		this.setDebugadorAtivo(ativo);
 	}
@@ -27,18 +39,21 @@ public class Debugador implements EventoListener {
 	public void update(TiposEvento tipoEvento, Object payload) {
 	
 		switch (tipoEvento) {
-// nao usado
-//		case TOGGLE_DEBUG:
-//			this.setDebugadorAtivo((Boolean) payload);
-//			break;
+		
+		case TOGGLE_DEBUG: // nao usado
+			this.setDebugadorAtivo((Boolean) payload);
+			break;
 		case NODE_DEBUG:
 			if (estado == EstadosDebug.DESATIVO)
 				return;
 			this.updateNodeDebug(payload);
 
 			break;
-		case CONTINUAR_DEBUG:
+		case CONTINUAR_DEBUG_ATIVO:
 			this.continuarExecucao();
+			break;
+		case CONTINUAR_DEBUG_DESATIVADO:
+			this.continuarExecucaoSemDebug();
 			break;
 		case FINALIZAR_DEBUG:
 			this.terminarExecucao();
@@ -50,6 +65,10 @@ public class Debugador implements EventoListener {
 
 	}
 
+	/**
+	 * Chamado quando o evento Node_Debug é disparado
+	 * @param payload - NodeAstDebug
+	 */
 	private void updateNodeDebug(Object payload) {
 
 		if (estado == EstadosDebug.ATIVO)
@@ -62,32 +81,48 @@ public class Debugador implements EventoListener {
 			this.linhaAnterior = this.strategy.executar(node, this);
 		}
 	}
-
+	
+	
+	/**
+	 * algoritimo de debug que deve ser utilizado
+	 * @param strategy
+	 */
 	public void setDebugStrategy(DebugStrategy strategy) {
 		this.strategy = strategy;
 	}
 
 	
-
+	/**
+	 * SE o debugador deve ser executado quando o codigo for interpretado
+	 * @param ativo
+	 */
 	public void setDebugadorAtivo(boolean ativo) {
 		this.setEstado(ativo ? EstadosDebug.ATIVO : EstadosDebug.DESATIVO);
 	}
 
-	
+	// CONTROLADORES DA EXECUÇÃO
 
-	protected void pausaExecucao() {
+	/**
+	 * Pausa a execução do interpretador
+	 */
+	protected void pausarExecucao() {
 
 		this.setEstado(EstadosDebug.PAUSADO);
 
 		interpretador.suspender();
 
 	}
-
+	/**
+	 * Para a execução do interpretador
+	 */
 	protected void terminarExecucao() {
-		this.setEstado(EstadosDebug.ATIVO);
+		this.setEstado(EstadosDebug.DESATIVO);
 		this.interpretador.terminar();
 	}
-
+	
+	/**
+	 * Continua a execução do interpretador, se estiver pausado.
+	 */
 	protected void continuarExecucao() {
 
 		if (this.estado == EstadosDebug.PAUSADO) {
@@ -98,12 +133,37 @@ public class Debugador implements EventoListener {
 		}
 
 	}
+	
+	/**
+	 * Continua a execução do interpretador, se estiver pausado, sem o debug.
+	 */
+	protected void continuarExecucaoSemDebug() {
 
+		if (this.estado == EstadosDebug.PAUSADO) {
+
+			this.ge.notificar(TiposEvento.TOGGLE_DEBUG, false);
+//			this.setEstado(EstadosDebug.EXECUTANDO);
+			this.interpretador.resumir();
+
+		}
+
+	}
+	
+	/**
+	 * Set para o estado do Debugador.
+	 * Dispara MUDANCA_ESTADO_DEBUG no Gerenciador de Eventos
+	 * @param estado
+	 */
 	protected void setEstado(EstadosDebug estado) {
 		this.estado = estado;
+		
 		this.ge.notificar(TiposEvento.MUDANCA_ESTADO_DEBUG, this.estado);
 	}
 	
+	/**
+	 * 
+	 * @return nummero da linha do ultimo node analisado
+	 */
 	protected int getLinha() {
 		return this.linhaAnterior;
 	}

@@ -55,12 +55,26 @@ public enum TiposEvento {
 	 * 
 	 * @payload - null
 	 */
-	CONTINUAR_DEBUG,
+	CONTINUAR_DEBUG_ATIVO,
+	
+	/**
+	 * informa o debugador a continuar a execucao sem o processo de debug
+	 * 
+	 * @payload - null
+	 */
+	CONTINUAR_DEBUG_DESATIVADO,
 	
 	/**
 	 * informa o debugador a terminar a execucao
 	 * 
 	 * @payload - null
 	 */
-	FINALIZAR_DEBUG,;
+	FINALIZAR_DEBUG,
+	
+	/**
+	 * A thread do processo de interpretação foi concluida
+	 * @payload - null
+	 */
+	INTERPRETACAO_CONCLUIDA,
+	;
 }

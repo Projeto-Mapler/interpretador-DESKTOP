@@ -42,7 +42,7 @@ public class MainUI extends JFrame implements EventoListener{
 	private final String PATH_EXEMPLOS = "..\\exemplos\\";
 
 	private JPanel panel;
-	private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar,  botaoDebugContinuar;
+	private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar,  botaoDebugContinuar, botaoDebugContinuarSem;
 	private JLabel labelOu;
 	private JComboBox<String> comboBoxExemplos;
 	private JFileChooser fileChooser;
@@ -73,6 +73,7 @@ public class MainUI extends JFrame implements EventoListener{
 		this.ge.inscrever(TiposEvento.MUDANCA_ESTADO_DEBUG, this);
 		this.ge.inscrever(TiposEvento.ESCREVER_EVENTO, this);
 		this.ge.inscrever(TiposEvento.LER_EVENTO, this);
+		this.ge.inscrever(TiposEvento.INTERPRETACAO_CONCLUIDA, this);
 	}
 	
 	public static void main(String[] args) {
@@ -129,6 +130,8 @@ public class MainUI extends JFrame implements EventoListener{
 		p.add(this.botaoDebugContinuar, cons2);
 		cons2.gridx = 1;
 		p.add(this.botaoDebugParar, cons2);
+		cons2.gridx = 2;
+		p.add(this.botaoDebugContinuarSem, cons2);
 		
 		cons.gridy++;
 		this.panel.add(p, cons);
@@ -188,15 +191,26 @@ public class MainUI extends JFrame implements EventoListener{
 //			}
 //		});
 		
-		this.botaoDebugContinuar = new JButton("|>");
+		this.botaoDebugContinuar = new JButton("->");
 	
 		this.botaoDebugParar = new JButton("X");
+		
+		this.botaoDebugContinuarSem = new JButton("|>");
 	
 		this.botaoDebugContinuar.addActionListener(new ActionListener() {
 			
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				ge.notificar(TiposEvento.CONTINUAR_DEBUG, null);
+				ge.notificar(TiposEvento.CONTINUAR_DEBUG_ATIVO, null);
+				
+			}
+		});
+		
+		this.botaoDebugContinuarSem.addActionListener(new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				ge.notificar(TiposEvento.CONTINUAR_DEBUG_DESATIVADO, null);
 				
 			}
 		});
@@ -212,6 +226,7 @@ public class MainUI extends JFrame implements EventoListener{
 		
 		this.botaoDebugContinuar.setEnabled(false);
 		this.botaoDebugParar.setEnabled(false);
+		this.botaoDebugContinuarSem.setEnabled(false);
 	}
 	
 	private String[] getNomeArquivosExemplo() {
@@ -241,6 +256,7 @@ public class MainUI extends JFrame implements EventoListener{
 
 	@Override
 	public void update(TiposEvento tipoEvento, Object payload) {
+		
 		if(tipoEvento == TiposEvento.ESCREVER_EVENTO) {
 			String msg = (String) payload;
 			System.out.println(msg);
@@ -258,25 +274,37 @@ public class MainUI extends JFrame implements EventoListener{
 			}
 			return;
 		}
+		
+		if(tipoEvento == TiposEvento.INTERPRETACAO_CONCLUIDA) {
+			
+				this.botaoDebugContinuar.setEnabled(false);
+				this.botaoDebugParar.setEnabled(false);
+				this.botaoDebugContinuarSem.setEnabled(false);
+		}
+		
 		if(payload instanceof EstadosDebug ) {
 			EstadosDebug estado = (EstadosDebug)payload;
 			
 			switch (estado) {
 			case DESATIVO:
+				this.checkBoxDebugAtivo.setSelected(false);
 			case ATIVO:
 				this.checkBoxDebugAtivo.setEnabled(true);
 				this.botaoDebugContinuar.setEnabled(false);
 				this.botaoDebugParar.setEnabled(false);
+				this.botaoDebugContinuarSem.setEnabled(false);
 				break;
 			case PAUSADO:
 				this.checkBoxDebugAtivo.setEnabled(false);
 				this.botaoDebugContinuar.setEnabled(true);
 				this.botaoDebugParar.setEnabled(true);
+				this.botaoDebugContinuarSem.setEnabled(true);
 				break;
 			case EXECUTANDO:
 				this.checkBoxDebugAtivo.setEnabled(false);
 				this.botaoDebugContinuar.setEnabled(false);
 				this.botaoDebugParar.setEnabled(true);
+				this.botaoDebugContinuarSem.setEnabled(false);
 				break;
 
 			default:

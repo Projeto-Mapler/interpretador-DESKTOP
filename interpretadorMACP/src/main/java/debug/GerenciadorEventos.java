@@ -24,9 +24,11 @@ public class GerenciadorEventos {
 	}
 
 	public void notificar(TiposEvento te, Object payload) {
-
+//		Object x = payload == null ? "" : payload;
+//		System.err.println(te.toString() + "---"+x.toString());
 		for (EventoListener ev : this.inscritos.get(te)) {
 			ev.update(te, payload);
+//			System.err.println(ev.getClass().getName());
 		}
 	}
 }

@@ -32,7 +32,7 @@ public class BreakpointsDebugStrategy implements DebugStrategy{
 		if (breakpoints.contains(node.getLinha())) {
 			if (!(breakpoint == node.getLinha() && debugador.getLinha() == breakpoint)) {				
 				breakpoint = node.getLinha();
-				debugador.pausaExecucao();
+				debugador.pausarExecucao();
 			}
 
 		}
