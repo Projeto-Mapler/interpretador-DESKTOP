@@ -13,6 +13,7 @@ import debug.BreakpointsDebugStrategy;
 import debug.Debugador;
 import debug.GerenciadorEventos;
 import debug.PassoAPassoDebugStrategy;
+import debug.TipoEvento;
 import interpreter.Interpretador;
 import model.ParserError;
 import model.RuntimeError;
@@ -29,11 +30,12 @@ public class Principal {
 	private  BufferedReader reader;
 	private  Interpretador interpreter;
 	private  Debugador debugador;	
+	private GerenciadorEventos eventos;
 	
 	public Principal(GerenciadorEventos ge, boolean debugAtivo) {
 		input = new InputStreamReader(System.in);
 		reader = new BufferedReader(input);
-		
+		eventos = ge;
 		interpreter = new Interpretador(this, reader, ge);
 		
 		debugador = new Debugador(interpreter, ge, debugAtivo);
@@ -72,11 +74,13 @@ public class Principal {
 
 
 	private void report(int line, String onde, String msg) {
-		System.err.println("[Parser Erro | linha " + line + "] Erro em '" + onde + "': " + msg);
+				System.err.println("[Parser Erro | linha " + line + "] Erro em '" + onde + "': " + msg);
 		temErro = true;
 	}
 
 	public void error(ParserError erro) {
+		this.eventos.notificar(TipoEvento.ERRO_PARSE, erro);
+
 		if(erro.token != null) {			
 			if (erro.token.type == TokenType.EOF) {
 				report(erro.linha, " no fim", erro.mensagem);
@@ -89,6 +93,7 @@ public class Principal {
 	}
 
 	public void runtimeError(RuntimeError error) {
+		this.eventos.notificar(TipoEvento.ERRO_RUNTIME, error);
 		System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
 		temRunTimeErro = true;
 	}
