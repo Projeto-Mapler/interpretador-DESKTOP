@@ -2,10 +2,11 @@ package interpretador;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
 
 import modelos.RuntimeError;
-import modelos.Token;
 import modelos.TiposToken;
+import modelos.Token;
 import modelos.VariavelVetor;
 
 /**
@@ -77,8 +78,7 @@ public class Ambiente {
 			}
 
 			if (checadorTipo.isTipoValorValido(variavel.getTipo(), valor)) {
-				variavel.getValores()[(int) index
-						- variavel.getIntervaloI()] = valor;
+				variavel.setValor((int)index, valor);
 				return;
 			} else {
 
@@ -126,6 +126,21 @@ public class Ambiente {
 		return definicoes.get(nome.lexeme);
 	}
 	
+	/**
+	 * Cria uma 'imagem' do estado atual das variaveis
+	 * @return Map<string, Object> = <'nome da variavel', 'valor da variavel'>
+	 */
+	protected Map<String, Object> criarSnapshot(){
+		Map<String, Object> retorno = new HashMap<String, Object>();
+		
+		Set<String> nomeVariaveis = this.definicoes.keySet();
+		
+		for(String nome: nomeVariaveis) {
+			retorno.put(nome, this.valores.get(nome));
+		}
+		
+		return retorno;
+	}
 //	private boolean isNomeVariavelValido(String nome) {
 //		char inicial =  nome.charAt(0);
 //		if(Character.isAlphabetic(inicial) || inicial == '_') {

@@ -16,15 +16,14 @@ public class Debugador implements EventoListener {
 	private Integer linhaAnterior = 0; // linha do node verificado
 	private GerenciadorEventos ge;
 	private DebugStrategy strategy; 
+	private AstDebugNode ultimoNode;
 
 	/**
 	 * 
-	 * @param i -  instancia do interpretador que está executando o codigo
 	 * @param ge - Gerenciador de Eventos compartilhado
 	 * @param ativo - SE o debugador deve ser executado quando o codigo for interpretado
 	 */
-	public Debugador(Interpretador i, GerenciadorEventos ge, boolean ativo) {
-		this.interpretador = i;
+	public Debugador( GerenciadorEventos ge, boolean ativo) {
 		this.ge = ge;
 		this.ge.inscrever(TiposEvento.NODE_DEBUG, this);
 		this.ge.inscrever(TiposEvento.CONTINUAR_DEBUG_ATIVO, this);
@@ -78,7 +77,9 @@ public class Debugador implements EventoListener {
 			if (node.getLinha() < 1)
 				return;
 		
+			ultimoNode = node;
 			this.linhaAnterior = this.strategy.executar(node, this);
+			
 		}
 	}
 	
@@ -108,7 +109,7 @@ public class Debugador implements EventoListener {
 	protected void pausarExecucao() {
 
 		this.setEstado(EstadosDebug.PAUSADO);
-
+		this.ge.notificar(TiposEvento.ACAO_DEBUG, new DebugSnapshot(ultimoNode, this.interpretador.getAmbienteSnapshot()));
 		interpretador.suspender();
 
 	}
@@ -166,6 +167,10 @@ public class Debugador implements EventoListener {
 	 */
 	protected int getLinha() {
 		return this.linhaAnterior;
+	}
+	
+	public void setInterpretador(Interpretador i) {
+		this.interpretador = i;
 	}
 	
 

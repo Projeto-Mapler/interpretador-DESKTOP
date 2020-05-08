@@ -26,9 +26,11 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import debug.Debugador;
 import debug.EstadosDebug;
 import debug.EventoListener;
 import debug.GerenciadorEventos;
+import debug.PassoAPassoDebugStrategy;
 import debug.TiposEvento;
 import modelos.LeitorEntradaConsole;
 
@@ -248,7 +250,13 @@ public class MainUI extends JFrame implements EventoListener{
 	}
 	private void rodarArquivo(String caminho) {
 		try {
-			new Principal(ge, checkBoxDebugAtivo.isSelected()).runFile(caminho);
+			Debugador debugador = new Debugador(this.ge, this.checkBoxDebugAtivo.isSelected());
+//			BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
+//			breakpointsDebugStrategy.addBreakPoint(13);
+//			debugador.setDebugStrategy(breakpointsDebugStrategy);
+			debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
+			
+			new Principal(ge, debugador).runFile(caminho);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

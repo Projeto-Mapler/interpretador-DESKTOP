@@ -57,8 +57,9 @@ public class VariavelVetor {
     public Object[] getValores() {
         return valores;
     }
-    public void setValores(Object[] valores) {
-        this.valores = valores;
+    public void setValor(int pseudoIndex, Object valor) {
+//    	System.err.println(this.resolverIndex(pseudoIndex) + " -- "+ valor);
+        this.valores[this.resolverIndex(pseudoIndex)] = valor; 
     }
     
     public TiposToken getTipo() {
@@ -74,6 +75,20 @@ public class VariavelVetor {
     public void setTamanho(int tamanho) {
         this.tamanho = tamanho;
     }
+
+	@Override
+	public String toString() {
+		String retorno = "[";
+		for(int i = 0; i< valores.length; i++) {
+//			System.err.println(valores[i]);
+			if(valores[i] == null) continue;
+			retorno = retorno + valores[i].toString();
+			if(i+1 < valores.length) {
+				retorno += ", ";
+			}
+		}
+		return retorno +"]";
+	}
 
     
     

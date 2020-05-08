@@ -7,6 +7,7 @@ import static modelos.TiposToken.MENOS;
 import static modelos.TiposToken.OU;
 
 import java.util.List;
+import java.util.Map;
 
 import debug.GerenciadorEventos;
 import debug.TiposEvento;
@@ -116,6 +117,9 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 			thread.stop();
 
 		}
+	}
+	public Map<String, Object> getAmbienteSnapshot(){
+		return this.environment.criarSnapshot();
 	}
 
 	// HELPERS:

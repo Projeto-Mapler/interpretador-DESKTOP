@@ -8,7 +8,9 @@ import java.util.List;
 
 import conversores.ConversorJava;
 import debug.BreakpointsDebugStrategy;
+import debug.DebugSnapshot;
 import debug.Debugador;
+import debug.EventoListener;
 import debug.GerenciadorEventos;
 import debug.PassoAPassoDebugStrategy;
 import debug.TiposEvento;
@@ -26,24 +28,24 @@ import tree.Declaracao;
  * @author Kerlyson
  *
  */
-public class Principal {
+public class Principal implements EventoListener{
 	private  boolean temErro = false;
 	private  boolean temRunTimeErro = false;
 	
 	private  Interpretador interpreter;
-	private  Debugador debugador;	
 	private GerenciadorEventos eventos;
 	
-	public Principal(GerenciadorEventos ge, boolean debugAtivo) {
+	public Principal(GerenciadorEventos ge, Debugador d) {
 		
 		eventos = ge;
+		ge.inscrever(TiposEvento.ACAO_DEBUG, this);
 		interpreter = new Interpretador(this, ge);
 		
-		debugador = new Debugador(interpreter, ge, debugAtivo);
-		BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
-		breakpointsDebugStrategy.addBreakPoint(13);
+		d.setInterpretador(interpreter);
+//		BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
+//		breakpointsDebugStrategy.addBreakPoint(13);
 //		debugador.setDebugStrategy(breakpointsDebugStrategy);
-		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
+//		debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 	
 	}
 
@@ -97,6 +99,27 @@ public class Principal {
 		this.eventos.notificar(TiposEvento.ERRO_RUNTIME, error);
 		System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
 		temRunTimeErro = true;
+	}
+
+	@Override
+	public void update(TiposEvento tipoEvento, Object payload) {
+		if(tipoEvento == TiposEvento.ACAO_DEBUG) {
+			DebugSnapshot s = (DebugSnapshot) payload;
+			System.out.println("=================");
+			System.out.println("linha: " + s.getNode().getLinha() +" .. "+s.getNode().getClass().getName());
+			System.out.println("Ambiente:");
+			System.out.println("Nome\tValor");
+			for(String n : s.getAmbienteSnapshot().keySet()) {
+				System.out.print(n+"\t");
+				Object valor = s.getAmbienteSnapshot().get(n);
+				if(valor != null) {
+					System.out.print(valor.toString());
+				}
+				System.out.print("\n");
+				
+			}
+			System.out.println("=================");
+		}
 	}
 
 }

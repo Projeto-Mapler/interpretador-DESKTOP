@@ -72,6 +72,13 @@ public enum TiposEvento {
 	FINALIZAR_DEBUG,
 	
 	/**
+	 * emitido apos uma estrategia de debug ser executada
+	 * 
+	 * @payload - DebugSnapshot
+	 */
+	ACAO_DEBUG,
+	
+	/**
 	 * A thread do processo de interpretação foi concluida
 	 * @payload - null
 	 */
