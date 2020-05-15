@@ -141,12 +141,5 @@ public class Ambiente {
 		
 		return retorno;
 	}
-//	private boolean isNomeVariavelValido(String nome) {
-//		char inicial =  nome.charAt(0);
-//		if(Character.isAlphabetic(inicial) || inicial == '_') {
-//			return true;
-//		}
-//		return false;
-//	}
 
 }

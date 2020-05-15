@@ -62,7 +62,11 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		this.gerenciadorEventos = ge;
 
 	}
-
+	
+	public Map<String, Object> getAmbienteSnapshot(){
+		return this.environment.criarSnapshot();
+	}
+	
 	public void interpret(Declaracao.Programa programa) {
 		this.parada = false;
 		this.terminada = false;
@@ -118,11 +122,9 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 		}
 	}
-	public Map<String, Object> getAmbienteSnapshot(){
-		return this.environment.criarSnapshot();
-	}
+	
 
-	// HELPERS:
+	// AUXILIARES:
 	private void execute(Declaracao declaracao) {
 		gerenciadorEventos.notificar(TiposEvento.NODE_DEBUG, declaracao);
 		declaracao.accept(this);
@@ -137,7 +139,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		if (object == null)
 			return "nulo";
 
-		// Hack. Work around Java adding ".0" to integer-valued doubles.
+		// Java add ".0" em intergers convertidos para doubles.
 		if (object instanceof Double) {
 			String text = object.toString();
 			if (text.endsWith(".0")) {
@@ -235,7 +237,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	}
 
 	// TODO: analisar remoção da variavel enviroment
-	// nao usada pois existe apenas o escopo local
+	// nao usada pois existe apenas o escopo global
 	public void executeBlock(List<Declaracao> statements, Ambiente environment) {
 
 //		Environment previous = this.environment; // uselles?
@@ -246,12 +248,12 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 				execute(statement);
 			}
 		} finally {
-//			this.environment = previous;
+//			this.environment = previous;uselles?
 		}
 	}
 	
 
-	// Nodes:
+	// NODES:
 
 	@Override
 	public Object visitBinarioExpressao(Binario expressao) {
@@ -370,7 +372,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 			this.gerenciadorEventos.notificar(TiposEvento.LER_EVENTO, this.entradaConsole);
 		
 			while(!this.entradaConsole.getValorSetado()) {
-				// espera o valor ser setado 
+				// espera o valor ser setado para continuar
 			}
 			String valor = this.entradaConsole.getValor();
 			this.entradaConsole.reset();
@@ -476,8 +478,6 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 						new Token(TiposToken.MAIOR_IQUAL, ">=", null, condicao.operador.line), condicao.direita);
 			}
 		}
-//		System.out.println(valorIncremento);
-//		System.out.println(condicao.operador);
 		while (isLogico(evaluate(condicao))) {
 			execute(declaracao.facaBloco);
 			evaluate(declaracao.incremento);
@@ -508,10 +508,6 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		int intervaloI = (int) evaluate(declaracao.intervaloI);
 		int intervaloF = (int) evaluate(declaracao.intervaloF);
 
-		// if(intervaloI < 0 || intervaloF < 0) {
-		// throw new RuntimeError(declaracao.nome, "Intervalos não podem ser
-		// negativos");
-		// }
 		if (intervaloI > intervaloF) {
 			throw new RuntimeError(declaracao.nome, "Intervalo inicial não pode ser maior que o intervalo final");
 		}

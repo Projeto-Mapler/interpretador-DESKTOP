@@ -22,6 +22,14 @@ public class DebugSnapshot {
 		return ambienteSnapshot;
 	}
 	
+	public int getLinha() {
+		return node.getLinha();
+	}
+	
+	public String getNodeClassName() {
+		return node.getClass().getName();
+	}
+	
 	
 	
 	
