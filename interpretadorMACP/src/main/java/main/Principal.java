@@ -6,6 +6,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import conversores.ConversorC;
 import conversores.ConversorJava;
 import debug.BreakpointsDebugStrategy;
 import debug.DebugSnapshot;
@@ -67,9 +68,10 @@ public class Principal implements EventoListener{
 
 		if (temErro)
 			return;
-		interpreter.interpret(programa);
-		
-		ConversorJava cj = new ConversorJava(this, programa);
+//		interpreter.interpret(programa);
+		ConversorC cc = new ConversorC(this, programa);
+		System.out.println(cc.converter());
+//		ConversorJava cj = new ConversorJava(this, programa);
 //		System.out.println("\n\n===>>Conversor Java:\n");
 //		System.out.println(cj.converter());
 
