@@ -280,7 +280,7 @@ public class Parser {
 		do {
 			expressoes.add(expressao());
 		} while (isTokenTypeIgualA(VIRGULA));
-		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		consumirToken(PONTO_VIRGULA, "Esperado ';'");
 		return new Declaracao.Escreva(anterior().line, expressoes);
 	}
 
@@ -303,7 +303,7 @@ public class Parser {
 			error(anterior(), "Esperado uma variável");
 		}
 
-		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		consumirToken(PONTO_VIRGULA, "Esperado ';'");
 		return retorno;
 	}
 
@@ -314,7 +314,7 @@ public class Parser {
 	 */
 	private Declaracao expressaoDeclaracao() {
 		Expressao expressao = expressao();
-		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		consumirToken(PONTO_VIRGULA, "Esperado ';'");
 		if (expressao instanceof Expressao.Variavel) {
 			return chamadaModulo(((Expressao.Variavel) expressao).nome);
 		}
@@ -603,7 +603,7 @@ public class Parser {
 		Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line,bloco());
 		consumirToken(ATE, "Esperado 'ate' depois da expressão.");
 		Expressao condicao = ou();
-		consumirToken(PONTO_VIRGULA, "Esperado ';' depois do valor.");
+		consumirToken(PONTO_VIRGULA, "Esperado ';'");
 
 		return new Declaracao.Repita(inicio.line,corpo, condicao);
 

@@ -1,0 +1,16 @@
+variaveis
+    n1, n2, limite, i, temp: inteiro;
+inicio
+    n1 <- 0;
+    n2 <- 1;
+    i <- 0;
+    limite <- 10;
+
+    enquanto i < limite faca {
+        temp <- n1;
+        n1 <- n1 + n2;
+        n2 <- temp;
+        escrever n1;
+        i <- i+1;
+    }
+fim

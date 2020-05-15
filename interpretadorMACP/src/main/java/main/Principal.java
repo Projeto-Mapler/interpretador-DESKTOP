@@ -77,7 +77,7 @@ public class Principal implements EventoListener{
 
 
 	private void report(int line, String onde, String msg) {
-				System.err.println("[Parser Erro | linha " + line + "] Erro em '" + onde + "': " + msg);
+				System.err.println("[Parser Erro | linha " + line + "] Erro " + onde + ": " + msg);
 		temErro = true;
 	}
 
