@@ -33,17 +33,17 @@ import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
 /**
- * Converte pseudoCodigo para C
+ * Converte pseudoCodigo para C++
  * @author Kerlyson
  *
  */
-public class ConversorC extends Conversor implements
+public class ConversorCpp extends Conversor implements
 Expressao.Visitor<Void>,
 Declaracao.Visitor<Void> {
 	
 	private Principal principal;
 	
-	public ConversorC(Principal principal, Declaracao.Programa programa) {
+	public ConversorCpp(Principal principal, Declaracao.Programa programa) {
 		super(programa);
 		this.principal = principal;
 	}
@@ -75,7 +75,7 @@ Declaracao.Visitor<Void> {
 	protected String tipoVariavel(TiposToken tipo) {
 		switch (tipo) {
 			case TIPO_CADEIA :
-				return "char"; // TODO: tem q virar um array
+				return "string"; 
 			case TIPO_INTEIRO :
 				return "int";
 			case TIPO_REAL :
@@ -91,25 +91,7 @@ Declaracao.Visitor<Void> {
 		}
 	}
 	
-	private String getEspecificadorTipo(TiposToken tipo) {
-		switch (tipo) {
-		case TIPO_CADEIA :
-			return "%s";
-		case TIPO_INTEIRO :
-			return "%d";
-		case TIPO_REAL :
-			return "%f";
-		case TIPO_CARACTERE :
-			return "%c";
-		// case TIPO_VETOR : return "arrya";
-		case TIPO_LOGICO :
-			return "bool"; // TODO
-		default :
-			// throw error?
-			return "";
-	} 	
-	}
-
+	
 	@Override
 	public String converter() {
 		try {
@@ -145,7 +127,7 @@ Declaracao.Visitor<Void> {
 
 	@Override
 	public Void visitEscrevaDeclaracao(Escreva declaracao) {
-		escritor.concatenarNaLinha("printf(");
+		escritor.concatenarNaLinha("cout << ");
 		List<tree.Expressao> expressoes = declaracao.expressoes;
 		for (int i = 0; i < expressoes.size(); i++) {
 			evaluate(expressoes.get(i));
@@ -153,7 +135,7 @@ Declaracao.Visitor<Void> {
 				escritor.concatenarNaLinha(" + ");
 			}
 		}
-		escritor.concatenarNaLinha(");").addQuebraLinha();
+		escritor.concatenarNaLinha("<< endl;").addQuebraLinha();
 		return null;
 	}
 
@@ -180,16 +162,16 @@ Declaracao.Visitor<Void> {
 		if (atribuicao instanceof Expressao.Atribuicao) {
 			String lexeme = ((Expressao.Atribuicao) atribuicao).nome.lexeme;
 			escritor
-			.concatenarNaLinha(lexeme + " = entrada.nextByte();")
+			.concatenarNaLinha("cin >> " + lexeme + ";")
 			.addQuebraLinha();
 
 		}
 		if (atribuicao instanceof Expressao.AtribuicaoArray) {
 			String lexeme = ((Expressao.AtribuicaoArray) atribuicao).nome.lexeme;
-			escritor.concatenarNaLinha(lexeme + "[");
+			escritor.concatenarNaLinha("cin >> " + lexeme + "[");
 			evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
 
-			escritor.concatenarNaLinha("] = entrada.nextByte();").addQuebraLinha();
+			escritor.concatenarNaLinha("];").addQuebraLinha();
 		}
 		return null;
 	}
@@ -348,9 +330,11 @@ Declaracao.Visitor<Void> {
 	public Void visitProgramaDeclaracao(Programa declaracao) {
 		
 		escritor
-			.concatenarNaLinha("#include <stdio.h>")
+			.concatenarNaLinha("#include <iostream>")
 			.addQuebraLinha()
-			.concatenarNaLinha("#include <stdbool.h>")
+			.concatenarNaLinha("#include <string>")
+			.addQuebraLinha(2)
+			.concatenarNaLinha("using namespace std;")
 			.addQuebraLinha(2);
 		
 		// converte variaveis
@@ -376,6 +360,8 @@ Declaracao.Visitor<Void> {
 		}
 		
 		escritor
+		.concatenarNaLinha("return 0;")
+		.addQuebraLinha()
 		.removerIdentacao()
 		.concatenarNaLinha("}"); // fim main
 		
