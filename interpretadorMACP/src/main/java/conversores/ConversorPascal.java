@@ -33,17 +33,17 @@ import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
 /**
- * Converte pseudoCodigo para C++
+ * Converte pseudoCodigo para Pascal
  * @author Kerlyson
  *
  */
-public class ConversorCpp extends Conversor implements
+public class ConversorPascal extends Conversor implements
 Expressao.Visitor<Void>,
 Declaracao.Visitor<Void> {
 	
 	private Principal principal;
 	
-	public ConversorCpp(Principal principal, Declaracao.Programa programa) {
+	public ConversorPascal(Principal principal, Declaracao.Programa programa) {
 		super(programa);
 		this.principal = principal;
 	}
@@ -60,11 +60,11 @@ Declaracao.Visitor<Void> {
 	protected String getOperadorLogico(TiposToken op) {
 		switch (op) {
 			case OU :
-				return "||";
+				return "or";
 			case E :
-				return "&&";
+				return "and";
 			case NAO:
-				return "!";
+				return "not";
 			
 			default :
 				return "";
@@ -77,14 +77,14 @@ Declaracao.Visitor<Void> {
 			case TIPO_CADEIA :
 				return "string"; 
 			case TIPO_INTEIRO :
-				return "int";
+				return "integer";
 			case TIPO_REAL :
-				return "double";
+				return "real";
 			case TIPO_CARACTERE :
 				return "char";
 			// case TIPO_VETOR : return "arrya";
 			case TIPO_LOGICO :
-				return "bool";
+				return "boolean";
 			default :
 				// throw error?
 				return "";
@@ -127,32 +127,49 @@ Declaracao.Visitor<Void> {
 
 	@Override
 	public Void visitEscrevaDeclaracao(Escreva declaracao) {
-		escritor.concatenarNaLinha("cout << ");
+		escritor.concatenarNaLinha("write(");
 		List<tree.Expressao> expressoes = declaracao.expressoes;
 		for (int i = 0; i < expressoes.size(); i++) {
 			evaluate(expressoes.get(i));
 			if (i < (expressoes.size() - 1)) {
-				escritor.concatenarNaLinha(" << ");
+				escritor.concatenarNaLinha(", ");
 			}
 		}
-		escritor.concatenarNaLinha(";").addQuebraLinha();
+		escritor.concatenarNaLinha(");").addQuebraLinha();
 		return null;
 	}
 
 	@Override
 	public Void visitSeDeclaracao(Se declaracao) {
-		escritor.concatenarNaLinha("if (");
+		
+		escritor.concatenarNaLinha("if ");
+		
 		evaluate(declaracao.condicao);
-		escritor.concatenarNaLinha(") {").indentar().addQuebraLinha();
+		
+		escritor.concatenarNaLinha(" then")
+		.addQuebraLinha()
+		.concatenarNaLinha("begin")
+		.addQuebraLinha()
+		.indentar();
+		
 		execute(declaracao.entaoBloco);
+		
 		escritor.removerIdentacao();
+		
 		if (declaracao.senaoBloco == null) {
-			escritor.concatenarNaLinha("}").addQuebraLinha();
+			escritor.concatenarNaLinha("end;").addQuebraLinha();
 			return null;
 		}
-		escritor.concatenarNaLinha("} else {").indentar().addQuebraLinha();
+		
+		escritor.concatenarNaLinha("else")
+		.addQuebraLinha()
+		.concatenarNaLinha("begin")
+		.addQuebraLinha()
+		.indentar();
+		
 		execute(declaracao.senaoBloco);
-		escritor.removerIdentacao().concatenarNaLinha("}").addQuebraLinha();
+		
+		escritor.removerIdentacao().concatenarNaLinha("end;").addQuebraLinha();
 		return null;
 	}
 
@@ -162,16 +179,16 @@ Declaracao.Visitor<Void> {
 		if (atribuicao instanceof Expressao.Atribuicao) {
 			String lexeme = ((Expressao.Atribuicao) atribuicao).nome.lexeme;
 			escritor
-			.concatenarNaLinha("cin >> " + lexeme + ";")
+			.concatenarNaLinha("readln(" + lexeme + ");")
 			.addQuebraLinha();
 
 		}
 		if (atribuicao instanceof Expressao.AtribuicaoArray) {
 			String lexeme = ((Expressao.AtribuicaoArray) atribuicao).nome.lexeme;
-			escritor.concatenarNaLinha("cin >> " + lexeme + "[");
+			escritor.concatenarNaLinha("readln(" + lexeme + "[");
 			evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
 
-			escritor.concatenarNaLinha("];").addQuebraLinha();
+			escritor.concatenarNaLinha("]);").addQuebraLinha();
 		}
 		return null;
 	}
@@ -183,7 +200,7 @@ Declaracao.Visitor<Void> {
 		}
 		String tipo = this.tipoVariavel(declaracao.tipo.type);
 		escritor
-			.concatenarNaLinha(tipo + " " + declaracao.nome.lexeme + ";")
+			.concatenarNaLinha( declaracao.nome.lexeme + " : "+ tipo +";")
 			.addQuebraLinha();
 		return null;
 	}
@@ -203,8 +220,6 @@ Declaracao.Visitor<Void> {
 				return null;
 			}
 			String tipo = this.tipoVariavel(tipoVar.type);
-			escritor
-				.concatenarNaLinha(tipo + " ");
 
 			for (int i = 0; i < lista.size(); i++) {
 				Declaracao.Var varriavel = (Declaracao.Var) lista.get(i);
@@ -217,14 +232,12 @@ Declaracao.Visitor<Void> {
 			}
 
 			escritor
-				.concatenarNaLinha(";")
+				.concatenarNaLinha(" : "+tipo+";")
 				.addQuebraLinha();
 		} else if (primeiro instanceof Declaracao.VariavelArray) {
 			Token tipoVar = ((Declaracao.VariavelArray) primeiro).tipo;
 			String tipo = this.tipoVariavel(tipoVar.type);
 
-			escritor
-				.concatenarNaLinha(tipo + " ");
 
 			for (int i = 0; i < lista.size(); i++) {
 				Declaracao.VariavelArray varriavel = (Declaracao.VariavelArray) lista
@@ -241,7 +254,7 @@ Declaracao.Visitor<Void> {
 				}
 			}
 			escritor
-				.concatenarNaLinha(";")
+			.concatenarNaLinha(" : "+tipo+";")
 				.addQuebraLinha();
 
 		}
@@ -257,7 +270,7 @@ Declaracao.Visitor<Void> {
 				(int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
 		escritor
-			.concatenarNaLinha(tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "];")
+			.concatenarNaLinha( declaracao.nome.lexeme + " : array[" + vv.getIntervaloI() +".."+vv.getIntervaloF() + "] of "+tipo+";")
 			.addQuebraLinha();
 		addVariavelVetor(declaracao.nome.lexeme, vv);
 		return null;
@@ -265,31 +278,36 @@ Declaracao.Visitor<Void> {
 
 	@Override
 	public Void visitParaDeclaracao(Para declaracao) {
-		escritor.concatenarNaLinha("for (");
+		escritor.concatenarNaLinha("for ");
 		evaluate(declaracao.atribuicao);
-		escritor.concatenarNaLinha("; ");
+		escritor.concatenarNaLinha(" to ");
 		evaluate(declaracao.condicao);
-		escritor.concatenarNaLinha("; ");
+		escritor.concatenarNaLinha("");
 		evaluate(declaracao.incremento);
-		escritor.concatenarNaLinha(") {").indentar().addQuebraLinha();
+		escritor.concatenarNaLinha("do")
+		.addQuebraLinha()
+		.concatenarNaLinha("begin")
+		.addQuebraLinha().indentar();
 		execute(declaracao.facaBloco);
-		escritor.removerIdentacao().concatenarNaLinha("}").addQuebraLinha();
+		escritor.removerIdentacao().concatenarNaLinha("end;").addQuebraLinha();
 		return null;
 	}
 
 	@Override
 	public Void visitEnquantoDeclaracao(Enquanto declaracao) {
 		escritor
-			.concatenarNaLinha("while (");
+			.concatenarNaLinha("while ");
 		evaluate(declaracao.condicao);
 		escritor
-			.concatenarNaLinha(") {")
+			.concatenarNaLinha(" do")
+			.addQuebraLinha()
+			.concatenarNaLinha("begin")
 			.addQuebraLinha()
 			.indentar();
 		execute(declaracao.corpo);
 		escritor
 			.removerIdentacao()
-			.concatenarNaLinha("}")
+			.concatenarNaLinha("end;")
 			.addQuebraLinha();
 		
 		return null;
@@ -297,24 +315,26 @@ Declaracao.Visitor<Void> {
 
 	@Override
 	public Void visitRepitaDeclaracao(Repita declaracao) {
-		escritor.concatenarNaLinha("do {").indentar().addQuebraLinha();
+		escritor.concatenarNaLinha("repeat").indentar().addQuebraLinha();
 		execute(declaracao.corpo);
-		escritor.removerIdentacao().concatenarNaLinha("while (");
+		escritor.removerIdentacao().concatenarNaLinha("until ");
 		evaluate(declaracao.condicao);
-		escritor.concatenarNaLinha(");").addQuebraLinha();
+		escritor.concatenarNaLinha(";").addQuebraLinha();
 		return null;
 	}
 
 	@Override
 	public Void visitModuloDeclaracao(Modulo declaracao) {
 		escritor
-			.concatenarNaLinha("void " + declaracao.nome.lexeme + " () { ")
-			.indentar()
-			.addQuebraLinha();
+			.concatenarNaLinha("procedure " + declaracao.nome.lexeme + " (); ")
+			.addQuebraLinha()
+			.concatenarNaLinha("begin")
+			.addQuebraLinha()
+			.indentar();
 		execute(declaracao.corpo);
 		escritor.removerIdentacao()
-		.concatenarNaLinha("}")
-		.addQuebraLinha();
+		.concatenarNaLinha("end;")
+		.addQuebraLinha(2);
 		return null;
 	}
 
@@ -330,28 +350,27 @@ Declaracao.Visitor<Void> {
 	public Void visitProgramaDeclaracao(Programa declaracao) {
 		
 		escritor
-			.concatenarNaLinha("#include <iostream>")
+			.concatenarNaLinha("program MeuPrograma;")
 			.addQuebraLinha()
-			.concatenarNaLinha("#include <string>")
-			.addQuebraLinha(2)
-			.concatenarNaLinha("using namespace std;")
-			.addQuebraLinha(2);
+			.concatenarNaLinha("var")
+			.addQuebraLinha()
+			.indentar();
 		
 		// converte variaveis
 				for (Declaracao variaveis : declaracao.variaveis) {
 					execute(variaveis);
 				}
+			escritor.addQuebraLinha(2).removerIdentacao();
+
+			// converte modulos-funcoes
+					for (Declaracao modulo : declaracao.modulos) {
+						execute(modulo);
+					}
+		escritor.addQuebraLinha().removerIdentacao().concatenarNaLinha("begin").addQuebraLinha().indentar();
 		
 		
-		// converte modulos-funcoes
-				for (Declaracao modulo : declaracao.modulos) {
-					execute(modulo);
-				}
 		
-		escritor
-			.concatenarNaLinha("int main() {")
-			.addQuebraLinha()
-			.indentar();
+
 		
 
 		// converte inicio-fim
@@ -360,10 +379,8 @@ Declaracao.Visitor<Void> {
 		}
 		
 		escritor
-		.concatenarNaLinha("return 0;")
-		.addQuebraLinha()
 		.removerIdentacao()
-		.concatenarNaLinha("}"); // fim main
+		.concatenarNaLinha("end."); // fim programa
 		
 		
 		return null;
@@ -400,7 +417,7 @@ Declaracao.Visitor<Void> {
 				escritor.concatenarNaLinha(" <= ");
 				break;
 			case DIFERENTE :
-				escritor.concatenarNaLinha(" != ");
+				escritor.concatenarNaLinha(" <> ");
 				break;
 			case IGUAL :
 				escritor.concatenarNaLinha(" == ");
@@ -430,7 +447,7 @@ Declaracao.Visitor<Void> {
 	public Void visitLiteralExpressao(Literal expressao) {
 		Object valor = expressao.valor;
 		if (valor instanceof String) {
-			valor = "\"".concat((String) valor).concat("\"");
+			valor = "'".concat((String) valor).concat("'");
 		} else if(valor instanceof Character) {
 			valor = "'".concat(((Character) valor).toString()).concat("'");
 		}
@@ -451,7 +468,7 @@ Declaracao.Visitor<Void> {
 	public Void visitUnarioExpressao(Unario expressao) {
 		switch (expressao.operador.type) {
 			case NAO :
-				escritor.concatenarNaLinha("!");
+				escritor.concatenarNaLinha("not ");
 				break;
 			case MENOS :
 				escritor.concatenarNaLinha("-");
@@ -467,7 +484,7 @@ Declaracao.Visitor<Void> {
 	@Override
 	public Void visitAtribuicaoExpressao(Atribuicao expressao) {
 		escritor
-		.concatenarNaLinha(expressao.nome.lexeme + " = ");
+		.concatenarNaLinha(expressao.nome.lexeme + " := ");
 		evaluate(expressao.valor);
 		return null;
 	}
@@ -477,14 +494,7 @@ Declaracao.Visitor<Void> {
 		escritor
 		.concatenarNaLinha(expressao.nome.lexeme + "[");
 
-		if (expressao.index instanceof Expressao.Literal) {
-
-			int valorIndex = (int) ((Expressao.Literal) expressao.index).valor;
-			escritor
-			.concatenarNaLinha(getVariavelVetor(expressao.nome.lexeme).resolverIndex(valorIndex) + "");
-		} else {
-			evaluate(expressao.index);
-		}
+		evaluate(expressao.index);
 		escritor
 		.concatenarNaLinha("] = ");
 		evaluate(expressao.valor);
@@ -497,15 +507,8 @@ Declaracao.Visitor<Void> {
 		String nome = expressao.nome.lexeme;
 		if (expressao.index == null) {
 			escritor.concatenarNaLinha(nome);
-		} else if (expressao.index instanceof tree.Expressao.Literal) {
-			escritor.concatenarNaLinha(nome + "[");
-			int i = (int) ((tree.Expressao.Literal) expressao.index).valor;
-			VariavelVetor vv = getVariavelVetor(nome);
-			escritor.concatenarNaLinha(vv.resolverIndex(i) + "");
-			escritor.concatenarNaLinha("]");
 		} else {
 			escritor.concatenarNaLinha(nome + "[");
-
 			evaluate(expressao.index);
 			escritor.concatenarNaLinha("]");
 		}
