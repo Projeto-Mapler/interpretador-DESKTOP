@@ -1,0 +1,24 @@
+variaveis
+  // numericos
+  var_inteiro: inteiro;
+  var_real: real;
+  
+  // booleano
+  var_logico: logico;
+  
+  // literais
+  var_cadeia: cadeia;
+  var_caractere: caractere;
+
+  // vetor
+  var_vetor: vetor[1..4] de cadeia;
+  var_nome: cadeia;
+
+inicio
+  ler var_inteiro;
+  ler var_real;
+  ler var_logico;
+  ler  var_cadeia;
+  ler var_caractere;
+  ler var_vetor[1];
+fim

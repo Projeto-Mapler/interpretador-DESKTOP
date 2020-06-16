@@ -37,6 +37,11 @@ public abstract class Conversor {
 		return null;
 	}
 	
+	protected TiposToken getVariavelVetorTipo(String nome) {
+	    if(this.mapaVariaveisVetor.containsKey(nome)) return this.mapaVariaveisVetor.get(nome).getTipo();
+	    return null;
+	}
+	
 	/**
 	 * Converte o pseudocodigo para a linguagem da Classe
 	 * @return - String com o programa convertido
