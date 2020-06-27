@@ -497,12 +497,12 @@ public class Parser {
 			return new Expressao.Variavel(identificador.line, identificador);
 		}
 		if (isTokenTypeIgualA(FALSO))
-			return new Expressao.Literal(anterior().line,false);
+			return new Expressao.Literal(anterior().line,false, anterior());
 		if (isTokenTypeIgualA(VERDADEIRO))
-			return new Expressao.Literal(anterior().line,true);
+			return new Expressao.Literal(anterior().line,true, anterior());
 
 		if (isTokenTypeIgualA(INTEIRO, REAL, CADEIA, CARACTERE)) {
-			return new Expressao.Literal(anterior().line,anterior().literal);
+			return new Expressao.Literal(anterior().line,anterior().literal, anterior());
 		}
 
 		if (isTokenTypeIgualA(ESQ_PARENTESES)) {
@@ -617,8 +617,12 @@ public class Parser {
 	 */
 	private Declaracao declaracaoVariavelArray(Token nome, Token intervaloI, Token intervaloF, Token tipo) {
 
-		return new Declaracao.VariavelArray(nome.line, nome, new Expressao.Literal(nome.line, intervaloI.literal),
-				new Expressao.Literal(nome.line, intervaloF.literal), tipo);
+		return new Declaracao.VariavelArray(
+		                                    nome.line, 
+		                                    nome, 
+		                                    new Expressao.Literal(nome.line, intervaloI.literal, nome),
+		                                    new Expressao.Literal(nome.line, intervaloF.literal, nome), 
+		                                    tipo);
 	}
 
 	/**

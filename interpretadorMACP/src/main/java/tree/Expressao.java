@@ -61,9 +61,10 @@ super(linha);
     public final Grupo grupo;
   }
 public static class Literal extends Expressao {
-    public Literal( int linha, Object valor) {
+    public Literal( int linha, Object valor, Token token) {
 super(linha);
       this.valor = valor;
+      this.token = token;
     }
 
     public <R> R accept(Visitor<R> visitor) {
@@ -71,6 +72,7 @@ super(linha);
     }
 
     public final Object valor;
+    public final Token token;
   }
 public static class Logico extends Expressao {
     public Logico( int linha, Expressao esquerda, Token operador, Expressao direita) {

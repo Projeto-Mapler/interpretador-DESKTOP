@@ -1,5 +1,11 @@
 package conversores;
 
+import static modelos.TiposToken.MAIOR_IQUAL;
+import static modelos.TiposToken.MAIOR_QUE;
+import static modelos.TiposToken.MENOR_IGUAL;
+import static modelos.TiposToken.MENOR_QUE;
+
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +15,7 @@ import modelos.RuntimeError;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
+import scala.actors.threadpool.Arrays;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
 import tree.Declaracao.ChamadaModulo;
@@ -94,16 +101,22 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     private String getEspecificadorTipo(TiposToken tipo) {
 	switch (tipo) {
+	case CADEIA:
 	case TIPO_CADEIA:
 	    return "%s";
+	case INTEIRO:
 	case TIPO_INTEIRO:
 	    return "%d";
+	case REAL:
 	case TIPO_REAL:
 	    return "%f";
+	case CARACTERE:
 	case TIPO_CARACTERE:
 	    return "%c";
+	case VERDADEIRO:
+	case FALSO:
 	case TIPO_LOGICO:
-	    return "bool"; // TODO
+	    return "%d"; // TODO
 	default:
 	    return tipo.toString();
 	}
@@ -144,18 +157,80 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     @Override
     public Void visitEscrevaDeclaracao(Escreva declaracao) {
-	escritor.concatenarNaLinha("printf(");
+	escritor.concatenarNaLinha("printf(" );
 	List<tree.Expressao> expressoes = declaracao.expressoes;
+	String especificadorLiteral = this.getEspecificadorEscreva(expressoes);
+	if(especificadorLiteral != null) {
+	    escritor.concatenarNaLinha("\""+especificadorLiteral+"\", ");
+	} 
 	for (int i = 0; i < expressoes.size(); i++) {
 	    evaluate(expressoes.get(i));
 	    if (i < (expressoes.size() - 1)) {
-		escritor.concatenarNaLinha(" + ");
+		escritor.concatenarNaLinha(", ");
 	    }
 	}
 	escritor.concatenarNaLinha(");").addQuebraLinha();
 	return null;
     }
+    
+    private String getEspecificadorEscreva(List<tree.Expressao> expressoes ) {
+	StringBuilder builder = new StringBuilder();
+	for (int i = 0; i < expressoes.size(); i++) {
+	    tree.Expressao exp = expressoes.get(i);
+	    if(exp instanceof tree.Expressao.Literal) {
+		    Token token = ((tree.Expressao.Literal) exp).token;
+		    builder.append(this.getEspecificadorTipo(token.type));
+	    } else if(exp instanceof tree.Expressao.Variavel) {
+		Token token = ((tree.Expressao.Variavel) exp).nome;
+		builder.append(this.getEspecificadorTipo(this.variaveis.get(token.lexeme)));
+	    } else if(exp instanceof tree.Expressao.VariavelArray) {
+		Token token = ((tree.Expressao.VariavelArray) exp).nome;
+		builder.append(this.getEspecificadorTipo(this.getVariavelVetorTipo(token.lexeme)));
+	    } else if(
+		    exp instanceof tree.Expressao.Logico ||
+		    exp instanceof tree.Expressao.Unario
+		    ) {
+		builder.append("%d");
+	    } else if(exp instanceof tree.Expressao.Binario) {
+		Token operador = ((tree.Expressao.Binario)exp).operador;
+		if(isTokenTypeIgualA(operador, MAIOR_QUE, MAIOR_IQUAL, MENOR_QUE, MENOR_IGUAL)) {
+		    // Operação logica
+		    builder.append("%d"); 
+		} else {
+		    // Operacao Aritimetica
+		    //builder.append("%f");
+		    builder.append(this.getEspecificadorBinario((tree.Expressao.Binario) exp));
+		    
+		}
+	    } else if(exp instanceof tree.Expressao.ExpParentizada) {
+		 tree.Expressao exp2 = ((tree.Expressao.ExpParentizada)exp).grupo.expressao;
+		 builder.append(this.getEspecificadorEscreva(Collections.singletonList(exp2)));
+	    }
+	    
+	}	
+	return builder.toString();
+    }
+    private String getEspecificadorBinario(tree.Expressao.Binario bin) {
+	tree.Expressao expEsquerda = (tree.Expressao) bin.esquerda;
+	tree.Expressao expDireita =  (tree.Expressao) bin.direita;
+	String esquerda = this.getEspecificadorEscreva(Collections.singletonList(expEsquerda));
+	String direita = this.getEspecificadorEscreva(Collections.singletonList(expDireita));
+	if(esquerda.contains("%f") || direita.contains("%f")) {
+	    return "%f";
+	} else {
+	    return "%d";
+	}
+    }
+    private boolean isTokenTypeIgualA(Token token, TiposToken... types) {
+	for (TiposToken type : types) {
+		if (token.type == type) {
+			return true;
+		}
+	}
 
+	return false;
+}
+    
     @Override
     public Void visitSeDeclaracao(Se declaracao) {
 	escritor.concatenarNaLinha("if (");

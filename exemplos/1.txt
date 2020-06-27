@@ -15,10 +15,5 @@ variaveis
   var_nome: cadeia;
 
 inicio
-  ler var_inteiro;
-  ler var_real;
-  ler var_logico;
-  ler  var_cadeia;
-  ler var_caractere;
-  ler var_vetor[1];
+  escrever var_vetor[1],  var_vetor[3];
 fim

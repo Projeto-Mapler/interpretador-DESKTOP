@@ -18,7 +18,7 @@ class GeradorAST {
 				"Binario   			: Expressao esquerda, Token operador, Expressao direita",
 				"Grupo     			: Expressao expressao",
 				"ExpParentizada 	: Grupo grupo", 
-				"Literal  			: Object valor",
+				"Literal  			: Object valor, Token token",
 				"Logico  			: Expressao esquerda, Token operador, Expressao direita",
 				"Unario    			: Token operador, Expressao direira",
 				"Atribuicao			: Token nome, Expressao valor",
@@ -51,7 +51,7 @@ class GeradorAST {
 		writer.println();
 		writer.println("import java.util.List;");
 		writer.println();
-		writer.println("import model.Token;");
+		writer.println("import modelos.Token;");
 		writer.println();
 		writer.println("public abstract class " + baseName + " extends AstDebugNode {");
 
