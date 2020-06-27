@@ -1,19 +1,11 @@
 package conversores;
 
-import static modelos.TiposToken.MAIOR_IQUAL;
-import static modelos.TiposToken.MAIOR_QUE;
-import static modelos.TiposToken.MENOR_IGUAL;
-import static modelos.TiposToken.MENOR_QUE;
-
-import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import main.Principal;
 import modelos.RuntimeError;
-import modelos.TiposToken;
 import modelos.Token;
+import modelos.TiposToken;
 import modelos.VariavelVetor;
 import tree.Declaracao;
 import tree.Declaracao.Bloco;
@@ -41,18 +33,16 @@ import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
 /**
- * Converte pseudoCodigo para C
+ * Converte pseudoCodigo para Java
  * 
  * @author Kerlyson
  *
  */
-public class ConversorC extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
+public class ConversorPython extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
 
     private Principal principal;
 
-    private Map<String, TiposToken> variaveis = new HashMap<String, TiposToken>();// variavel, tipo
-
-    public ConversorC(Principal principal, Declaracao.Programa programa) {
+    public ConversorPython(Principal principal, Declaracao.Programa programa) {
 	super(programa);
 	this.principal = principal;
     }
@@ -69,12 +59,9 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     protected String getOperadorLogico(TiposToken op) {
 	switch (op) {
 	case OU:
-	    return "||";
+	    return "or";
 	case E:
-	    return "&&";
-	case NAO:
-	    return "!";
-
+	    return "and";
 	default:
 	    return "";
 	}
@@ -82,43 +69,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     @Override
     protected String tipoVariavel(TiposToken tipo) {
-	switch (tipo) {
-	case TIPO_CADEIA:
-	    return "char";
-	case TIPO_INTEIRO:
-	    return "int";
-	case TIPO_REAL:
-	    return "double";
-	case TIPO_CARACTERE:
-	    return "char";
-	case TIPO_LOGICO:
-	    return "bool";
-	default:
-	    return "";
-	}
-    }
-
-    private String getEspecificadorTipo(TiposToken tipo) {
-	switch (tipo) {
-	case CADEIA:
-	case TIPO_CADEIA:
-	    return "%s";
-	case INTEIRO:
-	case TIPO_INTEIRO:
-	    return "%d";
-	case REAL:
-	case TIPO_REAL:
-	    return "%f";
-	case CARACTERE:
-	case TIPO_CARACTERE:
-	    return "%c";
-	case VERDADEIRO:
-	case FALSO:
-	case TIPO_LOGICO:
-	    return "%d"; // TODO
-	default:
-	    return tipo.toString();
-	}
+	return "";
     }
 
     @Override
@@ -150,100 +101,38 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     public Void visitExpressaoDeclaracao(tree.Declaracao.Expressao declaracao) {
 	escritor.concatenarNaLinha("");
 	evaluate(declaracao.expressao);
-	escritor.concatenarNaLinha(";").addQuebraLinha();
+	escritor.addQuebraLinha();
 	return null;
     }
 
     @Override
     public Void visitEscrevaDeclaracao(Escreva declaracao) {
-	escritor.concatenarNaLinha("printf(" );
+	escritor.concatenarNaLinha("print(");
 	List<tree.Expressao> expressoes = declaracao.expressoes;
-	String especificadorLiteral = this.getEspecificadorEscreva(expressoes);
-	if(especificadorLiteral != null) {
-	    escritor.concatenarNaLinha("\""+especificadorLiteral+"\", ");
-	} 
 	for (int i = 0; i < expressoes.size(); i++) {
 	    evaluate(expressoes.get(i));
 	    if (i < (expressoes.size() - 1)) {
-		escritor.concatenarNaLinha(", ");
+		escritor.concatenarNaLinha(" + ");
 	    }
 	}
-	escritor.concatenarNaLinha(");").addQuebraLinha();
+	escritor.concatenarNaLinha(")").addQuebraLinha();
 	return null;
     }
-    
-    private String getEspecificadorEscreva(List<tree.Expressao> expressoes ) {
-	StringBuilder builder = new StringBuilder();
-	for (int i = 0; i < expressoes.size(); i++) {
-	    tree.Expressao exp = expressoes.get(i);
-	    if(exp instanceof tree.Expressao.Literal) {
-		    Token token = ((tree.Expressao.Literal) exp).token;
-		    builder.append(this.getEspecificadorTipo(token.type));
-	    } else if(exp instanceof tree.Expressao.Variavel) {
-		Token token = ((tree.Expressao.Variavel) exp).nome;
-		builder.append(this.getEspecificadorTipo(this.variaveis.get(token.lexeme)));
-	    } else if(exp instanceof tree.Expressao.VariavelArray) {
-		Token token = ((tree.Expressao.VariavelArray) exp).nome;
-		builder.append(this.getEspecificadorTipo(this.getVariavelVetorTipo(token.lexeme)));
-	    } else if(
-		    exp instanceof tree.Expressao.Logico ||
-		    exp instanceof tree.Expressao.Unario
-		    ) {
-		builder.append("%d");
-	    } else if(exp instanceof tree.Expressao.Binario) {
-		Token operador = ((tree.Expressao.Binario)exp).operador;
-		if(isTokenTypeIgualA(operador, MAIOR_QUE, MAIOR_IQUAL, MENOR_QUE, MENOR_IGUAL)) {
-		    // Operação logica
-		    builder.append("%d"); 
-		} else {
-		    // Operacao Aritimetica
-		    //builder.append("%f");
-		    builder.append(this.getEspecificadorBinario((tree.Expressao.Binario) exp));
-		    
-		}
-	    } else if(exp instanceof tree.Expressao.ExpParentizada) {
-		 tree.Expressao exp2 = ((tree.Expressao.ExpParentizada)exp).grupo.expressao;
-		 builder.append(this.getEspecificadorEscreva(Collections.singletonList(exp2)));
-	    }
-	    
-	}	
-	return builder.toString();
-    }
-    private String getEspecificadorBinario(tree.Expressao.Binario bin) {
-	tree.Expressao expEsquerda = (tree.Expressao) bin.esquerda;
-	tree.Expressao expDireita =  (tree.Expressao) bin.direita;
-	String esquerda = this.getEspecificadorEscreva(Collections.singletonList(expEsquerda));
-	String direita = this.getEspecificadorEscreva(Collections.singletonList(expDireita));
-	if(esquerda.contains("%f") || direita.contains("%f")) {
-	    return "%f";
-	} else {
-	    return "%d";
-	}
-    }
-    private boolean isTokenTypeIgualA(Token token, TiposToken... types) {
-	for (TiposToken type : types) {
-		if (token.type == type) {
-			return true;
-		}
-	}
 
-	return false;
-}
-    
     @Override
     public Void visitSeDeclaracao(Se declaracao) {
 	escritor.concatenarNaLinha("if (");
 	evaluate(declaracao.condicao);
-	escritor.concatenarNaLinha(") {").indentar().addQuebraLinha();
+	escritor.concatenarNaLinha(") :").indentar().addQuebraLinha();
 	execute(declaracao.entaoBloco);
 	escritor.removerIdentacao();
 	if (declaracao.senaoBloco == null) {
-	    escritor.concatenarNaLinha("}").addQuebraLinha();
+	    escritor.addQuebraLinha();
 	    return null;
 	}
-	escritor.concatenarNaLinha("} else {").indentar().addQuebraLinha();
+	escritor.concatenarNaLinha("else :").indentar().addQuebraLinha();
 	execute(declaracao.senaoBloco);
-	escritor.removerIdentacao().concatenarNaLinha("}").addQuebraLinha();
+	escritor.removerIdentacao().addQuebraLinha();
 	return null;
     }
 
@@ -252,52 +141,27 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	Expressao atribuicao = declaracao.atribuicao;
 	if (atribuicao instanceof Expressao.Atribuicao) {
 	    String lexeme = ((Expressao.Atribuicao) atribuicao).nome.lexeme;
-	    escritor.concatenarNaLinha( getLerFuncao(lexeme)+");").addQuebraLinha();
+	    escritor.concatenarNaLinha(lexeme + " = input()").addQuebraLinha();
 
 	}
 	if (atribuicao instanceof Expressao.AtribuicaoArray) {
 	    String lexeme = ((Expressao.AtribuicaoArray) atribuicao).nome.lexeme;
-	    escritor.concatenarNaLinha(getLerFuncao(lexeme)+ "[");
+	    escritor.concatenarNaLinha(lexeme + "[");
 	    evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
 
-	    escritor.concatenarNaLinha("]);").addQuebraLinha();
+	    escritor.concatenarNaLinha("] = input()").addQuebraLinha();
 	}
 	return null;
-    }
-
-    private String getLerFuncao(String lexeme) {
-	if(this.isCadeia(lexeme)) {
-	    return "gets("+lexeme;
-	}
-	TiposToken tipo = null;
-	if(this.variaveis.get(lexeme) == TiposToken.TIPO_VETOR) {
-	    tipo = this.getVariavelVetorTipo(lexeme);
-	} else {
-	    tipo = this.variaveis.get(lexeme);
-	}
-	return "scanf(\""+this.getEspecificadorTipo(tipo)+"\", &"+lexeme;
     }
 
     @Override
     public Void visitVarDeclaracao(Var declaracao) {
-	this.variaveis.put(declaracao.nome.lexeme, declaracao.tipo.type);
 	if (declaracao.tipo.type == TiposToken.TIPO_MODULO) {
 	    return null;
 	}
 	String tipo = this.tipoVariavel(declaracao.tipo.type);
-	escritor
-		.concatenarNaLinha(
-				   tipo + " " + declaracao.nome.lexeme
-					   + this.getTamanhoVetorTipoString(declaracao.tipo.type) + ";")
-		.addQuebraLinha();
+	escritor.concatenarNaLinha(declaracao.nome.lexeme + " = None").addQuebraLinha();
 	return null;
-    }
-
-    private String getTamanhoVetorTipoString(TiposToken tipo) {
-	if (tipo == TiposToken.TIPO_CADEIA) {
-	    return "[100]";
-	}
-	return "";
     }
 
     @Override
@@ -310,27 +174,16 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	Declaracao primeiro = lista.get(0);
 
 	if (primeiro instanceof Declaracao.Var) {
-	    Token tipoVar = ((Declaracao.Var) primeiro).tipo;
-	    if (tipoVar.type == TiposToken.TIPO_MODULO) {
-		return null;
-	    }
-	    String tipo = this.tipoVariavel(tipoVar.type);
-	    escritor.concatenarNaLinha(tipo + " ");
-
 	    for (int i = 0; i < lista.size(); i++) {
 		Declaracao.Var varriavel = (Declaracao.Var) lista.get(i);
 		escritor.concatenarNaLinha(varriavel.nome.lexeme);
 		if (i < lista.size() - 1) {
-		    escritor.concatenarNaLinha(", ");
+		    escritor.concatenarNaLinha(" = ");
 		}
 	    }
 
-	    escritor.concatenarNaLinha(";").addQuebraLinha();
+	    escritor.concatenarNaLinha(" = None").addQuebraLinha();
 	} else if (primeiro instanceof Declaracao.VariavelArray) {
-	    Token tipoVar = ((Declaracao.VariavelArray) primeiro).tipo;
-	    String tipo = this.tipoVariavel(tipoVar.type);
-
-	    escritor.concatenarNaLinha(tipo + " ");
 
 	    for (int i = 0; i < lista.size(); i++) {
 		Declaracao.VariavelArray varriavel = (Declaracao.VariavelArray) lista.get(i);
@@ -339,12 +192,12 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 						     (int) ((Expressao.Literal) varriavel.intervaloI).valor,
 						     (int) ((Expressao.Literal) varriavel.intervaloF).valor);
 		addVariavelVetor(varriavel.nome.lexeme, vv);
-		escritor.concatenarNaLinha(varriavel.nome.lexeme + "[" + vv.getTamanho() + "]");
+		escritor.concatenarNaLinha(varriavel.nome.lexeme);
 		if (i < lista.size() - 1) {
-		    escritor.concatenarNaLinha(", ");
+		    escritor.concatenarNaLinha(" = ");
 		}
 	    }
-	    escritor.concatenarNaLinha(";").addQuebraLinha();
+	    escritor.concatenarNaLinha(" = []").addQuebraLinha();
 
 	}
 
@@ -353,34 +206,27 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     @Override
     public Void visitVariavelArrayDeclaracao(VariavelArray declaracao) {
-	this.variaveis.put(declaracao.nome.lexeme, declaracao.tipo.type);
 	String tipo = this.tipoVariavel(declaracao.tipo.type);
 	VariavelVetor vv = new VariavelVetor(
 					     declaracao.tipo.type,
 					     (int) ((Expressao.Literal) declaracao.intervaloI).valor,
 					     (int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
-	escritor.concatenarNaLinha(tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "]"+this.isVetorCadeia(declaracao.tipo.type)+";").addQuebraLinha();
+	escritor.concatenarNaLinha(declaracao.nome.lexeme + " = [None] * " + vv.getTamanho()).addQuebraLinha();
 	addVariavelVetor(declaracao.nome.lexeme, vv);
 	return null;
     }
 
-    private String isVetorCadeia(TiposToken type ) {
-	if(type == TiposToken.TIPO_CADEIA) return "[100]";
-	return "";
-    }
-
     @Override
     public Void visitParaDeclaracao(Para declaracao) {
-	escritor.concatenarNaLinha("for (");
 	evaluate(declaracao.atribuicao);
-	escritor.concatenarNaLinha("; ");
+	escritor.addQuebraLinha().concatenarNaLinha("while (");
 	evaluate(declaracao.condicao);
-	escritor.concatenarNaLinha("; ");
-	evaluate(declaracao.incremento);
-	escritor.concatenarNaLinha(") {").indentar().addQuebraLinha();
+	escritor.concatenarNaLinha(") :").addQuebraLinha().indentar();
 	execute(declaracao.facaBloco);
-	escritor.removerIdentacao().concatenarNaLinha("}").addQuebraLinha();
+	escritor.addQuebraLinha();
+	evaluate(declaracao.incremento);
+	escritor.removerIdentacao().addQuebraLinha();
 	return null;
     }
 
@@ -388,68 +234,59 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     public Void visitEnquantoDeclaracao(Enquanto declaracao) {
 	escritor.concatenarNaLinha("while (");
 	evaluate(declaracao.condicao);
-	escritor.concatenarNaLinha(") {").addQuebraLinha().indentar();
+	escritor.concatenarNaLinha(") :").addQuebraLinha().indentar();
 	execute(declaracao.corpo);
-	escritor.removerIdentacao().concatenarNaLinha("}").addQuebraLinha();
+	escritor.removerIdentacao().addQuebraLinha();
 
 	return null;
     }
 
     @Override
     public Void visitRepitaDeclaracao(Repita declaracao) {
-	escritor.concatenarNaLinha("do {").indentar().addQuebraLinha();
+	escritor.concatenarNaLinha("while True :").indentar().addQuebraLinha();
 	execute(declaracao.corpo);
-	escritor.removerIdentacao().concatenarNaLinha("while (");
+	escritor.concatenarNaLinha("if ");
 	evaluate(declaracao.condicao);
-	escritor.concatenarNaLinha(");").addQuebraLinha();
+	escritor.concatenarNaLinha(" : break").removerIdentacao().addQuebraLinha();
 	return null;
     }
 
     @Override
     public Void visitModuloDeclaracao(Modulo declaracao) {
-	escritor.concatenarNaLinha("void " + declaracao.nome.lexeme + " () { ").indentar().addQuebraLinha();
+	escritor.concatenarNaLinha("def " + declaracao.nome.lexeme + " () :").indentar().addQuebraLinha();
 	execute(declaracao.corpo);
-	escritor.removerIdentacao().concatenarNaLinha("}").addQuebraLinha();
+	escritor.removerIdentacao().addQuebraLinha();
 	return null;
     }
 
     @Override
     public Void visitChamadaModuloDeclaracao(ChamadaModulo declaracao) {
-	escritor.concatenarNaLinha(declaracao.identificador.lexeme + "();").addQuebraLinha();
+	escritor.concatenarNaLinha(declaracao.identificador.lexeme + "()").addQuebraLinha();
 	return null;
     }
 
     @Override
     public Void visitProgramaDeclaracao(Programa declaracao) {
 
-	escritor
-		.concatenarNaLinha("#include <stdio.h>")
-		.addQuebraLinha()
-		.concatenarNaLinha("#include <stdbool.h>")
-		.addQuebraLinha()
-		.concatenarNaLinha("#include <string.h>")
-		.addQuebraLinha(2);
-
 	// converte variaveis
 	for (Declaracao variaveis : declaracao.variaveis) {
 	    execute(variaveis);
 	}
-
-	escritor.addQuebraLinha();
 
 	// converte modulos-funcoes
 	for (Declaracao modulo : declaracao.modulos) {
 	    execute(modulo);
 	}
 
-	escritor.addQuebraLinha().concatenarNaLinha("int main() {").addQuebraLinha().indentar();
-
+	escritor.addQuebraLinha();
 	// converte inicio-fim
 	for (Declaracao corpo : declaracao.corpo) {
 	    execute(corpo);
 	}
 
-	escritor.removerIdentacao().concatenarNaLinha("}"); // fim main
+	escritor.removerIdentacao().addQuebraLinha(2);
+
+	escritor.removerIdentacao(); // fim class
 
 	return null;
     }
@@ -534,7 +371,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     public Void visitUnarioExpressao(Unario expressao) {
 	switch (expressao.operador.type) {
 	case NAO:
-	    escritor.concatenarNaLinha("!");
+	    escritor.concatenarNaLinha("not ");
 	    break;
 	case MENOS:
 	    escritor.concatenarNaLinha("-");
@@ -549,23 +386,9 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     @Override
     public Void visitAtribuicaoExpressao(Atribuicao expressao) {
-	if(this.isCadeia(expressao.nome.lexeme)) {
-	  
-	    escritor.concatenarNaLinha("strcpy("+expressao.nome.lexeme+", ");
-	    evaluate(expressao.valor);
-	    escritor.concatenarNaLinha(")");
-	    
-	    
-	} else {
-	    
-	    escritor.concatenarNaLinha(expressao.nome.lexeme + " = ");
-	    evaluate(expressao.valor);
-	}
+	escritor.concatenarNaLinha(expressao.nome.lexeme + " = ");
+	evaluate(expressao.valor);
 	return null;
-    }
-
-    private boolean isCadeia(String lexeme) {	
-	return this.variaveis.get(lexeme) == TiposToken.TIPO_CADEIA;
     }
 
     @Override
