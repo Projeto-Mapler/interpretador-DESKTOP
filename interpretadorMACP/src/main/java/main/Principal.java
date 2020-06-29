@@ -6,7 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
-import conversores.ConversorPython;
+import conversores.Conversor;
+import conversores.ConversorFactory;
+import conversores.ConversorStrategy;
 import debug.DebugSnapshot;
 import debug.Debugador;
 import debug.EventoListener;
@@ -68,7 +70,7 @@ public class Principal implements EventoListener {
 	if (temErro)
 	    return;
 //		interpreter.interpret(programa);
-	ConversorPython cc = new ConversorPython(this, programa);
+	Conversor cc = ConversorFactory.getConversor(this, programa, ConversorStrategy.PYTHON);
 	System.out.println(cc.converter());
 
     }
