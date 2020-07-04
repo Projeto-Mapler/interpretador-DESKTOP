@@ -54,7 +54,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	private Principal runTimer; // usado para reportar erros
 	private Thread thread; // thread para executar o processo de interpretação
 	private boolean parada, terminada; // FLAGS com o estado da execução da thread
-	private LeitorEntradaConsole entradaConsole = new LeitorEntradaConsole();
+	private LeitorEntradaConsole entradaConsole = new LeitorEntradaConsole(this);
 
 	public Interpretador(Principal runTimer, GerenciadorEventos ge) {
 		this.runTimer = runTimer;
@@ -119,7 +119,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		this.parada = true;
 		synchronized (thread) {
 			thread.stop();
-
+	
 		}
 	}
 	
@@ -371,12 +371,12 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	
 			this.gerenciadorEventos.notificar(TiposEvento.LER_EVENTO, this.entradaConsole);
 		
-			while(!this.entradaConsole.getValorSetado()) {
-				// espera o valor ser setado para continuar
-			}
+			this.suspender();// espera o valor ser setado para continuar
+
 			String valor = this.entradaConsole.getValor();
 			this.entradaConsole.reset();
-//			System.err.println("lido: " + valor);// imprime acoes no terminal
+			System.err.println("lido: " + valor);// imprime acoes no terminal
+			
 			Expressao atribuicao = declaracao.atribuicao;
 			if (atribuicao instanceof Expressao.Atribuicao) {
 				Token nome = ((Expressao.Atribuicao) atribuicao).nome;

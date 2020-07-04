@@ -69,9 +69,9 @@ public class Principal implements EventoListener {
 
 	if (temErro)
 	    return;
-//		interpreter.interpret(programa);
-	Conversor cc = ConversorFactory.getConversor(this, programa, ConversorStrategy.PYTHON);
-	System.out.println(cc.converter());
+		interpreter.interpret(programa);
+//	Conversor cc = ConversorFactory.getConversor(this, programa, ConversorStrategy.PYTHON);
+//	System.out.println(cc.converter());
 
     }
 
