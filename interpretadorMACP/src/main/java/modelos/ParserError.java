@@ -25,5 +25,9 @@ public class ParserError extends RuntimeException {
 		this.linha = linha;
 		this.mensagem = mensagem;
 	}
+	public String getLexeme() {
+	    if(token == null) return null;
+	    return token.lexeme;
+	}
 	
 }

@@ -55,10 +55,10 @@ public class Principal implements EventoListener {
 	byte[] bytes = Files.readAllBytes(Paths.get(path));
 	run(new String(bytes, Charset.defaultCharset()).trim());
 
-	if (temErro)
-	    System.exit(65);
-	if (temRunTimeErro)
-	    System.exit(70);
+	if (temErro || temRunTimeErro) return;
+//	    System.exit(65);
+//	if (temRunTimeErro)
+//	    System.exit(70);
     }
 
     private void run(String source) {

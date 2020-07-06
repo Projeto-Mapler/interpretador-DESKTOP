@@ -278,7 +278,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 					&& (direita instanceof Double || direita instanceof Integer)) {
 				return retornaValorNumericoTipoCorreto(MAIS, esquerda, direita);
 			}
-			throw new RuntimeError(expressao.operador, "Operadores devem ser números ou cadeia de caracteres.");
+			throw new RuntimeError(expressao.operador, "Operadores devem ser apenas números ou apenas cadeia de caracteres.");
 		case MAIOR_QUE:
 			checkNumberOperands(expressao.operador, esquerda, direita);
 			return toDouble(esquerda) > toDouble(direita);
