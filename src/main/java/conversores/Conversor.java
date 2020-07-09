@@ -3,6 +3,9 @@ package conversores;
 import java.util.HashMap;
 import java.util.Map;
 
+import debug.GerenciadorEventos;
+import debug.TiposEvento;
+import modelos.RuntimeError;
 import modelos.TiposToken;
 import modelos.VariavelVetor;
 import tree.Declaracao.Programa;
@@ -18,14 +21,18 @@ public abstract class Conversor {
 	protected Escritor escritor;
 	protected Programa programa;
 	private Map<String, VariavelVetor> mapaVariaveisVetor; // salva as variaveis do tipo vetor
+	private GerenciadorEventos gerenciadorEventos;
 	
-	public Conversor(Programa programa) {
+	public Conversor(Programa programa, GerenciadorEventos ge) {
+	    	this.gerenciadorEventos = ge;
 		this.escritor = new Escritor();
 		this.programa = programa;
 		this.mapaVariaveisVetor = new HashMap<String, VariavelVetor>();
 	}
 	
-	
+	protected void throwRuntimeErro(RuntimeError erro) {
+	    this.gerenciadorEventos.notificar(TiposEvento.ERRO_RUNTIME, erro);
+	}
 	
 	protected void addVariavelVetor(String nome, VariavelVetor variavel) {
 		this.mapaVariaveisVetor.put(nome, variavel);

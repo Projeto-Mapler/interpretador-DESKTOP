@@ -80,7 +80,7 @@ public enum TiposEvento {
 	
 	/**
 	 * A thread do processo de interpretação foi concluida
-	 * @payload - null
+	 * @payload - (double) tempo de execução
 	 */
 	INTERPRETACAO_CONCLUIDA,
 	;
