@@ -6,6 +6,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
+import conversores.Conversor;
+import conversores.ConversorFactory;
+import conversores.ConversorStrategy;
 import debug.Debugador;
 import debug.EventoListener;
 import debug.GerenciadorEventos;
@@ -15,6 +18,7 @@ import modelos.Token;
 import parser.Parser;
 import scanner.Scanner;
 import tree.Declaracao;
+import tree.Declaracao.Programa;
 
 /**
  * Responsável por executar as etapas do interpretador na ordem correta,
@@ -24,40 +28,59 @@ import tree.Declaracao;
  *
  */
 public class Principal implements EventoListener {
+    
     private boolean temErro = false;
     private boolean temRunTimeErro = false;
-
+    
     private Interpretador interpreter;
     private GerenciadorEventos eventos;
 
+    
     public Principal(GerenciadorEventos ge, Debugador debug) {
 
 	eventos = ge;
-	ge.inscrever(TiposEvento.ACAO_DEBUG, this);
+	ge.inscreverTodos(new TiposEvento[] {TiposEvento.ERRO_PARSE, TiposEvento.ERRO_RUNTIME}, this);
 	interpreter = new Interpretador(ge);
-	debug.setInterpretador(interpreter);
+	if(debug != null) {	    
+	    debug.setInterpretador(interpreter);
+	}
+	
 
     }
 
     public void runFile(String path) throws IOException {
-	byte[] bytes = Files.readAllBytes(Paths.get(path));
-	run(new String(bytes, Charset.defaultCharset()).trim());
-
-	if (temErro || temRunTimeErro)
-	    return;
+	run(this.getSource(path));	
     }
 
     private void run(String source) {
+	Programa programa = this.gerarPrograma(source);
+	if (temErro || temRunTimeErro)
+	    return;
+	interpreter.interpretar(programa);
+
+    }
+    
+    public String getConversao(String path, ConversorStrategy conversorStrategy) throws IOException {
+	String source = this.getSource(path);
+	Declaracao.Programa programa = this.gerarPrograma(source);
+	if (temErro || temRunTimeErro)
+	    return null;
+	Conversor conversor =  ConversorFactory.getConversor(this.eventos, programa, conversorStrategy);
+	return conversor.converter();
+    }
+    
+    private String getSource(String path) throws IOException {
+	byte[] bytes = Files.readAllBytes(Paths.get(path));
+	return new String(bytes, Charset.defaultCharset()).trim();
+    }
+    
+    private Programa gerarPrograma(String source) {
 	Scanner scanner = new Scanner(source, this.eventos);
 	List<Token> tokens = scanner.scanTokens();
 	
 	Parser parser = new Parser(tokens, this.eventos);
-	Declaracao.Programa programa = parser.parse();
-
-	if (temErro)
-	    return;
-	interpreter.interpretar(programa);
-
+	
+	return parser.parse();
     }
 
     @Override
