@@ -41,7 +41,7 @@ public class MainUI extends JFrame implements EventoListener{
 	 */
 	private static final long serialVersionUID = 1L;
 
-	private final String PATH_EXEMPLOS = "..\\exemplos\\";
+	private final String PATH_EXEMPLOS = "exemplos\\";
 
 	private JPanel panel;
 	private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar,  botaoDebugContinuar, botaoDebugContinuarSem;
