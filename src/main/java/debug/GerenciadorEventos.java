@@ -28,6 +28,28 @@ public class GerenciadorEventos {
 	public void inscrever(TiposEvento te, EventoListener ev) {
 		this.inscritos.get(te).add(ev);
 	}
+	
+	/**
+	 * Inscreve o listener nos eventos passados no array
+	 * @param tes - array de eventos para inscrever
+	 * @param ev - listener para increver nos eventos
+	 */
+	public void inscreverTodos(TiposEvento []tes, EventoListener ev) {
+	    for(TiposEvento te : tes) {
+		this.inscrever(te, ev);
+	    }
+	}
+	
+	/**
+	 * Desiscreve o eventoListener de todos os eventos que estiver inscrito
+	 * @param ev - listener que deseja desiscrever
+	 */
+	public void desiscreverTodos(EventoListener ev) {
+	    Set<TiposEvento> keys = this.inscritos.keySet();
+	    for(TiposEvento key : keys) {
+		this.desinscrever(key, ev);
+	    }
+	}
 
 	/**
 	 * Remove uma classe inscrita em determinado evento

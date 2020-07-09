@@ -74,13 +74,16 @@ public class MainUI extends JFrame implements EventoListener {
 	}
 	this.setup();
 	this.setVisible(true);
-
-	this.ge.inscrever(TiposEvento.MUDANCA_ESTADO_DEBUG, this);
-	this.ge.inscrever(TiposEvento.ESCREVER_EVENTO, this);
-	this.ge.inscrever(TiposEvento.LER_EVENTO, this);
-	this.ge.inscrever(TiposEvento.INTERPRETACAO_CONCLUIDA, this);
-	this.ge.inscrever(TiposEvento.ERRO_PARSE, this);
-	this.ge.inscrever(TiposEvento.ERRO_RUNTIME, this);
+	
+	this.ge.inscreverTodos(new TiposEvento[] {
+		TiposEvento.MUDANCA_ESTADO_DEBUG,
+		TiposEvento.ESCREVER_EVENTO,
+		TiposEvento.LER_EVENTO,
+		TiposEvento.INTERPRETACAO_CONCLUIDA,
+		TiposEvento.ERRO_PARSE,
+		TiposEvento.ERRO_RUNTIME,
+		TiposEvento.INTERPRETACAO_CONCLUIDA
+	}, this);
 	
     }
 
@@ -271,6 +274,10 @@ public class MainUI extends JFrame implements EventoListener {
     @Override
     public void update(TiposEvento tipoEvento, Object payload) {
 
+	if(tipoEvento == TiposEvento.INTERPRETACAO_CONCLUIDA) {	    
+	    System.out.println("Tempo de execução: " + (double)payload + "s");
+	    return;
+	}
 	if (tipoEvento == TiposEvento.ESCREVER_EVENTO) {
 	    String msg = (String) payload;
 	    System.out.println(msg);

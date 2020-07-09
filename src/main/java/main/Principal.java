@@ -30,12 +30,12 @@ public class Principal implements EventoListener {
     private Interpretador interpreter;
     private GerenciadorEventos eventos;
 
-    public Principal(GerenciadorEventos ge, Debugador d) {
+    public Principal(GerenciadorEventos ge, Debugador debug) {
 
 	eventos = ge;
 	ge.inscrever(TiposEvento.ACAO_DEBUG, this);
 	interpreter = new Interpretador(ge);
-	d.setInterpretador(interpreter);
+	debug.setInterpretador(interpreter);
 
     }
 

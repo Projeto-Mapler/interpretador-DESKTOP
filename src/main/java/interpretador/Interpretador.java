@@ -11,7 +11,6 @@ import java.util.Map;
 
 import debug.GerenciadorEventos;
 import debug.TiposEvento;
-import main.Principal;
 import modelos.LeitorEntradaConsole;
 import modelos.RuntimeError;
 import modelos.TiposToken;
@@ -81,7 +80,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		    e.printStackTrace();
 		}
 		long elapsedTime = System.nanoTime() - startTime;
-		gerenciadorEventos.notificar(TiposEvento.INTERPRETACAO_CONCLUIDA, elapsedTime);
+		gerenciadorEventos.notificar(TiposEvento.INTERPRETACAO_CONCLUIDA, (double) elapsedTime / 1000000000);
 	    }
 	});
 	thread.start();
