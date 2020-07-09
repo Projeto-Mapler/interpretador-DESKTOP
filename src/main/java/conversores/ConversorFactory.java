@@ -1,6 +1,6 @@
 package conversores;
 
-import main.Principal;
+import debug.GerenciadorEventos;
 import tree.Declaracao.Programa;
 
 public class ConversorFactory {
@@ -8,18 +8,18 @@ public class ConversorFactory {
     private ConversorFactory() {}
 
     
-    public static Conversor getConversor(Principal principal, Programa programa, ConversorStrategy conversor) {
+    public static Conversor getConversor(GerenciadorEventos gerenciadorEventos, Programa programa, ConversorStrategy conversor) {
 	switch (conversor) {
 	case C:
-	    return new ConversorC(principal, programa);
+	    return new ConversorC(programa, gerenciadorEventos);
 	case Cpp:
-	    return new ConversorCpp(principal, programa);
+	    return new ConversorCpp(programa, gerenciadorEventos);
 	case JAVA:
-	    return new ConversorJava(principal, programa);
+	    return new ConversorJava(programa, gerenciadorEventos);
 	case PASCAL:
-	    return new ConversorPascal(principal, programa);
+	    return new ConversorPascal(programa, gerenciadorEventos);
 	case PYTHON:
-	    return new ConversorPython(principal, programa);
+	    return new ConversorPython(programa, gerenciadorEventos);
 	default:
 	  return null;
 	}

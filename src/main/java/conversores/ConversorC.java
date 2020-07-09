@@ -10,7 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import main.Principal;
+import debug.GerenciadorEventos;
 import modelos.RuntimeError;
 import modelos.TiposToken;
 import modelos.Token;
@@ -48,13 +48,10 @@ import tree.Expressao.Variavel;
  */
 public class ConversorC extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
 
-    private Principal principal;
-
     private Map<String, TiposToken> variaveis = new HashMap<String, TiposToken>();// variavel, tipo
 
-    public ConversorC(Principal principal, Declaracao.Programa programa) {
-	super(programa);
-	this.principal = principal;
+    public ConversorC(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
+	super(programa, gerenciadorEventos);
     }
 
     private void evaluate(Expressao expressao) {
@@ -125,13 +122,13 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     public String converter() {
 	try {
 	    visitProgramaDeclaracao(programa);
-	    String programaJava = escritor.getResultado();
+	    String programa = escritor.getResultado();
 
-	    if (programaJava.length() > 0) {
-		return programaJava;
+	    if (programa.length() > 0) {
+		return programa;
 	    }
 	} catch (RuntimeError error) {
-	    this.principal.runtimeError(error);
+	    super.throwRuntimeErro(error);
 	} finally {
 	    escritor.reset();
 	}
@@ -156,12 +153,12 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     @Override
     public Void visitEscrevaDeclaracao(Escreva declaracao) {
-	escritor.concatenarNaLinha("printf(" );
+	escritor.concatenarNaLinha("printf(");
 	List<tree.Expressao> expressoes = declaracao.expressoes;
 	String especificadorLiteral = this.getEspecificadorEscreva(expressoes);
-	if(especificadorLiteral != null) {
-	    escritor.concatenarNaLinha("\""+especificadorLiteral+"\", ");
-	} 
+	if (especificadorLiteral != null) {
+	    escritor.concatenarNaLinha("\"" + especificadorLiteral + "\", ");
+	}
 	for (int i = 0; i < expressoes.size(); i++) {
 	    evaluate(expressoes.get(i));
 	    if (i < (expressoes.size() - 1)) {
@@ -171,65 +168,64 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	escritor.concatenarNaLinha(");").addQuebraLinha();
 	return null;
     }
-    
-    private String getEspecificadorEscreva(List<tree.Expressao> expressoes ) {
+
+    private String getEspecificadorEscreva(List<tree.Expressao> expressoes) {
 	StringBuilder builder = new StringBuilder();
 	for (int i = 0; i < expressoes.size(); i++) {
 	    tree.Expressao exp = expressoes.get(i);
-	    if(exp instanceof tree.Expressao.Literal) {
-		    Token token = ((tree.Expressao.Literal) exp).token;
-		    builder.append(this.getEspecificadorTipo(token.type));
-	    } else if(exp instanceof tree.Expressao.Variavel) {
+	    if (exp instanceof tree.Expressao.Literal) {
+		Token token = ((tree.Expressao.Literal) exp).token;
+		builder.append(this.getEspecificadorTipo(token.type));
+	    } else if (exp instanceof tree.Expressao.Variavel) {
 		Token token = ((tree.Expressao.Variavel) exp).nome;
 		builder.append(this.getEspecificadorTipo(this.variaveis.get(token.lexeme)));
-	    } else if(exp instanceof tree.Expressao.VariavelArray) {
+	    } else if (exp instanceof tree.Expressao.VariavelArray) {
 		Token token = ((tree.Expressao.VariavelArray) exp).nome;
 		builder.append(this.getEspecificadorTipo(this.getVariavelVetorTipo(token.lexeme)));
-	    } else if(
-		    exp instanceof tree.Expressao.Logico ||
-		    exp instanceof tree.Expressao.Unario
-		    ) {
+	    } else if (exp instanceof tree.Expressao.Logico || exp instanceof tree.Expressao.Unario) {
 		builder.append("%d");
-	    } else if(exp instanceof tree.Expressao.Binario) {
-		Token operador = ((tree.Expressao.Binario)exp).operador;
-		if(isTokenTypeIgualA(operador, MAIOR_QUE, MAIOR_IQUAL, MENOR_QUE, MENOR_IGUAL)) {
+	    } else if (exp instanceof tree.Expressao.Binario) {
+		Token operador = ((tree.Expressao.Binario) exp).operador;
+		if (isTokenTypeIgualA(operador, MAIOR_QUE, MAIOR_IQUAL, MENOR_QUE, MENOR_IGUAL)) {
 		    // Operação logica
-		    builder.append("%d"); 
+		    builder.append("%d");
 		} else {
 		    // Operacao Aritimetica
-		    //builder.append("%f");
+		    // builder.append("%f");
 		    builder.append(this.getEspecificadorBinario((tree.Expressao.Binario) exp));
-		    
+
 		}
-	    } else if(exp instanceof tree.Expressao.ExpParentizada) {
-		 tree.Expressao exp2 = ((tree.Expressao.ExpParentizada)exp).grupo.expressao;
-		 builder.append(this.getEspecificadorEscreva(Collections.singletonList(exp2)));
+	    } else if (exp instanceof tree.Expressao.ExpParentizada) {
+		tree.Expressao exp2 = ((tree.Expressao.ExpParentizada) exp).grupo.expressao;
+		builder.append(this.getEspecificadorEscreva(Collections.singletonList(exp2)));
 	    }
-	    
-	}	
+
+	}
 	return builder.toString();
     }
+
     private String getEspecificadorBinario(tree.Expressao.Binario bin) {
 	tree.Expressao expEsquerda = (tree.Expressao) bin.esquerda;
-	tree.Expressao expDireita =  (tree.Expressao) bin.direita;
+	tree.Expressao expDireita = (tree.Expressao) bin.direita;
 	String esquerda = this.getEspecificadorEscreva(Collections.singletonList(expEsquerda));
 	String direita = this.getEspecificadorEscreva(Collections.singletonList(expDireita));
-	if(esquerda.contains("%f") || direita.contains("%f")) {
+	if (esquerda.contains("%f") || direita.contains("%f")) {
 	    return "%f";
 	} else {
 	    return "%d";
 	}
     }
+
     private boolean isTokenTypeIgualA(Token token, TiposToken... types) {
 	for (TiposToken type : types) {
-		if (token.type == type) {
-			return true;
-		}
+	    if (token.type == type) {
+		return true;
+	    }
 	}
 
 	return false;
-}
-    
+    }
+
     @Override
     public Void visitSeDeclaracao(Se declaracao) {
 	escritor.concatenarNaLinha("if (");
@@ -252,12 +248,12 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	Expressao atribuicao = declaracao.atribuicao;
 	if (atribuicao instanceof Expressao.Atribuicao) {
 	    String lexeme = ((Expressao.Atribuicao) atribuicao).nome.lexeme;
-	    escritor.concatenarNaLinha( getLerFuncao(lexeme)+");").addQuebraLinha();
+	    escritor.concatenarNaLinha(getLerFuncao(lexeme) + ");").addQuebraLinha();
 
 	}
 	if (atribuicao instanceof Expressao.AtribuicaoArray) {
 	    String lexeme = ((Expressao.AtribuicaoArray) atribuicao).nome.lexeme;
-	    escritor.concatenarNaLinha(getLerFuncao(lexeme)+ "[");
+	    escritor.concatenarNaLinha(getLerFuncao(lexeme) + "[");
 	    evaluate(((Expressao.AtribuicaoArray) atribuicao).index);
 
 	    escritor.concatenarNaLinha("]);").addQuebraLinha();
@@ -266,16 +262,16 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     }
 
     private String getLerFuncao(String lexeme) {
-	if(this.isCadeia(lexeme)) {
-	    return "gets("+lexeme;
+	if (this.isCadeia(lexeme)) {
+	    return "gets(" + lexeme;
 	}
 	TiposToken tipo = null;
-	if(this.variaveis.get(lexeme) == TiposToken.TIPO_VETOR) {
+	if (this.variaveis.get(lexeme) == TiposToken.TIPO_VETOR) {
 	    tipo = this.getVariavelVetorTipo(lexeme);
 	} else {
 	    tipo = this.variaveis.get(lexeme);
 	}
-	return "scanf(\""+this.getEspecificadorTipo(tipo)+"\", &"+lexeme;
+	return "scanf(\"" + this.getEspecificadorTipo(tipo) + "\", &" + lexeme;
     }
 
     @Override
@@ -360,13 +356,18 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 					     (int) ((Expressao.Literal) declaracao.intervaloI).valor,
 					     (int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
-	escritor.concatenarNaLinha(tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "]"+this.isVetorCadeia(declaracao.tipo.type)+";").addQuebraLinha();
+	escritor
+		.concatenarNaLinha(
+				   tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "]"
+					   + this.isVetorCadeia(declaracao.tipo.type) + ";")
+		.addQuebraLinha();
 	addVariavelVetor(declaracao.nome.lexeme, vv);
 	return null;
     }
 
-    private String isVetorCadeia(TiposToken type ) {
-	if(type == TiposToken.TIPO_CADEIA) return "[100]";
+    private String isVetorCadeia(TiposToken type) {
+	if (type == TiposToken.TIPO_CADEIA)
+	    return "[100]";
 	return "";
     }
 
@@ -549,22 +550,21 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     @Override
     public Void visitAtribuicaoExpressao(Atribuicao expressao) {
-	if(this.isCadeia(expressao.nome.lexeme)) {
-	  
-	    escritor.concatenarNaLinha("strcpy("+expressao.nome.lexeme+", ");
+	if (this.isCadeia(expressao.nome.lexeme)) {
+
+	    escritor.concatenarNaLinha("strcpy(" + expressao.nome.lexeme + ", ");
 	    evaluate(expressao.valor);
 	    escritor.concatenarNaLinha(")");
-	    
-	    
+
 	} else {
-	    
+
 	    escritor.concatenarNaLinha(expressao.nome.lexeme + " = ");
 	    evaluate(expressao.valor);
 	}
 	return null;
     }
 
-    private boolean isCadeia(String lexeme) {	
+    private boolean isCadeia(String lexeme) {
 	return this.variaveis.get(lexeme) == TiposToken.TIPO_CADEIA;
     }
 

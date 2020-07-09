@@ -2,9 +2,9 @@ package conversores;
 
 import java.util.List;
 
+import debug.GerenciadorEventos;
 import main.Principal;
 import modelos.RuntimeError;
-import modelos.Token;
 import modelos.TiposToken;
 import modelos.VariavelVetor;
 import tree.Declaracao;
@@ -42,9 +42,8 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 
     private Principal principal;
 
-    public ConversorPython(Principal principal, Declaracao.Programa programa) {
-	super(programa);
-	this.principal = principal;
+    public ConversorPython(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
+	super(programa, gerenciadorEventos);
     }
 
     private void evaluate(Expressao expressao) {
@@ -76,13 +75,13 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
     public String converter() {
 	try {
 	    visitProgramaDeclaracao(programa);
-	    String programaJava = escritor.getResultado();
+	    String programa = escritor.getResultado();
 
-	    if (programaJava.length() > 0) {
-		return programaJava;
+	    if (programa.length() > 0) {
+		return programa;
 	    }
 	} catch (RuntimeError error) {
-	    this.principal.runtimeError(error);
+	    super.throwRuntimeErro(error);
 	} finally {
 	    escritor.reset();
 	}
