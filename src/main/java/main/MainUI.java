@@ -14,6 +14,7 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.ComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -26,6 +27,7 @@ import javax.swing.UIManager;
 import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 
+import conversores.ConversorStrategy;
 import debug.DebugSnapshot;
 import debug.Debugador;
 import debug.EstadosDebug;
@@ -50,9 +52,9 @@ public class MainUI extends JFrame implements EventoListener {
     private JPanel panel;
     private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar, botaoDebugContinuar, botaoDebugContinuarSem;
     private JLabel labelOu;
-    private JComboBox<String> comboBoxExemplos;
+    private JComboBox<String> comboBoxExemplos, comboBoxTraducoes;
     private JFileChooser fileChooser;
-    private JCheckBox checkBoxDebugAtivo;
+    private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao;
 
     private GerenciadorEventos ge = new GerenciadorEventos();
 
@@ -74,17 +76,15 @@ public class MainUI extends JFrame implements EventoListener {
 	}
 	this.setup();
 	this.setVisible(true);
-	
-	this.ge.inscreverTodos(new TiposEvento[] {
-		TiposEvento.MUDANCA_ESTADO_DEBUG,
-		TiposEvento.ESCREVER_EVENTO,
-		TiposEvento.LER_EVENTO,
-		TiposEvento.INTERPRETACAO_CONCLUIDA,
-		TiposEvento.ERRO_PARSE,
-		TiposEvento.ERRO_RUNTIME,
-		TiposEvento.INTERPRETACAO_CONCLUIDA
-	}, this);
-	
+
+	this.ge
+	       .inscreverTodos(
+			       new TiposEvento[] { TiposEvento.MUDANCA_ESTADO_DEBUG, TiposEvento.ESCREVER_EVENTO,
+				       TiposEvento.LER_EVENTO, TiposEvento.INTERPRETACAO_CONCLUIDA,
+				       TiposEvento.ERRO_PARSE, TiposEvento.ERRO_RUNTIME,
+				       TiposEvento.INTERPRETACAO_CONCLUIDA },
+			       this);
+
     }
 
     public static void main(String[] args) {
@@ -124,6 +124,18 @@ public class MainUI extends JFrame implements EventoListener {
 	cons.gridy++;
 	this.panel.add(this.botaoIniciarExemplo, cons);
 
+	cons.gridy++;
+	this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
+	
+	this.comboBoxTraducoes = new JComboBox<String>(this.getNomesTraducoes());
+	this.comboBoxTraducoes.setEnabled(false);
+	
+	cons.gridy++;
+	this.panel.add(this.checkBoxImprimirTraducao, cons);
+	
+	cons.gridy++;
+	this.panel.add(this.comboBoxTraducoes, cons);
+	
 	cons.gridy++;
 	this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
 
@@ -181,14 +193,27 @@ public class MainUI extends JFrame implements EventoListener {
 
 	    @Override
 	    public void actionPerformed(ActionEvent e) {
-		String arquivo = (String) comboBoxExemplos.getSelectedItem();
-		String caminho = PATH_EXEMPLOS + arquivo;
+		String caminho  = getCamihoArquivo();
 		rodarArquivo(caminho);
 
 	    }
 	});
-
-	this.checkBoxDebugAtivo = new JCheckBox("Debug ativo", true);
+	
+	this.checkBoxImprimirTraducao = new JCheckBox("Imprimir Tradução", false);
+	this.checkBoxImprimirTraducao.addActionListener(new ActionListener() {
+	    
+	    @Override
+	    public void actionPerformed(ActionEvent e) {
+		JCheckBox x = (JCheckBox) e.getSource();
+		if(x.isSelected()) {
+		    comboBoxTraducoes.setEnabled(true);
+		} else {
+		    comboBoxTraducoes.setEnabled(false);
+		}
+		
+	    }
+	});
+	this.checkBoxDebugAtivo = new JCheckBox("Debug ativo", false);
 	// n usado: degug eh instanciado apenas apos o botao de executar eh clicado
 //		this.checkBoxDebugAtivo.addActionListener(new ActionListener() {
 //			
@@ -239,6 +264,18 @@ public class MainUI extends JFrame implements EventoListener {
 	this.botaoDebugContinuarSem.setEnabled(false);
     }
 
+    private String[] getNomesTraducoes() {
+	List<String> retorno = new ArrayList<String>();
+	for(ConversorStrategy s: ConversorStrategy.values()) {
+	    retorno.add(s.name());
+	}
+	
+	String[] conversores = new String[retorno.size()];
+	conversores = retorno.toArray(conversores);
+
+	return conversores;
+    }
+
     private String[] getNomeArquivosExemplo() {
 	File folder = new File(PATH_EXEMPLOS);
 	File[] listOfFiles = folder.listFiles();
@@ -266,16 +303,40 @@ public class MainUI extends JFrame implements EventoListener {
 	    debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 
 	    new Principal(ge, debugador).runFile(caminho);
+	    
 	} catch (IOException e) {
 	    e.printStackTrace();
 	}
+    }
+    
+    private String getCamihoArquivo() {
+	String arquivo = (String) comboBoxExemplos.getSelectedItem();
+	String caminho = PATH_EXEMPLOS + arquivo;
+	return caminho;
     }
 
     @Override
     public void update(TiposEvento tipoEvento, Object payload) {
 
-	if(tipoEvento == TiposEvento.INTERPRETACAO_CONCLUIDA) {	    
-	    System.out.println("Tempo de execução: " + (double)payload + "s");
+	if (tipoEvento == TiposEvento.INTERPRETACAO_CONCLUIDA) {
+	    System.out.println("Tempo de execução: " + (double) payload + "s");
+	    
+	    if(this.checkBoxImprimirTraducao.isSelected()) {
+		String cs = (String) this.comboBoxTraducoes.getSelectedItem();
+		ConversorStrategy conversor = ConversorStrategy.valueOf(cs);
+		
+		String result;
+		try {
+		    result = new Principal(ge, null).getConversao(this.getCamihoArquivo(), conversor);
+		    System.out.println("Conversao " + cs);
+			System.out.println(result);
+		} catch (IOException e) {
+		    // TODO Auto-generated catch block
+		    e.printStackTrace();
+		}
+		
+		
+	    }
 	    return;
 	}
 	if (tipoEvento == TiposEvento.ESCREVER_EVENTO) {
