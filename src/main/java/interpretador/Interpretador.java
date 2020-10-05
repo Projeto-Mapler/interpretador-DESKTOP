@@ -6,6 +6,7 @@ import static modelos.TiposToken.MAIS;
 import static modelos.TiposToken.MENOS;
 import static modelos.TiposToken.OU;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
@@ -371,7 +372,10 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	    }
 	    output.append(stringify(valor));
 	}
-	gerenciadorEventos.notificar(TiposEvento.ESCREVER_EVENTO, output.toString());
+	  byte[] valorBytes = output.toString().getBytes();
+	  Charset charSetUtf8 = Charset.forName("UTF-8");
+	  String valorString = new String(valorBytes, charSetUtf8);
+	gerenciadorEventos.notificar(TiposEvento.ESCREVER_EVENTO, valorString);
 //		System.out.println(output.toString());// imprime acoes no terminal
 	return null;
     }
@@ -379,13 +383,13 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
     @Override
     public Void visitLerDeclaracao(Ler declaracao) {
 
-	this.gerenciadorEventos.notificar(TiposEvento.LER_EVENTO, this.entradaConsole);
+	this.gerenciadorEventos.notificar(TiposEvento.LER_EVENTO, this.entradaConsole); // Observador do evento eh responsavel por informar o dado
 
 	this.suspender();// espera o valor ser setado para continuar
 
 	String valor = this.entradaConsole.getValor();
 	this.entradaConsole.reset();
-	System.err.println("lido: " + valor);// imprime acoes no terminal
+	//System.err.println("lido: " + valor);// imprime acoes no terminal
 
 	Expressao atribuicao = declaracao.atribuicao;
 	if (atribuicao instanceof Expressao.Atribuicao) {
