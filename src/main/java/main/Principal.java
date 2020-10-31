@@ -50,6 +50,11 @@ public class Principal implements EventoListener {
     if (temErro || temRunTimeErro)
       return;
     interpreter.interpretar(programa);
+  }  
+ 
+  public Declaracao.Programa getProgramaAST(String path) throws IOException{
+    String source = this.getSource(path);
+    return this.gerarPrograma(source);
   }
 
   public String getConversao(String path, ConversorStrategy conversorStrategy) throws IOException {

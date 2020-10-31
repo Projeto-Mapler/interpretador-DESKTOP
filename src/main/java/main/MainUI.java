@@ -36,9 +36,11 @@ import modelos.LeitorEntradaConsole;
 import modelos.ParserError;
 import modelos.RuntimeError;
 import modelos.TiposToken;
+import util.JGraphTBuilder;
 
 /**
  * Classe de teste de implementação da biblioteca
+ * 
  * @author Kerlyson
  *
  */
@@ -53,7 +55,7 @@ public class MainUI extends JFrame implements EventoListener {
   private JLabel labelOu;
   private JComboBox<String> comboBoxExemplos, comboBoxTraducoes;
   private JFileChooser fileChooser;
-  private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao;
+  private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao, checkBoxJGraphT;
 
   private GerenciadorEventos ge = new GerenciadorEventos();
 
@@ -154,8 +156,13 @@ public class MainUI extends JFrame implements EventoListener {
     cons.gridy++;
     this.panel.add(p, cons);
 
-    this.add(panel);
+    cons.gridy++;
+    this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
 
+    cons.gridy++;
+    this.panel.add(this.checkBoxJGraphT, cons);
+
+    this.add(panel);
     this.pack();
     this.centralizaJanela();
   }
@@ -221,6 +228,8 @@ public class MainUI extends JFrame implements EventoListener {
     //
     // }
     // });
+
+    this.checkBoxJGraphT = new JCheckBox("Exibir Grafo", true);
 
     this.botaoDebugContinuar = new JButton("->");
 
@@ -298,7 +307,11 @@ public class MainUI extends JFrame implements EventoListener {
       // debugador.setDebugStrategy(breakpointsDebugStrategy);
       debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 
-      new Principal(ge, debugador).runFile(caminho);
+      Principal principal = new Principal(ge, debugador);
+      principal.runFile(caminho);
+      if (this.checkBoxJGraphT.isSelected()) {
+        new JGraphTBuilder().print(principal.getProgramaAST(caminho));
+      }
 
     } catch (IOException e) {
       e.printStackTrace();
