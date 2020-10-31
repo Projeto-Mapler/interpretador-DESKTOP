@@ -3,12 +3,19 @@ package conversores;
 import debug.GerenciadorEventos;
 import tree.Declaracao.Programa;
 
+/**
+ * Retorna o conversor da linguagem desejada.
+ * 
+ * @author Kerlyson
+ *
+ */
 public class ConversorFactory {
-    
-    private ConversorFactory() {}
 
-    
-    public static Conversor getConversor(GerenciadorEventos gerenciadorEventos, Programa programa, ConversorStrategy conversor) {
+    private ConversorFactory() {
+    }
+
+    public static Conversor getConversor(GerenciadorEventos gerenciadorEventos, Programa programa,
+	    ConversorStrategy conversor) {
 	switch (conversor) {
 	case C:
 	    return new ConversorC(programa, gerenciadorEventos);
@@ -21,8 +28,8 @@ public class ConversorFactory {
 	case PYTHON:
 	    return new ConversorPython(programa, gerenciadorEventos);
 	default:
-	  return null;
+	    return null;
 	}
-	
+
     }
 }

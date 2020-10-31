@@ -112,10 +112,8 @@ public class Debugador implements EventoListener {
     protected void pausarExecucao() {
 
 	this.setEstado(EstadosDebug.PAUSADO);
-	this.ge
-	       .notificar(
-			  TiposEvento.ACAO_DEBUG,
-			  new DebugSnapshot(ultimoNode, this.interpretador.getAmbienteSnapshot()));
+	this.ge.notificar(TiposEvento.ACAO_DEBUG,
+		new DebugSnapshot(ultimoNode, this.interpretador.getAmbienteSnapshot()));
 	interpretador.suspender();
 
     }

@@ -8,6 +8,7 @@ import interpretador.Interpretador;
  *
  */
 public class LeitorEntradaConsole {
+  
 	private String valor;
 	private Interpretador interpretador;
 	/**
@@ -28,8 +29,7 @@ public class LeitorEntradaConsole {
 	public void setValor(String valor) {
 		this.valor = valor;
 		this.valorSetado = true;
-		this.interpretador.resumir();// continua a execucao
-		
+		this.interpretador.resumir();// continua a execucao		
 	}
 	
 	public boolean getValorSetado() {
@@ -39,7 +39,5 @@ public class LeitorEntradaConsole {
 	public void reset() {
 		this.valorSetado = false;
 		this.valor = null;
-	}
-	
-	
+	}	
 }

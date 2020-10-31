@@ -13,14 +13,14 @@ import tree.Declaracao;
 public class Modulo implements Chamavel{
 
 	private final Declaracao.Modulo modulo;
+	
 	public Modulo(Declaracao.Modulo modulo) {
 		this.modulo = modulo;
 	}
 	
 	@Override
 	public Object chamar(Interpretador interpretador, List<Object> argumentos) {
-		interpretador.executeBlock(modulo.corpo.declaracoes, null);
-		return null;
+		interpretador.executeBlock(modulo.corpo.declaracoes, null); // ambiente null pois o escopo é global
+		return null; // modulos não tem retorno
 	}
-
 }

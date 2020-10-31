@@ -3,7 +3,6 @@ package conversores;
 import java.util.List;
 
 import debug.GerenciadorEventos;
-import main.Principal;
 import modelos.RuntimeError;
 import modelos.TiposToken;
 import modelos.Token;
@@ -41,8 +40,6 @@ import tree.Expressao.Variavel;
  */
 public class ConversorJava extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
 
-    private Principal principal;
-
     public ConversorJava(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
 	super(programa, gerenciadorEventos);
     }
@@ -78,11 +75,9 @@ public class ConversorJava extends Conversor implements Expressao.Visitor<Void>,
 	    return "double";
 	case TIPO_CARACTERE:
 	    return "char";
-	// case TIPO_VETOR : return "arrya";
 	case TIPO_LOGICO:
 	    return "boolean";
 	default:
-	    // throw error?
 	    return "";
 	}
     }
@@ -213,10 +208,9 @@ public class ConversorJava extends Conversor implements Expressao.Visitor<Void>,
 
 	    for (int i = 0; i < lista.size(); i++) {
 		Declaracao.VariavelArray varriavel = (Declaracao.VariavelArray) lista.get(i);
-		VariavelVetor vv = new VariavelVetor(
-						     varriavel.tipo.type,
-						     (int) ((Expressao.Literal) varriavel.intervaloI).valor,
-						     (int) ((Expressao.Literal) varriavel.intervaloF).valor);
+		VariavelVetor vv = new VariavelVetor(varriavel.tipo.type,
+			(int) ((Expressao.Literal) varriavel.intervaloI).valor,
+			(int) ((Expressao.Literal) varriavel.intervaloF).valor);
 		addVariavelVetor(varriavel.nome.lexeme, vv);
 		escritor.concatenarNaLinha(varriavel.nome.lexeme + "[" + vv.getTamanho() + "]");
 		if (i < lista.size() - 1) {
@@ -233,16 +227,12 @@ public class ConversorJava extends Conversor implements Expressao.Visitor<Void>,
     @Override
     public Void visitVariavelArrayDeclaracao(VariavelArray declaracao) {
 	String tipo = this.tipoVariavel(declaracao.tipo.type);
-	VariavelVetor vv = new VariavelVetor(
-					     declaracao.tipo.type,
-					     (int) ((Expressao.Literal) declaracao.intervaloI).valor,
-					     (int) ((Expressao.Literal) declaracao.intervaloF).valor);
+	VariavelVetor vv = new VariavelVetor(declaracao.tipo.type,
+		(int) ((Expressao.Literal) declaracao.intervaloI).valor,
+		(int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
-	escritor
-		.concatenarNaLinha(
-				   "public static " + tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho()
-					   + "];")
-		.addQuebraLinha();
+	escritor.concatenarNaLinha(
+		"public static " + tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "];").addQuebraLinha();
 	addVariavelVetor(declaracao.nome.lexeme, vv);
 	return null;
     }
@@ -284,9 +274,7 @@ public class ConversorJava extends Conversor implements Expressao.Visitor<Void>,
 
     @Override
     public Void visitModuloDeclaracao(Modulo declaracao) {
-	escritor
-		.concatenarNaLinha("public static void " + declaracao.nome.lexeme + " () { ")
-		.indentar()
+	escritor.concatenarNaLinha("public static void " + declaracao.nome.lexeme + " () { ").indentar()
 		.addQuebraLinha();
 	execute(declaracao.corpo);
 	escritor.removerIdentacao().concatenarNaLinha("}").addQuebraLinha();
@@ -302,32 +290,21 @@ public class ConversorJava extends Conversor implements Expressao.Visitor<Void>,
     @Override
     public Void visitProgramaDeclaracao(Programa declaracao) {
 
-	escritor
-		.concatenarNaLinha("import java.util.Scanner;")
-		.addQuebraLinha(2)
-		.concatenarNaLinha("public class Programa {")
-		.addQuebraLinha()
-		.indentar();
+	escritor.concatenarNaLinha("import java.util.Scanner;").addQuebraLinha(2)
+		.concatenarNaLinha("public class Programa {").addQuebraLinha().indentar();
 	// converte variaveis
 	for (Declaracao variaveis : declaracao.variaveis) {
 	    execute(variaveis);
 	}
 
-	escritor
-		.addQuebraLinha()
-		.concatenarNaLinha("public static void main(String[] args) {")
-		.addQuebraLinha()
-		.indentar()
-		.concatenarNaLinha("Scanner entrada = new Scanner(System.in);")
-		.addQuebraLinha();
+	escritor.addQuebraLinha().concatenarNaLinha("public static void main(String[] args) {").addQuebraLinha()
+		.indentar().concatenarNaLinha("Scanner entrada = new Scanner(System.in);").addQuebraLinha();
 	// converte inicio-fim
 	for (Declaracao corpo : declaracao.corpo) {
 	    execute(corpo);
 	}
 
-	escritor
-		.removerIdentacao()
-		.concatenarNaLinha("}") // fim main
+	escritor.removerIdentacao().concatenarNaLinha("}") // fim main
 		.addQuebraLinha(2);
 	// converte modulos-funcoes
 	for (Declaracao modulo : declaracao.modulos) {
