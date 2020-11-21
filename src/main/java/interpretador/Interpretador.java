@@ -465,29 +465,8 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   public Void visitParaDeclaracao(Para declaracao) {
 
     evaluate(declaracao.atribuicao);
-    // GAMBIARRA - se o incremento for negativo
-    // inverte o sinal da condição de <= para >=
     Expressao.Binario condicao = (Expressao.Binario) declaracao.condicao;
-    Expressao.Atribuicao incremento = (Expressao.Atribuicao) declaracao.incremento;
-    Expressao.Binario operacaoIncremento = (Expressao.Binario) incremento.valor;
-    Expressao exValorIncremento = operacaoIncremento.direita;
-    Object valorIncremento = evaluate(exValorIncremento);
 
-    if (valorIncremento instanceof Integer) {
-
-      if ((int) valorIncremento < 0) {
-        condicao = new Binario(condicao.operador.line, condicao.esquerda,
-            new Token(TiposToken.MAIOR_IQUAL, ">=", null, condicao.operador.line),
-            condicao.direita);
-
-      }
-    } else if (valorIncremento instanceof Double) {
-      if ((double) valorIncremento < 0) {
-        condicao = new Binario(condicao.operador.line, condicao.esquerda,
-            new Token(TiposToken.MAIOR_IQUAL, ">=", null, condicao.operador.line),
-            condicao.direita);
-      }
-    }
     while (isLogico(evaluate(condicao))) {
       execute(declaracao.facaBloco);
       evaluate(declaracao.incremento);
