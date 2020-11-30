@@ -6,7 +6,9 @@ package modelos;
  *
  */
 public class RuntimeError extends RuntimeException {
-	public final Token token;
+  
+  private static final long serialVersionUID = 1L;
+  public final Token token;
 
 	public RuntimeError(Token token, String message) {
 		super(message);
@@ -16,8 +18,8 @@ public class RuntimeError extends RuntimeException {
 	public int getLinha() {
 	    return token.line;
 	}
+	
 	public String getLexeme() {
 	    return token.lexeme;
-	}
-	
+	}	
 }

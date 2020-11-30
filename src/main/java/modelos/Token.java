@@ -6,11 +6,11 @@ package modelos;
  *
  */
 public class Token {
-	/*
+	/**
 	 * tipo de token
 	 */
 	public final TiposToken type;
-	/*
+	/**
 	 * String da palavra/simbolo no arquivo fonte
 	 */
 	public final String lexeme;
@@ -33,6 +33,4 @@ public class Token {
 	public String toString() {
 		return type + " " + lexeme + " " + literal;
 	}
-	
-
 }

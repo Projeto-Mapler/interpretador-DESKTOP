@@ -5,6 +5,11 @@ import java.io.PrintWriter;
 import java.util.Arrays;
 import java.util.List;
 
+/**
+ * Gera todas as classes node do programa
+ * @author Kerlyson
+ *
+ */
 class GeradorAST {
 
 	public static void main(String[] args) throws IOException {

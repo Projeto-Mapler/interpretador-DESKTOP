@@ -3,7 +3,6 @@ package conversores;
 import java.util.List;
 
 import debug.GerenciadorEventos;
-import main.Principal;
 import modelos.RuntimeError;
 import modelos.TiposToken;
 import modelos.VariavelVetor;
@@ -33,14 +32,12 @@ import tree.Expressao.Unario;
 import tree.Expressao.Variavel;
 
 /**
- * Converte pseudoCodigo para Java
+ * Converte pseudoCodigo para Python
  * 
  * @author Kerlyson
  *
  */
 public class ConversorPython extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
-
-    private Principal principal;
 
     public ConversorPython(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
 	super(programa, gerenciadorEventos);
@@ -158,7 +155,6 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 	if (declaracao.tipo.type == TiposToken.TIPO_MODULO) {
 	    return null;
 	}
-	String tipo = this.tipoVariavel(declaracao.tipo.type);
 	escritor.concatenarNaLinha(declaracao.nome.lexeme + " = None").addQuebraLinha();
 	return null;
     }
@@ -186,10 +182,9 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 
 	    for (int i = 0; i < lista.size(); i++) {
 		Declaracao.VariavelArray varriavel = (Declaracao.VariavelArray) lista.get(i);
-		VariavelVetor vv = new VariavelVetor(
-						     varriavel.tipo.type,
-						     (int) ((Expressao.Literal) varriavel.intervaloI).valor,
-						     (int) ((Expressao.Literal) varriavel.intervaloF).valor);
+		VariavelVetor vv = new VariavelVetor(varriavel.tipo.type,
+			(int) ((Expressao.Literal) varriavel.intervaloI).valor,
+			(int) ((Expressao.Literal) varriavel.intervaloF).valor);
 		addVariavelVetor(varriavel.nome.lexeme, vv);
 		escritor.concatenarNaLinha(varriavel.nome.lexeme);
 		if (i < lista.size() - 1) {
@@ -205,11 +200,9 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 
     @Override
     public Void visitVariavelArrayDeclaracao(VariavelArray declaracao) {
-	String tipo = this.tipoVariavel(declaracao.tipo.type);
-	VariavelVetor vv = new VariavelVetor(
-					     declaracao.tipo.type,
-					     (int) ((Expressao.Literal) declaracao.intervaloI).valor,
-					     (int) ((Expressao.Literal) declaracao.intervaloF).valor);
+	VariavelVetor vv = new VariavelVetor(declaracao.tipo.type,
+		(int) ((Expressao.Literal) declaracao.intervaloI).valor,
+		(int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
 	escritor.concatenarNaLinha(declaracao.nome.lexeme + " = [None] * " + vv.getTamanho()).addQuebraLinha();
 	addVariavelVetor(declaracao.nome.lexeme, vv);

@@ -1,19 +1,13 @@
 variaveis
-  // numericos
-  var_inteiro: inteiro;
-  var_real: real;
-  
-  // booleano
-  var_logico: logico;
-  
-  // literais
-  var_cadeia: cadeia;
-  var_caractere: caractere;
-
-  // vetor
-  var_vetor: vetor[1..4] de cadeia;
-  var_nome: cadeia;
+	
+  x:inteiro;
 
 inicio
-  escrever var_vetor[1],  var_vetor[3];
+	
+	para x de 5 ate 1 passo -1 faca {
+		escrever x;
+	}
+
+
+
 fim

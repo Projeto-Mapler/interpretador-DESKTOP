@@ -3,7 +3,6 @@ package conversores;
 import java.util.List;
 
 import debug.GerenciadorEventos;
-import main.Principal;
 import modelos.RuntimeError;
 import modelos.TiposToken;
 import modelos.Token;
@@ -40,8 +39,6 @@ import tree.Expressao.Variavel;
  *
  */
 public class ConversorPascal extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
-
-    private Principal principal;
 
     public ConversorPascal(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
 	super(programa, gerenciadorEventos);
