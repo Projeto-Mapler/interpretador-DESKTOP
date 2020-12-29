@@ -18,10 +18,10 @@ public enum TiposToken {
 
   // palavras-reservadas
   E, OU, NAO, FALSO, VERDADEIRO, SE, ENTAO, CASO, SENAO, FACA, ENQUANTO, PARA, DE, ATE, PASSO, ESCREVER, LER, VARIAVEIS, INICIO, FIM, INTERVALO, REPITA, CADEIA, REAL, INTEIRO, CARACTERE, VETOR,
-
+  
   // representa o tipo de uma variavel ou valor no programa
   TIPO_INTEIRO, TIPO_REAL, TIPO_LOGICO, TIPO_CADEIA, TIPO_CARACTERE, TIPO_VETOR, TIPO_MODULO,
-
+  
   // fim do arquivo
   EOF
 }

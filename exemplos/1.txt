@@ -1,13 +1,52 @@
 variaveis
 	
-  x:inteiro;
+  idades: vetor[1..4] de inteiro;
+  i: inteiro;
+    x:inteiro;
 
 inicio
 	
-	para x de 5 ate 1 passo -1 faca {
+  idades[1] <- 9;
+  idades[2] <- 15;
+  idades[3] <- 30;
+  idades[4] <- 60;
+
+  para i de 1 ate 4 passo 1 faca 
+    se idades[i] > 11 e idades[i] < 18 entao 
+      escrever "adolescente";
+    senao 
+      se idades[i] >= 18  e idades[i] < 60 entao 
+        escrever "adulto";
+      senao 
+        se idades[i] >= 60 entao
+          escrever "idoso";
+        senao 
+          escrever "criança";
+        fim se;
+       fim se;
+     fim se;
+fim para;
+
+
+	para x de 1 ate 5 passo 1 faca 
 		escrever x;
-	}
+	fim para;
 
+  escrever " "; // escreve linha em branco
+  x<-1;
 
+  enquanto x <= 5 faca 
+    escrever x;
+    x<- x+1;
+  fim enquanto;
+
+  
+  escrever " "; // escreve linha em branco
+  x<-1;
+
+  repita 
+    escrever x;
+    x<- x+1;
+  ate (x <= 5);
 
 fim

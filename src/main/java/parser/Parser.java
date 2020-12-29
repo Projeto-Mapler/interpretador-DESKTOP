@@ -8,7 +8,6 @@ import static modelos.TiposToken.CADEIA;
 import static modelos.TiposToken.CARACTERE;
 import static modelos.TiposToken.DE;
 import static modelos.TiposToken.DIFERENTE;
-import static modelos.TiposToken.DIR_CHAVES;
 import static modelos.TiposToken.DIR_COLCHETE;
 import static modelos.TiposToken.DIR_PARENTESES;
 import static modelos.TiposToken.DOIS_PONTOS;
@@ -17,7 +16,6 @@ import static modelos.TiposToken.ENQUANTO;
 import static modelos.TiposToken.ENTAO;
 import static modelos.TiposToken.EOF;
 import static modelos.TiposToken.ESCREVER;
-import static modelos.TiposToken.ESQ_CHAVES;
 import static modelos.TiposToken.ESQ_COLCHETE;
 import static modelos.TiposToken.ESQ_PARENTESES;
 import static modelos.TiposToken.FACA;
@@ -54,8 +52,10 @@ import static modelos.TiposToken.TIPO_VETOR;
 import static modelos.TiposToken.VARIAVEIS;
 import static modelos.TiposToken.VERDADEIRO;
 import static modelos.TiposToken.VIRGULA;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import debug.GerenciadorEventos;
 import debug.TiposEvento;
 import modelos.ParserError;
@@ -248,8 +248,8 @@ public class Parser {
         return escreverDeclaracao();
       if (isTokenTypeIgualA(LER))
         return lerDeclaracao();
-      if (isTokenTypeIgualA(ESQ_CHAVES))
-        return new Declaracao.Bloco(anterior().line, bloco());
+//      if (isTokenTypeIgualA(ESQ_CHAVES))
+//        return new Declaracao.Bloco(anterior().line, bloco());
       if (isTokenTypeIgualA(REPITA))
         return repitaDeclaracao();
       return expressaoDeclaracao();
@@ -266,12 +266,13 @@ public class Parser {
    */
   private List<Declaracao> bloco() {
     List<Declaracao> declaracoes = new ArrayList<>();
-
-    while (!checar(DIR_CHAVES) && !isFimDoArquivo()) {
+    // condições:
+    // fim(do controlador/condicional/arquivo), senao(se), ate (repita)
+    while (!checar(FIM) && !checar(SENAO) && !checar(ATE) && !isFimDoArquivo()) {
       declaracoes.add(declaracao());
     }
 
-    consumirToken(DIR_CHAVES, "Esperado '}' depois do bloco.");
+    //consumirToken(DIR_CHAVES, "Esperado '}' depois do bloco.");
     return declaracoes;
   }
 
@@ -538,13 +539,16 @@ public class Parser {
   private Declaracao seDeclaracao() {
     Expressao condicao = ou();
     Token inicio = consumirToken(ENTAO, "Esperado 'entao' depois da expressao.");
-    consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+   // consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
     Declaracao.Bloco entaoBloco = new Declaracao.Bloco(anterior().line, bloco());
     Declaracao.Bloco senaoBloco = null;
     if (isTokenTypeIgualA(SENAO)) {
-      consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+      //consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
       senaoBloco = new Declaracao.Bloco(anterior().line, bloco());
     }
+    consumirToken(FIM, "Esperado 'fim se' depois da expressao.");
+    consumirToken(SE, "Esperado 'fim se' depois da expressao.");
+    consumirToken(PONTO_VIRGULA, "Esperado ';'");
     return new Declaracao.Se(inicio.line, condicao, entaoBloco, senaoBloco);
   }
 
@@ -556,8 +560,13 @@ public class Parser {
   private Declaracao enquantoDeclaracao() {
     Expressao condicao = ou();
     Token inicio = consumirToken(FACA, "Esperado 'faca' depois da expressao.");
-    consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+   // consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
     Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line, bloco());
+    
+    consumirToken(FIM, "Esperado 'fim enquanto' depois da expressao.");
+    consumirToken(ENQUANTO, "Esperado 'fim enquanto' depois da expressao.");
+    consumirToken(PONTO_VIRGULA, "Esperado ';'");
+    
     return new Declaracao.Enquanto(inicio.line, condicao, corpo);
   }
 
@@ -577,7 +586,7 @@ public class Parser {
     consumirToken(PASSO, "Esperado 'passo' depois da expressao.");
     Expressao passo = adicao();
     consumirToken(FACA, "Esperado 'faca' depois da expressao.");
-    consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+    //consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
     Declaracao.Bloco corpo = new Declaracao.Bloco(identificador.line, bloco());
 
     Expressao.Variavel variavel = new Expressao.Variavel(identificador.line, identificador);
@@ -596,6 +605,10 @@ public class Parser {
     Expressao.Atribuicao incrementoExpressao =
         new Expressao.Atribuicao(identificador.line, identificador, operacaoIncremento);
 
+    consumirToken(FIM, "Esperado 'fim para' depois da expressao.");
+    consumirToken(PARA, "Esperado 'fim para' depois da expressao.");
+    consumirToken(PONTO_VIRGULA, "Esperado ';'");
+    
     return new Declaracao.Para(identificador.line, atribuicaoExpressao, condicao,
         incrementoExpressao, corpo);
   }
@@ -607,11 +620,12 @@ public class Parser {
    */
   private Declaracao repitaDeclaracao() {
     Token inicio = anterior();
-    consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
+   //consumirToken(ESQ_CHAVES, "Esperado '{' depois da expressao.");
     Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line, bloco());
     consumirToken(ATE, "Esperado 'ate' depois da expressão.");
     Expressao condicao = ou();
     consumirToken(PONTO_VIRGULA, "Esperado ';'");
+    
 
     return new Declaracao.Repita(inicio.line, corpo, condicao);
   }
@@ -637,8 +651,12 @@ public class Parser {
   private Declaracao declaracaoModulo() {
     consumirToken(TIPO_MODULO, "Esperado 'modulo'");
     Token nome = consumirToken(IDENTIFICADOR, "Esperado nome do módulo");
-    consumirToken(ESQ_CHAVES, "Esperado {");
+    //consumirToken(ESQ_CHAVES, "Esperado {");
     Declaracao.Bloco corpo = new Declaracao.Bloco(anterior().line, bloco());
+    
+    consumirToken(FIM, "Esperado 'fim modulo' depois da expressao.");
+    consumirToken(TIPO_MODULO, "Esperado 'fim modulo' depois da expressao.");
+    consumirToken(PONTO_VIRGULA, "Esperado ';'");
 
     return new Declaracao.Modulo(nome.line, nome, corpo);
   }

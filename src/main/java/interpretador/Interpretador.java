@@ -6,7 +6,6 @@ import static modelos.TiposToken.MAIS;
 import static modelos.TiposToken.MENOS;
 import static modelos.TiposToken.OU;
 
-import java.nio.charset.Charset;
 import java.util.List;
 import java.util.Map;
 
