@@ -12,7 +12,7 @@ variaveis
   var_caractere: caractere;
 
   // vetor
-  var_vetor: vetor[1..4] de inteiro;
+  var_vetor, var_vetor_2: vetor[1..4] de inteiro;
 
 inicio
   
@@ -27,5 +27,6 @@ inicio
   var_logico <- verdadeiro;
 
   var_vetor[1] <- 2;
+   var_vetor_2[1] <- 2;
 
 fim

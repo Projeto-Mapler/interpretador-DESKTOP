@@ -10,20 +10,20 @@ inicio
   idades[3] <- 30;
   idades[4] <- 60;
 
-  para i de 1 ate 4 passo 1 faca {
-    se idades[i] > 11 e idades[i] < 18 entao {
+  para i de 1 ate 4 passo 1 faca 
+    se idades[i] > 11 e idades[i] < 18 entao 
       escrever "adolescente";
-    } senao {
-      se idades[i] >= 18  e idades[i] < 60 entao {
+    senao 
+      se idades[i] >= 18  e idades[i] < 60 entao 
         escrever "adulto";
-      } senao {
-        se idades[i] >= 60 entao{
+       senao 
+        se idades[i] >= 60 entao
           escrever "idoso";
-        } senao {
+        senao
           escrever "criança";
-        }
-      }
-    }
-  }
+        fim se;
+      fim se;
+    fim se;
+  fim para;
 
 fim

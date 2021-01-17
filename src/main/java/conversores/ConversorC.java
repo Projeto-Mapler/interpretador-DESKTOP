@@ -316,6 +316,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	    for (int i = 0; i < lista.size(); i++) {
 		Declaracao.Var varriavel = (Declaracao.Var) lista.get(i);
 		escritor.concatenarNaLinha(varriavel.nome.lexeme);
+		this.variaveis.put(varriavel.nome.lexeme, varriavel.tipo.type);
 		if (i < lista.size() - 1) {
 		    escritor.concatenarNaLinha(", ");
 		}
@@ -330,6 +331,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
 	    for (int i = 0; i < lista.size(); i++) {
 		Declaracao.VariavelArray varriavel = (Declaracao.VariavelArray) lista.get(i);
+		//this.variaveis.put(varriavel.nome.lexeme, varriavel.tipo.type);
 		VariavelVetor vv = new VariavelVetor(
 						     varriavel.tipo.type,
 						     (int) ((Expressao.Literal) varriavel.intervaloI).valor,

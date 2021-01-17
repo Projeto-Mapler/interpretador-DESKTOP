@@ -6,11 +6,11 @@ inicio
     i <- 0;
     limite <- 10;
 
-    enquanto i < limite faca {
+    enquanto i < limite faca 
         temp <- n1;
         n1 <- n1 + n2;
         n2 <- temp;
         escrever n1;
         i <- i+1;
-    }
+    fim enquanto;
 fim

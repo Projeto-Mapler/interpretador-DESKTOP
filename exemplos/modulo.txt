@@ -11,6 +11,6 @@ inicio
 
 fim
 
-modulo soma {
+modulo soma 
 	escrever a+b;
-}
+fim modulo;
