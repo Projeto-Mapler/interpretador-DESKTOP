@@ -379,8 +379,8 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   public Void visitLerDeclaracao(Ler declaracao) {
 
     this.gerenciadorEventos.notificar(TiposEvento.LER_EVENTO, this.entradaConsole);
-
-    this.suspender();// espera o valor ser setado para continuar
+    if(!this.entradaConsole.getValorSetado())this.suspender();// espera o valor ser setado para continuar
+   
 
     String valor = this.entradaConsole.getValor();
     this.entradaConsole.reset();
