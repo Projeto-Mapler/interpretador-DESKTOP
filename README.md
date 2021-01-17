@@ -12,7 +12,6 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 	- caractere
 - controle de fluxo com "se entao senao"
 - laços de repetição com "enquanto...", "repita...ate..." e "para ... de ... ate ... passo ... faca ..."
-- blocos utilizam "{ }" 
 - vetores 
 - módulos (funções sem parâmetros e sem retorno)
 - I/O com 'ler' e 'escrever'
@@ -32,15 +31,15 @@ inicio
 	x<-1+2*3+(4/2);
 	escrever x;
 	
-	se x = 9 e x > 8 e nao(x<=7) entao{
+	se x = 9 e x > 8 e nao(x<=7) entao
 		escrever "dentro do se";
-	} senao {
+	senao
 		escrever "dentro do senao";
-	}
+	fim se;
 	
-	para x de 1 ate 5 passo 1 faca {
+	para x de 1 ate 5 passo 1 faca
 		escrever x;
-	}
+	fim para;
 fim
 ```
 
@@ -56,15 +55,15 @@ declaracaoVariavelArray → "vetor" "[" INTEIRO ".." INTEIRO "]" "de" TIPO_DADO
 declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para | repita 
 expressaoDeclarativa → expressao | chamadaModulo ";" 
 
-declaracaoModulo → "modulo" IDENTIFICADOR bloco
+declaracaoModulo → "modulo" IDENTIFICADOR bloco fim modulo  ";"
 chamadaModulo → IDENTIFICADOR 
 
-bloco → "{" (declaracao)* "}" 
+bloco →  (declaracao)* 
 escrever → "escrever" expressao ("," expressao)*";" 
 ler → "ler" variavel ";" 
-se  → "se" ou "entao" bloco ("senao" bloco)*
-enquanto → "enquanto" ou "faca" bloco
-para → "para" variavel "de" adicao "ate" adicao "passo" adicao "faca" bloco
+se  → "se" ou "entao" bloco ("senao" bloco)* fim se ";"
+enquanto → "enquanto" ou "faca" bloco fim enquanto  ";"
+para → "para" variavel "de" adicao "ate" adicao "passo" adicao "faca" bloco fim para ";"
 repita → "repita" bloco "ate" ou ";"
 
 
