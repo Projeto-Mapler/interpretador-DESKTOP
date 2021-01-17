@@ -4,25 +4,25 @@ variaveis
 
 inicio
 	
-	para x de 1 ate 5 passo 1 faca {
-		escrever x;
-	}
+	para x de 1 ate 5 passo 1 faca 
+			escrever x;
+	fim para;
 
   escrever " "; // escreve linha em branco
   x<-1;
 
-  enquanto x <= 5 faca {
+  enquanto x <= 5 faca 
     escrever x;
     x<- x+1;
-  }
+  fim enquanto;
 
   
   escrever " "; // escreve linha em branco
   x<-1;
 
-  repita {
+  repita 
     escrever x;
     x<- x+1;
-  } ate (x <= 5);
+  ate (x <= 5);
 
 fim
