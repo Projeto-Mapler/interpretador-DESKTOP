@@ -229,7 +229,7 @@ public class MainUI extends JFrame implements EventoListener {
     // }
     // });
 
-    this.checkBoxJGraphT = new JCheckBox("Exibir Grafo", true);
+    this.checkBoxJGraphT = new JCheckBox("Exibir Grafo", false);
 
     this.botaoDebugContinuar = new JButton("->");
 

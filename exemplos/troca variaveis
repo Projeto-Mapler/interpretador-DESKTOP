@@ -1,0 +1,18 @@
+variaveis
+	a, b, aux: inteiro;	
+inicio
+	a <- 1;
+	b <- 2;
+	
+	escrever "Valor de A = ", a;
+	escrever "Valor de B = ", b;
+	
+	escrever "TROCA";
+	
+	aux <- a;
+	a <- b;
+	b <-aux;
+	
+	escrever "Valor de A = ", a;
+	escrever "Valor de B = ", b;
+fim
