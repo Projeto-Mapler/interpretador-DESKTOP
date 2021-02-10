@@ -260,7 +260,6 @@ public class MainUI extends JFrame implements EventoListener {
       @Override
       public void actionPerformed(ActionEvent e) {
         ge.notificar(TiposEvento.FINALIZAR_DEBUG, null);
-
       }
     });
 
@@ -308,7 +307,7 @@ public class MainUI extends JFrame implements EventoListener {
       debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 
       Principal principal = new Principal(ge, debugador);
-      principal.runFile(caminho);
+      principal.executarViaArquivo(caminho);
       if (this.checkBoxJGraphT.isSelected()) {
         new JGraphTBuilder().print(principal.getProgramaAST(caminho));
       }
@@ -330,20 +329,24 @@ public class MainUI extends JFrame implements EventoListener {
     if (tipoEvento == TiposEvento.INTERPRETACAO_CONCLUIDA) {
       System.out.println("Tempo de execução: " + (double) payload + "s");
 
+      this.botaoDebugContinuar.setEnabled(false);
+      this.botaoDebugParar.setEnabled(false);
+      this.botaoDebugContinuarSem.setEnabled(false);
+      
+      
       if (this.checkBoxImprimirTraducao.isSelected()) {
         String cs = (String) this.comboBoxTraducoes.getSelectedItem();
         ConversorStrategy conversor = ConversorStrategy.valueOf(cs);
 
         String result;
         try {
-          result = new Principal(ge, null).getConversao(this.getCamihoArquivo(), conversor);
+          result = new Principal(ge, null).traduzirDoArquivo(this.getCamihoArquivo(), conversor);
           System.out.println("Conversao " + cs);
           System.out.println(result);
         } catch (IOException e) {
           // TODO Auto-generated catch block
           e.printStackTrace();
         }
-
 
       }
       return;
@@ -392,13 +395,6 @@ public class MainUI extends JFrame implements EventoListener {
 
       }
       System.out.println("=================");
-    }
-
-    if (tipoEvento == TiposEvento.INTERPRETACAO_CONCLUIDA) {
-
-      this.botaoDebugContinuar.setEnabled(false);
-      this.botaoDebugParar.setEnabled(false);
-      this.botaoDebugContinuarSem.setEnabled(false);
     }
 
     if (payload instanceof EstadosDebug) {
