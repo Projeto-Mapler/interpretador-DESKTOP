@@ -37,36 +37,50 @@ public class Principal implements EventoListener {
 
   public Principal(GerenciadorEventos ge, Debugador debug) {
     eventos = ge;
-    ge.inscreverTodos(new TiposEvento[] {TiposEvento.ERRO_PARSE, TiposEvento.ERRO_RUNTIME}, this);
+    ge.inscreverTodos(new TiposEvento[] {
+        TiposEvento.ERRO_PARSE, 
+        TiposEvento.ERRO_RUNTIME,
+        TiposEvento.INTERPRETACAO_CONCLUIDA}, this);
     interpreter = new Interpretador(ge);
     if (debug != null) {
       debug.setInterpretador(interpreter);
     }
   }
 
-  public void runFile(String path) throws IOException {
-    String source = this.getSource(path);
+  public void executarViaArquivo(String path) throws IOException {
+    String source = this.getTextoCodigoDoArquivo(path);
+    executarViaTexto(source);
+  }  
+  
+  public void executarViaTexto(String source) {
+    if(interpreter.isExecutando()) {
+      interpreter.terminarExecucao();
+    }
     Programa programa = this.gerarPrograma(source);
     if (temErro || temRunTimeErro)
       return;
     interpreter.interpretar(programa);
-  }  
+  }
  
   public Declaracao.Programa getProgramaAST(String path) throws IOException{
-    String source = this.getSource(path);
+    String source = this.getTextoCodigoDoArquivo(path);
     return this.gerarPrograma(source);
   }
 
-  public String getConversao(String path, ConversorStrategy conversorStrategy) throws IOException {
-    String source = this.getSource(path);
-    Declaracao.Programa programa = this.gerarPrograma(source);
+  public String traduzirDoArquivo(String path, ConversorStrategy conversorStrategy) throws IOException {
+    String source = this.getTextoCodigoDoArquivo(path);
+    return traduzirDoTexto(source, conversorStrategy);
+  }
+  
+  public String traduzirDoTexto(String texto, ConversorStrategy conversorStrategy) throws IOException {
+    Declaracao.Programa programa = this.gerarPrograma(texto);
     if (temErro || temRunTimeErro)
       return null;
     Conversor conversor = ConversorFactory.getConversor(this.eventos, programa, conversorStrategy);
     return conversor.converter();
   }
 
-  private String getSource(String path) throws IOException {
+  private String getTextoCodigoDoArquivo(String path) throws IOException {
     byte[] bytes = Files.readAllBytes(Paths.get(path));
     return new String(bytes, Charset.defaultCharset()).trim();
   }
@@ -87,6 +101,8 @@ public class Principal implements EventoListener {
       case ERRO_RUNTIME:
         temRunTimeErro = true;
         break;
+      case INTERPRETACAO_CONCLUIDA:
+       // this.interpreter.terminar();// garante que a thread do interpretador seja terminada;
       default:
         break;
     }
