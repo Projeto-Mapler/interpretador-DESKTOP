@@ -9,36 +9,35 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import debug.GerenciadorEventos;
-import modelos.RuntimeError;
+import evento.GerenciadorEventos;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
-import tree.Declaracao;
-import tree.Declaracao.Bloco;
-import tree.Declaracao.ChamadaModulo;
-import tree.Declaracao.Enquanto;
-import tree.Declaracao.Escreva;
-import tree.Declaracao.Ler;
-import tree.Declaracao.Modulo;
-import tree.Declaracao.Para;
-import tree.Declaracao.Programa;
-import tree.Declaracao.Repita;
-import tree.Declaracao.Se;
-import tree.Declaracao.Var;
-import tree.Declaracao.VarDeclaracoes;
-import tree.Declaracao.VariavelArray;
-import tree.Expressao;
-import tree.Expressao.Atribuicao;
-import tree.Expressao.AtribuicaoArray;
-import tree.Expressao.Binario;
-import tree.Expressao.ExpParentizada;
-import tree.Expressao.Grupo;
-import tree.Expressao.Literal;
-import tree.Expressao.Logico;
-import tree.Expressao.Unario;
-import tree.Expressao.Variavel;
+import modelos.excecao.RuntimeError;
+import modelos.tree.Declaracao;
+import modelos.tree.Expressao;
+import modelos.tree.Declaracao.Bloco;
+import modelos.tree.Declaracao.ChamadaModulo;
+import modelos.tree.Declaracao.Enquanto;
+import modelos.tree.Declaracao.Escreva;
+import modelos.tree.Declaracao.Ler;
+import modelos.tree.Declaracao.Modulo;
+import modelos.tree.Declaracao.Para;
+import modelos.tree.Declaracao.Programa;
+import modelos.tree.Declaracao.Repita;
+import modelos.tree.Declaracao.Se;
+import modelos.tree.Declaracao.Var;
+import modelos.tree.Declaracao.VarDeclaracoes;
+import modelos.tree.Declaracao.VariavelArray;
+import modelos.tree.Expressao.Atribuicao;
+import modelos.tree.Expressao.AtribuicaoArray;
+import modelos.tree.Expressao.Binario;
+import modelos.tree.Expressao.ExpParentizada;
+import modelos.tree.Expressao.Grupo;
+import modelos.tree.Expressao.Literal;
+import modelos.tree.Expressao.Logico;
+import modelos.tree.Expressao.Unario;
+import modelos.tree.Expressao.Variavel;
 
 /**
  * Converte pseudoCodigo para C
@@ -144,7 +143,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     }
 
     @Override
-    public Void visitExpressaoDeclaracao(tree.Declaracao.Expressao declaracao) {
+    public Void visitExpressaoDeclaracao(modelos.tree.Declaracao.Expressao declaracao) {
 	escritor.concatenarNaLinha("");
 	evaluate(declaracao.expressao);
 	escritor.concatenarNaLinha(";").addQuebraLinha();
@@ -154,7 +153,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     @Override
     public Void visitEscrevaDeclaracao(Escreva declaracao) {
 	escritor.concatenarNaLinha("printf(");
-	List<tree.Expressao> expressoes = declaracao.expressoes;
+	List<modelos.tree.Expressao> expressoes = declaracao.expressoes;
 	String especificadorLiteral = this.getEspecificadorEscreva(expressoes);
 	if (especificadorLiteral != null) {
 	    escritor.concatenarNaLinha("\"" + especificadorLiteral + "\", ");
@@ -169,34 +168,34 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	return null;
     }
 
-    private String getEspecificadorEscreva(List<tree.Expressao> expressoes) {
+    private String getEspecificadorEscreva(List<modelos.tree.Expressao> expressoes) {
 	StringBuilder builder = new StringBuilder();
 	for (int i = 0; i < expressoes.size(); i++) {
-	    tree.Expressao exp = expressoes.get(i);
-	    if (exp instanceof tree.Expressao.Literal) {
-		Token token = ((tree.Expressao.Literal) exp).token;
+	    modelos.tree.Expressao exp = expressoes.get(i);
+	    if (exp instanceof modelos.tree.Expressao.Literal) {
+		Token token = ((modelos.tree.Expressao.Literal) exp).token;
 		builder.append(this.getEspecificadorTipo(token.type));
-	    } else if (exp instanceof tree.Expressao.Variavel) {
-		Token token = ((tree.Expressao.Variavel) exp).nome;
+	    } else if (exp instanceof modelos.tree.Expressao.Variavel) {
+		Token token = ((modelos.tree.Expressao.Variavel) exp).nome;
 		builder.append(this.getEspecificadorTipo(this.variaveis.get(token.lexeme)));
-	    } else if (exp instanceof tree.Expressao.VariavelArray) {
-		Token token = ((tree.Expressao.VariavelArray) exp).nome;
+	    } else if (exp instanceof modelos.tree.Expressao.VariavelArray) {
+		Token token = ((modelos.tree.Expressao.VariavelArray) exp).nome;
 		builder.append(this.getEspecificadorTipo(this.getVariavelVetorTipo(token.lexeme)));
-	    } else if (exp instanceof tree.Expressao.Logico || exp instanceof tree.Expressao.Unario) {
+	    } else if (exp instanceof modelos.tree.Expressao.Logico || exp instanceof modelos.tree.Expressao.Unario) {
 		builder.append("%d");
-	    } else if (exp instanceof tree.Expressao.Binario) {
-		Token operador = ((tree.Expressao.Binario) exp).operador;
+	    } else if (exp instanceof modelos.tree.Expressao.Binario) {
+		Token operador = ((modelos.tree.Expressao.Binario) exp).operador;
 		if (isTokenTypeIgualA(operador, MAIOR_QUE, MAIOR_IQUAL, MENOR_QUE, MENOR_IGUAL)) {
 		    // Operação logica
 		    builder.append("%d");
 		} else {
 		    // Operacao Aritimetica
 		    // builder.append("%f");
-		    builder.append(this.getEspecificadorBinario((tree.Expressao.Binario) exp));
+		    builder.append(this.getEspecificadorBinario((modelos.tree.Expressao.Binario) exp));
 
 		}
-	    } else if (exp instanceof tree.Expressao.ExpParentizada) {
-		tree.Expressao exp2 = ((tree.Expressao.ExpParentizada) exp).grupo.expressao;
+	    } else if (exp instanceof modelos.tree.Expressao.ExpParentizada) {
+		modelos.tree.Expressao exp2 = ((modelos.tree.Expressao.ExpParentizada) exp).grupo.expressao;
 		builder.append(this.getEspecificadorEscreva(Collections.singletonList(exp2)));
 	    }
 
@@ -204,9 +203,9 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	return builder.toString();
     }
 
-    private String getEspecificadorBinario(tree.Expressao.Binario bin) {
-	tree.Expressao expEsquerda = (tree.Expressao) bin.esquerda;
-	tree.Expressao expDireita = (tree.Expressao) bin.direita;
+    private String getEspecificadorBinario(modelos.tree.Expressao.Binario bin) {
+	modelos.tree.Expressao expEsquerda = (modelos.tree.Expressao) bin.esquerda;
+	modelos.tree.Expressao expDireita = (modelos.tree.Expressao) bin.direita;
 	String esquerda = this.getEspecificadorEscreva(Collections.singletonList(expEsquerda));
 	String direita = this.getEspecificadorEscreva(Collections.singletonList(expDireita));
 	if (esquerda.contains("%f") || direita.contains("%f")) {
@@ -587,13 +586,13 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
     }
 
     @Override
-    public Void visitVariavelArrayExpressao(tree.Expressao.VariavelArray expressao) {
+    public Void visitVariavelArrayExpressao(modelos.tree.Expressao.VariavelArray expressao) {
 	String nome = expressao.nome.lexeme;
 	if (expressao.index == null) {
 	    escritor.concatenarNaLinha(nome);
-	} else if (expressao.index instanceof tree.Expressao.Literal) {
+	} else if (expressao.index instanceof modelos.tree.Expressao.Literal) {
 	    escritor.concatenarNaLinha(nome + "[");
-	    int i = (int) ((tree.Expressao.Literal) expressao.index).valor;
+	    int i = (int) ((modelos.tree.Expressao.Literal) expressao.index).valor;
 	    VariavelVetor vv = getVariavelVetor(nome);
 	    escritor.concatenarNaLinha(vv.resolverIndex(i) + "");
 	    escritor.concatenarNaLinha("]");

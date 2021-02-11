@@ -2,13 +2,12 @@ package conversores;
 
 import java.util.HashMap;
 import java.util.Map;
-
-import debug.GerenciadorEventos;
-import debug.TiposEvento;
-import modelos.RuntimeError;
+import evento.EventoInterpretador;
+import evento.GerenciadorEventos;
 import modelos.TiposToken;
 import modelos.VariavelVetor;
-import tree.Declaracao.Programa;
+import modelos.excecao.RuntimeError;
+import modelos.tree.Declaracao.Programa;
 
 /**
  * Base para Classes conversoras para outras linguagens Classes conversoras
@@ -32,7 +31,7 @@ public abstract class Conversor {
     }
 
     protected void throwRuntimeErro(RuntimeError erro) {
-	this.gerenciadorEventos.notificar(TiposEvento.ERRO_RUNTIME, erro);
+	this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_RUNTIME, erro);
     }
 
     protected void addVariavelVetor(String nome, VariavelVetor variavel) {

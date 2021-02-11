@@ -60,11 +60,11 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import debug.GerenciadorEventos;
-import debug.TiposEvento;
-import modelos.ParserError;
+import evento.EventoInterpretador;
+import evento.GerenciadorEventos;
 import modelos.TiposToken;
 import modelos.Token;
+import modelos.excecao.ParserError;
 
 /**
  * Análise Léxica
@@ -229,7 +229,7 @@ public class Scanner {
         } else if (isLetra(c)) {
           identificador();
         } else {
-          this.gerenciadorEventos.notificar(TiposEvento.ERRO_PARSE,
+          this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE,
               new ParserError(linha, "caractere '" + c + "' não identificado."));
         }
         break;
@@ -295,7 +295,7 @@ public class Scanner {
 
     // Unterminated string.
     if (isFinal()) {
-      this.gerenciadorEventos.notificar(TiposEvento.ERRO_PARSE,
+      this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE,
           new ParserError(linha, "cadeia não determinada."));
       return;
     }

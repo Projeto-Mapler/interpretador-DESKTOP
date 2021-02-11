@@ -1,4 +1,4 @@
-package debug;
+package evento;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,11 +13,11 @@ import java.util.Set;
  *
  */
 public class GerenciadorEventos {
-    Map<TiposEvento, Set<EventoListener>> inscritos;
+    Map<EventoInterpretador, Set<EventoListener>> inscritos;
 
     public GerenciadorEventos() {
-	inscritos = new HashMap<TiposEvento, Set<EventoListener>>();
-	for (TiposEvento t : TiposEvento.values()) {
+	inscritos = new HashMap<EventoInterpretador, Set<EventoListener>>();
+	for (EventoInterpretador t : EventoInterpretador.values()) {
 	    inscritos.put(t, new HashSet<EventoListener>());
 	}
     }
@@ -28,7 +28,7 @@ public class GerenciadorEventos {
      * @param te - evento que a classe deseja 'ouvir'
      * @param ev - classe que deseja se inscrever
      */
-    public void inscrever(TiposEvento te, EventoListener ev) {
+    public void inscrever(EventoInterpretador te, EventoListener ev) {
 	this.inscritos.get(te).add(ev);
     }
 
@@ -38,8 +38,8 @@ public class GerenciadorEventos {
      * @param tes - array de eventos para inscrever
      * @param ev  - listener para increver nos eventos
      */
-    public void inscreverTodos(TiposEvento[] tes, EventoListener ev) {
-	for (TiposEvento te : tes) {
+    public void inscreverTodos(EventoInterpretador[] tes, EventoListener ev) {
+	for (EventoInterpretador te : tes) {
 	    this.inscrever(te, ev);
 	}
     }
@@ -50,8 +50,8 @@ public class GerenciadorEventos {
      * @param ev - listener que deseja desiscrever
      */
     public void desiscreverTodos(EventoListener ev) {
-	Set<TiposEvento> keys = this.inscritos.keySet();
-	for (TiposEvento key : keys) {
+	Set<EventoInterpretador> keys = this.inscritos.keySet();
+	for (EventoInterpretador key : keys) {
 	    this.desinscrever(key, ev);
 	}
     }
@@ -62,7 +62,7 @@ public class GerenciadorEventos {
      * @param te - evento que a classe se inscreveu
      * @param ev - classe inscrita no evento
      */
-    public void desinscrever(TiposEvento te, EventoListener ev) {
+    public void desinscrever(EventoInterpretador te, EventoListener ev) {
 	this.inscritos.get(te).remove(ev);
     }
 
@@ -72,7 +72,7 @@ public class GerenciadorEventos {
      * @param te      - tipo do evento
      * @param payload - carga do evento
      */
-    public void notificar(TiposEvento te, Object payload) {
+    public void notificar(EventoInterpretador te, Object payload) {
 //		Object x = payload == null ? "" : payload;
 //		System.err.println(te.toString() + "---"+x.toString());
 	for (EventoListener ev : this.inscritos.get(te)) {

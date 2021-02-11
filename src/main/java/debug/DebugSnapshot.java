@@ -1,8 +1,7 @@
 package debug;
 
 import java.util.Map;
-
-import tree.AstDebugNode;
+import modelos.tree.AstDebugNode;
 
 /**
  * Representa o estado do interpretador no node atual sendo debugado

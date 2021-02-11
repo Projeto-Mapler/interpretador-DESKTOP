@@ -1,6 +1,6 @@
 package debug;
 
-import tree.AstDebugNode;
+import modelos.tree.AstDebugNode;
 
 /**
  * Estratégia para pausar a execução do código em cada linha

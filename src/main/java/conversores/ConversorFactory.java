@@ -1,7 +1,7 @@
 package conversores;
 
-import debug.GerenciadorEventos;
-import tree.Declaracao.Programa;
+import evento.GerenciadorEventos;
+import modelos.tree.Declaracao.Programa;
 
 /**
  * Retorna o conversor da linguagem desejada.

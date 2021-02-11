@@ -3,7 +3,7 @@ package modelos;
 import java.util.List;
 
 import interpretador.Interpretador;
-import tree.Declaracao;
+import modelos.tree.Declaracao;
 
 /**
  * Representa objeto chamavel módulo da pseudolinguagem

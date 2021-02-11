@@ -1,4 +1,4 @@
-package debug;
+package evento;
 
 /**
  * Padrão Observer. Toda classe que deseja 'ouvir' os eventos do Gerenciador de
@@ -14,5 +14,5 @@ public interface EventoListener {
      * @param tipoEvento - tipo do evento
      * @param payload    - carga do evento
      */
-    void update(TiposEvento tipoEvento, Object payload);
+    void update(EventoInterpretador tipoEvento, Object payload);
 }

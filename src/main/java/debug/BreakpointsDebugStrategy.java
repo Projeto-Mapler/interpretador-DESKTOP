@@ -2,8 +2,7 @@ package debug;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import tree.AstDebugNode;
+import modelos.tree.AstDebugNode;
 
 /**
  * Estratégia para pausar a execução do código apenas nas linhas (breakpoints) informadas

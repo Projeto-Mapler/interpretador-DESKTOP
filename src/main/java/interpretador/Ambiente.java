@@ -3,11 +3,10 @@ package interpretador;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
-
-import modelos.RuntimeError;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
+import modelos.excecao.RuntimeError;
 
 /**
  * Gerencia variaveis e seus valores durante a interpretação do programa

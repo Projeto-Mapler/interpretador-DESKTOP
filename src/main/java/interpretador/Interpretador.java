@@ -5,41 +5,39 @@ import static modelos.TiposToken.BARRA;
 import static modelos.TiposToken.MAIS;
 import static modelos.TiposToken.MENOS;
 import static modelos.TiposToken.OU;
-
 import java.util.List;
 import java.util.Map;
-
-import debug.GerenciadorEventos;
-import debug.TiposEvento;
-import modelos.LeitorEntradaConsole;
-import modelos.RuntimeError;
+import evento.EventoInterpretador;
+import evento.GerenciadorEventos;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
-import tree.Declaracao;
-import tree.Declaracao.Bloco;
-import tree.Declaracao.ChamadaModulo;
-import tree.Declaracao.Enquanto;
-import tree.Declaracao.Escreva;
-import tree.Declaracao.Ler;
-import tree.Declaracao.Modulo;
-import tree.Declaracao.Para;
-import tree.Declaracao.Programa;
-import tree.Declaracao.Repita;
-import tree.Declaracao.Se;
-import tree.Declaracao.Var;
-import tree.Declaracao.VarDeclaracoes;
-import tree.Declaracao.VariavelArray;
-import tree.Expressao;
-import tree.Expressao.Atribuicao;
-import tree.Expressao.AtribuicaoArray;
-import tree.Expressao.Binario;
-import tree.Expressao.ExpParentizada;
-import tree.Expressao.Grupo;
-import tree.Expressao.Literal;
-import tree.Expressao.Logico;
-import tree.Expressao.Unario;
-import tree.Expressao.Variavel;
+import modelos.excecao.ExecucaoInterrompidaException;
+import modelos.excecao.RuntimeError;
+import modelos.tree.Declaracao;
+import modelos.tree.Expressao;
+import modelos.tree.Declaracao.Bloco;
+import modelos.tree.Declaracao.ChamadaModulo;
+import modelos.tree.Declaracao.Enquanto;
+import modelos.tree.Declaracao.Escreva;
+import modelos.tree.Declaracao.Ler;
+import modelos.tree.Declaracao.Modulo;
+import modelos.tree.Declaracao.Para;
+import modelos.tree.Declaracao.Programa;
+import modelos.tree.Declaracao.Repita;
+import modelos.tree.Declaracao.Se;
+import modelos.tree.Declaracao.Var;
+import modelos.tree.Declaracao.VarDeclaracoes;
+import modelos.tree.Declaracao.VariavelArray;
+import modelos.tree.Expressao.Atribuicao;
+import modelos.tree.Expressao.AtribuicaoArray;
+import modelos.tree.Expressao.Binario;
+import modelos.tree.Expressao.ExpParentizada;
+import modelos.tree.Expressao.Grupo;
+import modelos.tree.Expressao.Literal;
+import modelos.tree.Expressao.Logico;
+import modelos.tree.Expressao.Unario;
+import modelos.tree.Expressao.Variavel;
 
 /**
  * Interpreta e gera a saída do pseudocodigo representado no Declaração.Programa passado
@@ -51,13 +49,14 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
   private Ambiente environment = new Ambiente();
   private GerenciadorEventos gerenciadorEventos;
-  private Thread thread; // thread para executar o processo de interpretação
-  private boolean parada, terminada; // FLAGS com o estado da execução da
-                                     // thread
   private LeitorEntradaConsole entradaConsole = new LeitorEntradaConsole(this);
+  private boolean terminado, pausado;
+  private Thread thread;
 
   public Interpretador(GerenciadorEventos ge) {
     this.gerenciadorEventos = ge;
+    this.terminado = true;
+    this.pausado = false;
   }
 
   public Map<String, Object> getAmbienteSnapshot() {
@@ -65,81 +64,98 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   }
 
   public void interpretar(Declaracao.Programa programa) {
-    this.parada = false;
-    this.terminada = false;
-    thread = new Thread(new Runnable() {
+    this.pausado = false;
+    this.terminado = false;
+    this.thread = new Thread(new Runnable() {
       @Override
       public void run() {
         long startTime = System.nanoTime();
-        
+
         try {
           visitProgramaDeclaracao(programa);
         } catch (RuntimeError error) {
-          gerenciadorEventos.notificar(TiposEvento.ERRO_RUNTIME, error);
+          gerenciadorEventos.notificar(EventoInterpretador.ERRO_RUNTIME, error);
         } catch (StackOverflowError e) {
           e.printStackTrace();
+        } catch (ExecucaoInterrompidaException e) {
+          gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_INTERROMPIDA, null);
         }
-        
         long elapsedTime = System.nanoTime() - startTime;
-        gerenciadorEventos.notificar(TiposEvento.INTERPRETACAO_CONCLUIDA,
-            (double) elapsedTime / 1000000000);
+        gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, (double) elapsedTime / 1000000000);
+        terminarExecucao();
       }
     });
-    thread.start();
-
+    this.thread.start();
   }
 
-  // THREAD CONTROLE
+  // CONTROLE DA EXECUCAO:
 
-  public void suspender() {
-    this.parada = true;
-    try {
-      synchronized (thread) {
-        thread.wait();
+  public void suspenderExecucao() {
+    if (this.isExecutando()) {
+      this.pausado = true;
+      this.terminado = false;
+    }
+  }
+
+  public void continuarExecucao() {
+    if (this.pausado) {
+      this.pausado = false;
+      this.terminado = false;
+      synchronized (this.thread) {
+        this.thread.notify();
       }
-    } catch (InterruptedException e) {
-      thread.interrupt();
-      e.printStackTrace();
     }
   }
 
-  public void resumir() {
-    this.parada = false;
-    synchronized (thread) {
-      thread.notify();
+  public void terminarExecucao() {
+    if (this.pausado) {
+      this.terminado = true;
+      this.pausado = false;
+      synchronized (this.thread) {
+        this.thread.notify();
+      }
     }
   }
 
-  @SuppressWarnings("deprecation")
-  public void terminar() {
-    this.terminada = true;
-    this.parada = true;
-    synchronized (thread) {
-      thread.stop();
-    }
+  public boolean isExecutando() {
+    return !this.terminado && !this.pausado;
   }
 
-  public boolean isRodando() {
-    return this.parada || this.terminada;
+  public boolean isPausado() {
+    return this.pausado;
   }
-  
-  public boolean isPausada() {
-    return this.parada;
+
+  public boolean isTerminado() {
+    return this.terminado;
   }
-  
-  public boolean isTerminada() {
-    return this.terminada;
+
+  private void checkFlagsExecucao() {
+    if (this.pausado) {
+      // loop infinito para 'pausar' execução
+      try {
+        synchronized (this.thread) {
+          this.thread.wait();
+        }
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+      }
+    }
+    if (this.terminado) {
+      throw new ExecucaoInterrompidaException();
+    }
   }
 
   // AUXILIARES:
 
   private void execute(Declaracao declaracao) {
-    gerenciadorEventos.notificar(TiposEvento.NODE_DEBUG, declaracao);
+    gerenciadorEventos.notificar(EventoInterpretador.VISITA_NODE_AST, declaracao);
+    checkFlagsExecucao();
     declaracao.accept(this);
   }
 
   private Object evaluate(Expressao expressao) {
-    gerenciadorEventos.notificar(TiposEvento.NODE_DEBUG, expressao);
+    gerenciadorEventos.notificar(EventoInterpretador.VISITA_NODE_AST, expressao);
+    checkFlagsExecucao();
     return expressao.accept(this);
   }
 
@@ -178,7 +194,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
       return false;
     if (object instanceof Boolean)
       return (boolean) object;
-    return true; //TODO: jogar error
+    return true; // TODO: jogar error
   }
 
   private boolean isIgual(Object a, Object b) {
@@ -224,8 +240,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
       }
     }
     // se os dois não forem inteiros, retorna um real
-    double esquerdaDouble =
-        (esquerda instanceof Integer) ? ((int) esquerda) / 1.0 : (double) esquerda;
+    double esquerdaDouble = (esquerda instanceof Integer) ? ((int) esquerda) / 1.0 : (double) esquerda;
     double direitaDouble = (direita instanceof Integer) ? ((int) direita) / 1.0 : (double) direita;
     switch (op) {
       case MAIS:
@@ -252,6 +267,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
   /**
    * Executa lista de blocos de execução
+   * 
    * @param statements - lista de Declaracoes que devem ser executados
    * @param environment - escopo do bloco | não utilizado pois existe apenas um escopo atualmente
    */
@@ -282,12 +298,10 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
         if (esquerda instanceof String && direita instanceof String) {
           return (String) esquerda + (String) direita;
         }
-        if ((esquerda instanceof Double || esquerda instanceof Integer)
-            && (direita instanceof Double || direita instanceof Integer)) {
+        if ((esquerda instanceof Double || esquerda instanceof Integer) && (direita instanceof Double || direita instanceof Integer)) {
           return retornaValorNumericoTipoCorreto(MAIS, esquerda, direita);
         }
-        throw new RuntimeError(expressao.operador,
-            "Operadores devem ser apenas números ou apenas cadeia de caracteres.");
+        throw new RuntimeError(expressao.operador, "Operadores devem ser apenas números ou apenas cadeia de caracteres.");
       case MAIOR_QUE:
         checarOperadorNumericos(expressao.operador, esquerda, direita);
         return toDouble(esquerda) > toDouble(direita);
@@ -345,7 +359,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   }
 
   @Override
-  public Void visitExpressaoDeclaracao(tree.Declaracao.Expressao declaracao) {
+  public Void visitExpressaoDeclaracao(modelos.tree.Declaracao.Expressao declaracao) {
     evaluate(declaracao.expressao);
     return null;
   }
@@ -354,7 +368,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   public Void visitEscrevaDeclaracao(Escreva declaracao) {
     StringBuilder output = new StringBuilder();
 
-    for (tree.Expressao expressao : declaracao.expressoes) {
+    for (modelos.tree.Expressao expressao : declaracao.expressoes) {
       Object valor = evaluate(expressao);
       if (valor instanceof VariavelVetor) {
         Object v[] = ((VariavelVetor) valor).getValores();
@@ -370,7 +384,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
       }
       output.append(stringify(valor));
     }
-    gerenciadorEventos.notificar(TiposEvento.ESCREVER_EVENTO, output.toString());
+    gerenciadorEventos.notificar(EventoInterpretador.OUTPUT, output.toString());
     // System.out.println(output.toString());// imprime acoes no terminal
     return null;
   }
@@ -378,9 +392,10 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   @Override
   public Void visitLerDeclaracao(Ler declaracao) {
 
-    this.gerenciadorEventos.notificar(TiposEvento.LER_EVENTO, this.entradaConsole);
-    if(!this.entradaConsole.getValorSetado())this.suspender();// espera o valor ser setado para continuar
-   
+    this.gerenciadorEventos.notificar(EventoInterpretador.INPUT, this.entradaConsole);
+    if (!this.entradaConsole.getValorSetado())
+      this.suspenderExecucao();// espera o valor ser setado para continuar
+
 
     String valor = this.entradaConsole.getValor();
     this.entradaConsole.reset();
@@ -498,14 +513,12 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
     int intervaloF = (int) evaluate(declaracao.intervaloF);
 
     if (intervaloI > intervaloF) {
-      throw new RuntimeError(declaracao.nome,
-          "Intervalo inicial não pode ser maior que o intervalo final");
+      throw new RuntimeError(declaracao.nome, "Intervalo inicial não pode ser maior que o intervalo final");
     }
     if (declaracao.tipo.type == TiposToken.TIPO_MODULO) {
       throw new RuntimeError(declaracao.nome, "vetor não pode ter o tipo modulo.");
     }
-    environment.definirVariavelVetor(declaracao.nome,
-        new VariavelVetor(declaracao.tipo.type, intervaloI, intervaloF));
+    environment.definirVariavelVetor(declaracao.nome, new VariavelVetor(declaracao.tipo.type, intervaloI, intervaloF));
     return null;
   }
 
@@ -529,8 +542,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
     if (!(index instanceof Integer)) {
       throw new RuntimeError(expressao.nome, "Index informado não pode ser resolvido.");
     }
-    if ((int) index < 0 || (int) index > variavel.getIntervaloF()
-        || (int) index < variavel.getIntervaloI()) {
+    if ((int) index < 0 || (int) index > variavel.getIntervaloF() || (int) index < variavel.getIntervaloI()) {
       throw new RuntimeError(expressao.nome, "Index informado não encontrado");
     }
     return variavel.getValorNoIndex((int) index);

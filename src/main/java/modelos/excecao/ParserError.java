@@ -1,4 +1,6 @@
-package modelos;
+package modelos.excecao;
+
+import modelos.Token;
 
 /**
  * Erro Léxico - palavra/simbolo invalido

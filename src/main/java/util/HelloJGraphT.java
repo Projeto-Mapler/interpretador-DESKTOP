@@ -8,7 +8,7 @@ import org.graphstream.graph.Node;
 import org.graphstream.graph.NodeFactory;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.ui.view.Viewer;
-import tree.AstDebugNode;
+import modelos.tree.AstDebugNode;
 
 /**
  * Teste de visualização da AST

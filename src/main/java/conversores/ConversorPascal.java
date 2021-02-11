@@ -1,36 +1,35 @@
 package conversores;
 
 import java.util.List;
-
-import debug.GerenciadorEventos;
-import modelos.RuntimeError;
+import evento.GerenciadorEventos;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
-import tree.Declaracao;
-import tree.Declaracao.Bloco;
-import tree.Declaracao.ChamadaModulo;
-import tree.Declaracao.Enquanto;
-import tree.Declaracao.Escreva;
-import tree.Declaracao.Ler;
-import tree.Declaracao.Modulo;
-import tree.Declaracao.Para;
-import tree.Declaracao.Programa;
-import tree.Declaracao.Repita;
-import tree.Declaracao.Se;
-import tree.Declaracao.Var;
-import tree.Declaracao.VarDeclaracoes;
-import tree.Declaracao.VariavelArray;
-import tree.Expressao;
-import tree.Expressao.Atribuicao;
-import tree.Expressao.AtribuicaoArray;
-import tree.Expressao.Binario;
-import tree.Expressao.ExpParentizada;
-import tree.Expressao.Grupo;
-import tree.Expressao.Literal;
-import tree.Expressao.Logico;
-import tree.Expressao.Unario;
-import tree.Expressao.Variavel;
+import modelos.excecao.RuntimeError;
+import modelos.tree.Declaracao;
+import modelos.tree.Expressao;
+import modelos.tree.Declaracao.Bloco;
+import modelos.tree.Declaracao.ChamadaModulo;
+import modelos.tree.Declaracao.Enquanto;
+import modelos.tree.Declaracao.Escreva;
+import modelos.tree.Declaracao.Ler;
+import modelos.tree.Declaracao.Modulo;
+import modelos.tree.Declaracao.Para;
+import modelos.tree.Declaracao.Programa;
+import modelos.tree.Declaracao.Repita;
+import modelos.tree.Declaracao.Se;
+import modelos.tree.Declaracao.Var;
+import modelos.tree.Declaracao.VarDeclaracoes;
+import modelos.tree.Declaracao.VariavelArray;
+import modelos.tree.Expressao.Atribuicao;
+import modelos.tree.Expressao.AtribuicaoArray;
+import modelos.tree.Expressao.Binario;
+import modelos.tree.Expressao.ExpParentizada;
+import modelos.tree.Expressao.Grupo;
+import modelos.tree.Expressao.Literal;
+import modelos.tree.Expressao.Logico;
+import modelos.tree.Expressao.Unario;
+import modelos.tree.Expressao.Variavel;
 
 /**
  * Converte pseudoCodigo para Pascal
@@ -113,7 +112,7 @@ public class ConversorPascal extends Conversor implements Expressao.Visitor<Void
     }
 
     @Override
-    public Void visitExpressaoDeclaracao(tree.Declaracao.Expressao declaracao) {
+    public Void visitExpressaoDeclaracao(modelos.tree.Declaracao.Expressao declaracao) {
 	escritor.concatenarNaLinha("");
 	evaluate(declaracao.expressao);
 	escritor.concatenarNaLinha(";").addQuebraLinha();
@@ -123,7 +122,7 @@ public class ConversorPascal extends Conversor implements Expressao.Visitor<Void
     @Override
     public Void visitEscrevaDeclaracao(Escreva declaracao) {
 	escritor.concatenarNaLinha("write(");
-	List<tree.Expressao> expressoes = declaracao.expressoes;
+	List<modelos.tree.Expressao> expressoes = declaracao.expressoes;
 	for (int i = 0; i < expressoes.size(); i++) {
 	    evaluate(expressoes.get(i));
 	    if (i < (expressoes.size() - 1)) {
@@ -450,7 +449,7 @@ public class ConversorPascal extends Conversor implements Expressao.Visitor<Void
     }
 
     @Override
-    public Void visitVariavelArrayExpressao(tree.Expressao.VariavelArray expressao) {
+    public Void visitVariavelArrayExpressao(modelos.tree.Expressao.VariavelArray expressao) {
 	String nome = expressao.nome.lexeme;
 	if (expressao.index == null) {
 	    escritor.concatenarNaLinha(nome);

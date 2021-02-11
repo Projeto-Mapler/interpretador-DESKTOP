@@ -1,8 +1,4 @@
-package modelos;
-
-import java.nio.charset.Charset;
-
-import interpretador.Interpretador;
+package interpretador;
 
 /**
  * Esse objeto é usado para passar valores de entrada para o interprador quando
@@ -29,7 +25,7 @@ public class LeitorEntradaConsole {
     public void setValor(String valor) {
 	this.valor = valor;
 	this.valorSetado = true;
-	this.interpretador.resumir();// continua a execucao
+	this.interpretador.continuarExecucao();
     }
 
     public boolean getValorSetado() {

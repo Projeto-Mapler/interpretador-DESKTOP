@@ -1,31 +1,31 @@
-package debug;
+package evento;
 
 /**
  * Eventos do interpretador
  * @author Kerlyson
  *
  */
-public enum TiposEvento {
+public enum EventoInterpretador {
     /**
      * quando o node 'ler' eh processado
      * 
      * @payload - LeitorEntradaConsole
      */
-    LER_EVENTO,
+    INPUT,
 
     /**
      * quando o node 'escrever' eh processado
      * 
      * @payload - String
      */
-    ESCREVER_EVENTO,
+    OUTPUT,
 
     /**
      * quando um node executa o metodo visit
      * 
      * @payload - AstDebugNode
      */
-    NODE_DEBUG,
+    VISITA_NODE_AST,
 
     /**
      * quando um runtime erro eh lancado
@@ -60,14 +60,14 @@ public enum TiposEvento {
      * 
      * @payload - null
      */
-    CONTINUAR_DEBUG_ATIVO,
+    CONTINUAR_DEBUG_ON,
 
     /**
      * informa o debugador a continuar a execucao sem o processo de debug
      * 
      * @payload - null
      */
-    CONTINUAR_DEBUG_DESATIVADO,
+    CONTINUAR_DEBUG_OFF,
 
     /**
      * informa o debugador a terminar a execucao
@@ -88,5 +88,12 @@ public enum TiposEvento {
      * 
      * @payload - (double) tempo de execução
      */
-    INTERPRETACAO_CONCLUIDA,;
+    INTERPRETACAO_CONCLUIDA,
+  
+  /**
+   * A thread do processo de interpretação foi terminada
+   * 
+   * @payload - null
+   */
+  INTERPRETACAO_INTERROMPIDA,;
 }

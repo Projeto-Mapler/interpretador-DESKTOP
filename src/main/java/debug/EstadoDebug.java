@@ -6,7 +6,7 @@ package debug;
  * @author Kerlyson
  *
  */
-public enum EstadosDebug {
+public enum EstadoDebug {
     /**
      * Debugador está executando o codigo
      */
@@ -16,11 +16,15 @@ public enum EstadosDebug {
      */
     PAUSADO,
     /**
+     * Debugador conclui a interpretação ou foi interrompido
+     */
+    FINALIZADO,
+    /**
      * Debugador está desativado, não interfere na execução do código
      */
-    DESATIVO,
+    OFF,
     /**
      * Debugador está ativo, pode interferir na execução do código
      */
-    ATIVO
+    ON
 };

@@ -1,4 +1,4 @@
-package tree;
+package modelos.tree;
 
 import java.util.List;
 
@@ -37,7 +37,7 @@ super(linha);
     public final List<Declaracao> declaracoes;
   }
 public static class Expressao extends Declaracao {
-    public Expressao( int linha, tree.Expressao expressao) {
+    public Expressao( int linha, modelos.tree.Expressao expressao) {
 super(linha);
       this.expressao = expressao;
     }
@@ -46,10 +46,10 @@ super(linha);
       return visitor.visitExpressaoDeclaracao(this);
     }
 
-    public final tree.Expressao expressao;
+    public final modelos.tree.Expressao expressao;
   }
 public static class Escreva extends Declaracao {
-    public Escreva( int linha, List<tree.Expressao> expressoes) {
+    public Escreva( int linha, List<modelos.tree.Expressao> expressoes) {
 super(linha);
       this.expressoes = expressoes;
     }
@@ -58,10 +58,10 @@ super(linha);
       return visitor.visitEscrevaDeclaracao(this);
     }
 
-    public final List<tree.Expressao> expressoes;
+    public final List<modelos.tree.Expressao> expressoes;
   }
 public static class Se extends Declaracao {
-    public Se( int linha, tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco) {
+    public Se( int linha, modelos.tree.Expressao condicao, Bloco entaoBloco, Bloco senaoBloco) {
 super(linha);
       this.condicao = condicao;
       this.entaoBloco = entaoBloco;
@@ -72,12 +72,12 @@ super(linha);
       return visitor.visitSeDeclaracao(this);
     }
 
-    public final tree.Expressao condicao;
+    public final modelos.tree.Expressao condicao;
     public final Bloco entaoBloco;
     public final Bloco senaoBloco;
   }
 public static class Ler extends Declaracao {
-    public Ler( int linha, tree.Expressao atribuicao) {
+    public Ler( int linha, modelos.tree.Expressao atribuicao) {
 super(linha);
       this.atribuicao = atribuicao;
     }
@@ -86,7 +86,7 @@ super(linha);
       return visitor.visitLerDeclaracao(this);
     }
 
-    public final tree.Expressao atribuicao;
+    public final modelos.tree.Expressao atribuicao;
   }
 public static class Var extends Declaracao {
     public Var( int linha, Token nome, Token tipo) {
@@ -115,7 +115,7 @@ super(linha);
     public final List<Declaracao> variaveis;
   }
 public static class VariavelArray extends Declaracao {
-    public VariavelArray( int linha, Token nome, tree.Expressao intervaloI, tree.Expressao intervaloF, Token tipo) {
+    public VariavelArray( int linha, Token nome, modelos.tree.Expressao intervaloI, modelos.tree.Expressao intervaloF, Token tipo) {
 super(linha);
       this.nome = nome;
       this.intervaloI = intervaloI;
@@ -128,12 +128,12 @@ super(linha);
     }
 
     public final Token nome;
-    public final tree.Expressao intervaloI;
-    public final tree.Expressao intervaloF;
+    public final modelos.tree.Expressao intervaloI;
+    public final modelos.tree.Expressao intervaloF;
     public final Token tipo;
   }
 public static class Para extends Declaracao {
-    public Para( int linha, tree.Expressao atribuicao, tree.Expressao condicao, tree.Expressao incremento, Bloco facaBloco) {
+    public Para( int linha, modelos.tree.Expressao atribuicao, modelos.tree.Expressao condicao, modelos.tree.Expressao incremento, Bloco facaBloco) {
 super(linha);
       this.atribuicao = atribuicao;
       this.condicao = condicao;
@@ -145,13 +145,13 @@ super(linha);
       return visitor.visitParaDeclaracao(this);
     }
 
-    public final tree.Expressao atribuicao;
-    public final tree.Expressao condicao;
-    public final tree.Expressao incremento;
+    public final modelos.tree.Expressao atribuicao;
+    public final modelos.tree.Expressao condicao;
+    public final modelos.tree.Expressao incremento;
     public final Bloco facaBloco;
   }
 public static class Enquanto extends Declaracao {
-    public Enquanto( int linha, tree.Expressao condicao, Bloco corpo) {
+    public Enquanto( int linha, modelos.tree.Expressao condicao, Bloco corpo) {
 super(linha);
       this.condicao = condicao;
       this.corpo = corpo;
@@ -161,11 +161,11 @@ super(linha);
       return visitor.visitEnquantoDeclaracao(this);
     }
 
-    public final tree.Expressao condicao;
+    public final modelos.tree.Expressao condicao;
     public final Bloco corpo;
   }
 public static class Repita extends Declaracao {
-    public Repita( int linha, Bloco corpo, tree.Expressao condicao) {
+    public Repita( int linha, Bloco corpo, modelos.tree.Expressao condicao) {
 super(linha);
       this.corpo = corpo;
       this.condicao = condicao;
@@ -176,7 +176,7 @@ super(linha);
     }
 
     public final Bloco corpo;
-    public final tree.Expressao condicao;
+    public final modelos.tree.Expressao condicao;
   }
 public static class Modulo extends Declaracao {
     public Modulo( int linha, Token nome, Bloco corpo) {

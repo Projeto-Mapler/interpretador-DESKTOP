@@ -1,6 +1,6 @@
 package debug;
 
-import tree.AstDebugNode;
+import modelos.tree.AstDebugNode;
 
 /**
  * Padrão Strategy.

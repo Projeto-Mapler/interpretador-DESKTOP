@@ -55,14 +55,13 @@ import static modelos.TiposToken.VIRGULA;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import debug.GerenciadorEventos;
-import debug.TiposEvento;
-import modelos.ParserError;
+import evento.EventoInterpretador;
+import evento.GerenciadorEventos;
 import modelos.TiposToken;
 import modelos.Token;
-import tree.Declaracao;
-import tree.Expressao;
+import modelos.excecao.ParserError;
+import modelos.tree.Declaracao;
+import modelos.tree.Expressao;
 
 /**
  * Análise Sintática
@@ -107,7 +106,7 @@ public class Parser {
       
       return new Declaracao.Programa(variaveisToken.line, variaveis, corpo, modulos);
     } catch (ParserError e) {
-      this.gerenciadorEventos.notificar(TiposEvento.ERRO_PARSE, e);
+      this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE, e);
     }
     
     return null;
@@ -189,7 +188,7 @@ public class Parser {
 
   private ParserError error(Token token, String mensagem) {
     ParserError erro = new ParserError(token, mensagem);
-    this.gerenciadorEventos.notificar(TiposEvento.ERRO_PARSE, erro);
+    this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE, erro);
     return erro;
   }
 

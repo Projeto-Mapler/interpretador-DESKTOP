@@ -10,15 +10,15 @@ import conversores.Conversor;
 import conversores.ConversorFactory;
 import conversores.ConversorStrategy;
 import debug.Debugador;
-import debug.EventoListener;
-import debug.GerenciadorEventos;
-import debug.TiposEvento;
+import evento.EventoInterpretador;
+import evento.EventoListener;
+import evento.GerenciadorEventos;
 import interpretador.Interpretador;
 import modelos.Token;
+import modelos.tree.Declaracao;
+import modelos.tree.Declaracao.Programa;
 import parser.Parser;
 import scanner.Scanner;
-import tree.Declaracao;
-import tree.Declaracao.Programa;
 
 /**
  * Responsável por executar as etapas do interpretador na ordem correta, disparar os eventos de
@@ -37,10 +37,10 @@ public class Principal implements EventoListener {
 
   public Principal(GerenciadorEventos ge, Debugador debug) {
     eventos = ge;
-    ge.inscreverTodos(new TiposEvento[] {
-        TiposEvento.ERRO_PARSE, 
-        TiposEvento.ERRO_RUNTIME,
-        TiposEvento.INTERPRETACAO_CONCLUIDA}, this);
+    ge.inscreverTodos(new EventoInterpretador[] {
+        EventoInterpretador.ERRO_PARSE, 
+        EventoInterpretador.ERRO_RUNTIME,
+        EventoInterpretador.INTERPRETACAO_CONCLUIDA}, this);
     interpreter = new Interpretador(ge);
     if (debug != null) {
       debug.setInterpretador(interpreter);
@@ -53,7 +53,7 @@ public class Principal implements EventoListener {
   }  
   
   public void executarViaTexto(String source) {
-    if(interpreter.isExecutando()) {
+    if(!interpreter.isExecutando()) {
       interpreter.terminarExecucao();
     }
     Programa programa = this.gerarPrograma(source);
@@ -93,7 +93,7 @@ public class Principal implements EventoListener {
   }
 
   @Override
-  public void update(TiposEvento tipoEvento, Object payload) {
+  public void update(EventoInterpretador tipoEvento, Object payload) {
     switch (tipoEvento) {
       case ERRO_PARSE:
         temErro = true;
@@ -101,8 +101,8 @@ public class Principal implements EventoListener {
       case ERRO_RUNTIME:
         temRunTimeErro = true;
         break;
-      case INTERPRETACAO_CONCLUIDA:
-       // this.interpreter.terminar();// garante que a thread do interpretador seja terminada;
+//      case INTERPRETACAO_CONCLUIDA:
+//       this.interpreter.terminarExecucao();// garante que a thread do interpretador seja terminada;
       default:
         break;
     }

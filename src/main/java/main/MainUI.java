@@ -27,15 +27,15 @@ import javax.swing.border.EmptyBorder;
 import conversores.ConversorStrategy;
 import debug.DebugSnapshot;
 import debug.Debugador;
-import debug.EstadosDebug;
-import debug.EventoListener;
-import debug.GerenciadorEventos;
+import debug.EstadoDebug;
 import debug.PassoAPassoDebugStrategy;
-import debug.TiposEvento;
-import modelos.LeitorEntradaConsole;
-import modelos.ParserError;
-import modelos.RuntimeError;
+import evento.EventoInterpretador;
+import evento.EventoListener;
+import evento.GerenciadorEventos;
+import interpretador.LeitorEntradaConsole;
 import modelos.TiposToken;
+import modelos.excecao.ParserError;
+import modelos.excecao.RuntimeError;
 import util.JGraphTBuilder;
 
 /**
@@ -50,14 +50,15 @@ public class MainUI extends JFrame implements EventoListener {
   private final String PATH_EXEMPLOS = "exemplos\\";
 
   private JPanel panel;
-  private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar, botaoDebugContinuar,
-      botaoDebugContinuarSem;
+  private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar, botaoDebugContinuar, botaoDebugContinuarSem;
   private JLabel labelOu;
   private JComboBox<String> comboBoxExemplos, comboBoxTraducoes;
   private JFileChooser fileChooser;
   private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao, checkBoxJGraphT;
 
   private GerenciadorEventos ge = new GerenciadorEventos();
+  private Debugador debugador;
+  private Principal principal;
 
   public MainUI() {
     try {
@@ -78,10 +79,8 @@ public class MainUI extends JFrame implements EventoListener {
     this.setup();
     this.setVisible(true);
 
-    this.ge.inscreverTodos(new TiposEvento[] {TiposEvento.MUDANCA_ESTADO_DEBUG,
-        TiposEvento.ESCREVER_EVENTO, TiposEvento.LER_EVENTO, TiposEvento.INTERPRETACAO_CONCLUIDA,
-        TiposEvento.ERRO_PARSE, TiposEvento.ERRO_RUNTIME, TiposEvento.INTERPRETACAO_CONCLUIDA},
-        this);
+    this.ge.inscreverTodos(new EventoInterpretador[] {EventoInterpretador.MUDANCA_ESTADO_DEBUG, EventoInterpretador.OUTPUT, EventoInterpretador.INPUT, EventoInterpretador.INTERPRETACAO_CONCLUIDA,
+        EventoInterpretador.ERRO_PARSE, EventoInterpretador.ERRO_RUNTIME, EventoInterpretador.INTERPRETACAO_CONCLUIDA}, this);
 
   }
 
@@ -217,17 +216,18 @@ public class MainUI extends JFrame implements EventoListener {
       }
     });
     this.checkBoxDebugAtivo = new JCheckBox("Debug ativo", false);
-    // n usado: degug eh instanciado apenas apos o botao de executar eh clicado
-    // this.checkBoxDebugAtivo.addActionListener(new ActionListener() {
-    //
-    // @Override
-    // public void actionPerformed(ActionEvent e) {
-    // System.out.println("jeje");
-    // JCheckBox cbLog = (JCheckBox) e.getSource();
-    // ge.notificar(TipoEvento.TOGGLE_DEBUG, cbLog.isSelected());
-    //
-    // }
-    // });
+
+//    this.checkBoxDebugAtivo.addActionListener(new ActionListener() {
+//
+//      @Override
+//      public void actionPerformed(ActionEvent e) {
+//        if (debugador == null)
+//          return;
+//        JCheckBox cbLog = (JCheckBox) e.getSource();
+//        ge.notificar(EventoInterpretador.TOGGLE_DEBUG, cbLog.isSelected());
+//
+//      }
+//    });
 
     this.checkBoxJGraphT = new JCheckBox("Exibir Grafo", false);
 
@@ -238,28 +238,23 @@ public class MainUI extends JFrame implements EventoListener {
     this.botaoDebugContinuarSem = new JButton("|>");
 
     this.botaoDebugContinuar.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
-        ge.notificar(TiposEvento.CONTINUAR_DEBUG_ATIVO, null);
-
+        ge.notificar(EventoInterpretador.CONTINUAR_DEBUG_ON, null);
       }
     });
 
     this.botaoDebugContinuarSem.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
-        ge.notificar(TiposEvento.CONTINUAR_DEBUG_DESATIVADO, null);
-
+        ge.notificar(EventoInterpretador.CONTINUAR_DEBUG_OFF, null);
       }
     });
 
     this.botaoDebugParar.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
-        ge.notificar(TiposEvento.FINALIZAR_DEBUG, null);
+        ge.notificar(EventoInterpretador.FINALIZAR_DEBUG, null);
       }
     });
 
@@ -299,15 +294,21 @@ public class MainUI extends JFrame implements EventoListener {
   }
 
   private void rodarArquivo(String caminho) {
-    try {
-      Debugador debugador = new Debugador(this.ge, this.checkBoxDebugAtivo.isSelected());
-      // BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
-      // breakpointsDebugStrategy.addBreakPoint(13);
-      // debugador.setDebugStrategy(breakpointsDebugStrategy);
-      debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
 
-      Principal principal = new Principal(ge, debugador);
-      principal.executarViaArquivo(caminho);
+
+    try {
+      if (this.principal == null) {
+        this.debugador = new Debugador(this.ge, this.checkBoxDebugAtivo.isSelected());
+        // BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
+        // breakpointsDebugStrategy.addBreakPoint(13);
+        // debugador.setDebugStrategy(breakpointsDebugStrategy);
+        debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
+
+        this.principal = new Principal(ge, debugador);
+      }
+
+      this.principal.executarViaArquivo(caminho);
+
       if (this.checkBoxJGraphT.isSelected()) {
         new JGraphTBuilder().print(principal.getProgramaAST(caminho));
       }
@@ -324,109 +325,93 @@ public class MainUI extends JFrame implements EventoListener {
   }
 
   @Override
-  public void update(TiposEvento tipoEvento, Object payload) {
+  public void update(EventoInterpretador tipoEvento, Object payload) {
 
-    if (tipoEvento == TiposEvento.INTERPRETACAO_CONCLUIDA) {
-      System.out.println("Tempo de execução: " + (double) payload + "s");
-
-      this.botaoDebugContinuar.setEnabled(false);
-      this.botaoDebugParar.setEnabled(false);
-      this.botaoDebugContinuarSem.setEnabled(false);
-      
-      
-      if (this.checkBoxImprimirTraducao.isSelected()) {
-        String cs = (String) this.comboBoxTraducoes.getSelectedItem();
-        ConversorStrategy conversor = ConversorStrategy.valueOf(cs);
-
-        String result;
+    switch (tipoEvento) {
+      case INTERPRETACAO_CONCLUIDA:
+        interpretacaoConcluida(payload);
+        return;
+      case OUTPUT:
+        String msg = (String) payload;
+        System.out.println(msg);
+        return;
+      case INPUT:
+        LeitorEntradaConsole leitor = (LeitorEntradaConsole) payload;
+        System.out.println(">");
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         try {
-          result = new Principal(ge, null).traduzirDoArquivo(this.getCamihoArquivo(), conversor);
-          System.out.println("Conversao " + cs);
-          System.out.println(result);
+          leitor.setValor(reader.readLine());
         } catch (IOException e) {
-          // TODO Auto-generated catch block
           e.printStackTrace();
         }
+        return;
+      case ERRO_PARSE:
+        this.error((ParserError) payload);
+        return;
+      case ERRO_RUNTIME:
+        this.runtimeError((RuntimeError) payload);
+        return;
+      case ACAO_DEBUG:
+        AcaoDebug(payload);
+        return;
+      case MUDANCA_ESTADO_DEBUG:
+        mudancaEstadoDebug(payload);
+        return;
+      default:
+        return;
+    }
+  }
 
+  private void mudancaEstadoDebug(Object payload) {
+    EstadoDebug estado = (EstadoDebug) payload;
+
+    switch (estado) {
+      case OFF:
+        this.checkBoxDebugAtivo.setSelected(false);
+        return;
+      case ON:
+      case FINALIZADO:// reset
+        this.checkBoxDebugAtivo.setEnabled(true);
+        this.botaoDebugContinuar.setEnabled(false);
+        this.botaoDebugParar.setEnabled(false);
+        this.botaoDebugContinuarSem.setEnabled(false);
+        return;
+      case PAUSADO:
+        this.checkBoxDebugAtivo.setEnabled(false);
+        this.botaoDebugContinuar.setEnabled(true);
+        this.botaoDebugParar.setEnabled(true);
+        this.botaoDebugContinuarSem.setEnabled(true);
+        return;
+      case EXECUTANDO:
+        this.checkBoxDebugAtivo.setEnabled(false);
+        this.botaoDebugContinuar.setEnabled(false);
+        this.botaoDebugParar.setEnabled(true);
+        this.botaoDebugContinuarSem.setEnabled(false);
+        return;
+
+      default:
+        return;
+    }
+  }
+
+
+
+  private void AcaoDebug(Object payload) {
+    DebugSnapshot s = (DebugSnapshot) payload;
+    System.out.println("=================");
+    System.out.println("linha: " + s.getNode().getLinha() + " .. " + s.getNode().getClass().getName());
+    System.out.println("Ambiente:");
+    System.out.println("Nome\tValor");
+    for (String n : s.getAmbienteSnapshot().keySet()) {
+      System.out.print(n + "\t");
+      Object valor = s.getAmbienteSnapshot().get(n);
+      if (valor != null) {
+        System.out.print(valor.toString());
       }
-      return;
-    }
-    if (tipoEvento == TiposEvento.ESCREVER_EVENTO) {
-      String msg = (String) payload;
-      System.out.println(msg);
-      return;
-    }
-    if (tipoEvento == TiposEvento.LER_EVENTO) {
-      LeitorEntradaConsole leitor = (LeitorEntradaConsole) payload;
-      System.out.println(">");
-      BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-      try {
-        leitor.setValor(reader.readLine());
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      return;
-    }
+      System.out.print("\n");
 
-    if (tipoEvento == TiposEvento.ERRO_PARSE) {
-      this.error((ParserError) payload);
-      return;
     }
-
-    if (tipoEvento == TiposEvento.ERRO_RUNTIME) {
-      this.runtimeError((RuntimeError) payload);
-      return;
-    }
-    if (tipoEvento == TiposEvento.ACAO_DEBUG) {
-      DebugSnapshot s = (DebugSnapshot) payload;
-      System.out.println("=================");
-      System.out
-          .println("linha: " + s.getNode().getLinha() + " .. " + s.getNode().getClass().getName());
-      System.out.println("Ambiente:");
-      System.out.println("Nome\tValor");
-      for (String n : s.getAmbienteSnapshot().keySet()) {
-        System.out.print(n + "\t");
-        Object valor = s.getAmbienteSnapshot().get(n);
-        if (valor != null) {
-          System.out.print(valor.toString());
-        }
-        System.out.print("\n");
-
-      }
-      System.out.println("=================");
-    }
-
-    if (payload instanceof EstadosDebug) {
-      EstadosDebug estado = (EstadosDebug) payload;
-
-      switch (estado) {
-        case DESATIVO:
-          this.checkBoxDebugAtivo.setSelected(false);
-        case ATIVO:
-          this.checkBoxDebugAtivo.setEnabled(true);
-          this.botaoDebugContinuar.setEnabled(false);
-          this.botaoDebugParar.setEnabled(false);
-          this.botaoDebugContinuarSem.setEnabled(false);
-          break;
-        case PAUSADO:
-          this.checkBoxDebugAtivo.setEnabled(false);
-          this.botaoDebugContinuar.setEnabled(true);
-          this.botaoDebugParar.setEnabled(true);
-          this.botaoDebugContinuarSem.setEnabled(true);
-          break;
-        case EXECUTANDO:
-          this.checkBoxDebugAtivo.setEnabled(false);
-          this.botaoDebugContinuar.setEnabled(false);
-          this.botaoDebugParar.setEnabled(true);
-          this.botaoDebugContinuarSem.setEnabled(false);
-          break;
-
-        default:
-          break;
-      }
-    }
-
+    System.out.println("=================");
   }
 
   private void report(int line, String onde, String msg) {
@@ -448,8 +433,31 @@ public class MainUI extends JFrame implements EventoListener {
   }
 
   private void runtimeError(RuntimeError error) {
-    System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '"
-        + error.token.lexeme + "': " + error.getMessage());
+    System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
+  }
 
+  private void interpretacaoConcluida(Object payload) {
+    System.out.println("Tempo de execução: " + (double) payload + "s");
+
+    this.botaoDebugContinuar.setEnabled(false);
+    this.botaoDebugParar.setEnabled(false);
+    this.botaoDebugContinuarSem.setEnabled(false);
+
+
+    if (this.checkBoxImprimirTraducao.isSelected()) {
+      String cs = (String) this.comboBoxTraducoes.getSelectedItem();
+      ConversorStrategy conversor = ConversorStrategy.valueOf(cs);
+
+      String result;
+      try {
+        result = new Principal(ge, null).traduzirDoArquivo(this.getCamihoArquivo(), conversor);
+        System.out.println("Conversao " + cs);
+        System.out.println(result);
+      } catch (IOException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+
+    }
   }
 }

@@ -1,4 +1,4 @@
-package tree;
+package modelos.tree;
 
 /**
  * Super classe de todos os nodes

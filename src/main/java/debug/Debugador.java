@@ -1,7 +1,10 @@
 package debug;
 
+import evento.EventoInterpretador;
+import evento.EventoListener;
+import evento.GerenciadorEventos;
 import interpretador.Interpretador;
-import tree.AstDebugNode;
+import modelos.tree.AstDebugNode;
 
 /**
  * Realiza o processo de Debug do pseudoCodigo
@@ -11,172 +14,169 @@ import tree.AstDebugNode;
  */
 public class Debugador implements EventoListener {
 
-    private Interpretador interpretador;
+  private Interpretador interpretador;
 
-    private EstadosDebug estado;// estado em que se encontra o Debugador
-    private Integer linhaAnterior = 0; // linha do node verificado
-    private GerenciadorEventos ge;
-    private DebugStrategy strategy;
-    private AstDebugNode ultimoNode;
+  private EstadoDebug estado;// estado em que se encontra o Debugador
+  private Integer linhaAnterior = 0; // linha do node verificado
+  private GerenciadorEventos ge;
+  private DebugStrategy strategy;
+  private AstDebugNode ultimoNode;
 
-    /**
-     * 
-     * @param ge    - Gerenciador de Eventos compartilhado
-     * @param ativo - SE o debugador deve ser executado quando o codigo for
-     *              interpretado
-     */
-    public Debugador(GerenciadorEventos ge, boolean ativo) {
-	this.ge = ge;
-	this.ge.inscrever(TiposEvento.NODE_DEBUG, this);
-	this.ge.inscrever(TiposEvento.CONTINUAR_DEBUG_ATIVO, this);
-	this.ge.inscrever(TiposEvento.CONTINUAR_DEBUG_DESATIVADO, this);
-	this.ge.inscrever(TiposEvento.FINALIZAR_DEBUG, this);
-	this.ge.inscrever(TiposEvento.TOGGLE_DEBUG, this); // nao usado
+  /**
+   * 
+   * @param ge - Gerenciador de Eventos compartilhado
+   * @param ativo - SE o debugador deve ser executado quando o codigo for interpretado
+   */
+  public Debugador(GerenciadorEventos ge, boolean ativo) {
+    this.ge = ge;
+    this.ge.inscrever(EventoInterpretador.VISITA_NODE_AST, this);
+    this.ge.inscrever(EventoInterpretador.CONTINUAR_DEBUG_ON, this);
+    this.ge.inscrever(EventoInterpretador.CONTINUAR_DEBUG_OFF, this);
+    this.ge.inscrever(EventoInterpretador.FINALIZAR_DEBUG, this);
+    this.ge.inscrever(EventoInterpretador.TOGGLE_DEBUG, this); 
+    this.ge.inscrever(EventoInterpretador.INTERPRETACAO_INTERROMPIDA, this);
 
-	this.setDebugadorAtivo(ativo);
+    this.setDebugadorAtivo(ativo);
+  }
+
+  @Override
+  public void update(EventoInterpretador tipoEvento, Object payload) {
+
+    switch (tipoEvento) {
+
+      case TOGGLE_DEBUG: 
+        this.setDebugadorAtivo((Boolean) payload);
+        break;
+      case VISITA_NODE_AST:
+        if (estado == EstadoDebug.OFF)
+          return;
+        this.updateNodeDebug(payload);
+
+        break;
+      case CONTINUAR_DEBUG_ON:
+        this.continuarExecucao();
+        break;
+      case CONTINUAR_DEBUG_OFF:
+        this.continuarExecucaoSemDebug();
+        break;
+      case FINALIZAR_DEBUG:
+        this.terminarExecucao();
+        break;
+      case INTERPRETACAO_INTERROMPIDA:
+        this.setEstado(EstadoDebug.FINALIZADO);
+        break;
+      default:
+        break;
     }
 
-    @Override
-    public void update(TiposEvento tipoEvento, Object payload) {
+  }
 
-	switch (tipoEvento) {
+  /**
+   * Chamado quando o evento Node_Debug é disparado
+   * 
+   * @param payload - NodeAstDebug
+   */
+  private void updateNodeDebug(Object payload) {
 
-	case TOGGLE_DEBUG: // nao usado
-	    this.setDebugadorAtivo((Boolean) payload);
-	    break;
-	case NODE_DEBUG:
-	    if (estado == EstadosDebug.DESATIVO)
-		return;
-	    this.updateNodeDebug(payload);
+    if (estado == EstadoDebug.ON)
+      this.setEstado(EstadoDebug.EXECUTANDO);
+    if (payload instanceof AstDebugNode) {
+      AstDebugNode node = (AstDebugNode) payload;
+      if (node.getLinha() < 1)
+        return;
 
-	    break;
-	case CONTINUAR_DEBUG_ATIVO:
-	    this.continuarExecucao();
-	    break;
-	case CONTINUAR_DEBUG_DESATIVADO:
-	    this.continuarExecucaoSemDebug();
-	    break;
-	case FINALIZAR_DEBUG:
-	    this.terminarExecucao();
-	    break;
-
-	default:
-	    break;
-	}
+      ultimoNode = node;
+      this.linhaAnterior = this.strategy.executar(node, this);
 
     }
+  }
 
-    /**
-     * Chamado quando o evento Node_Debug é disparado
-     * 
-     * @param payload - NodeAstDebug
-     */
-    private void updateNodeDebug(Object payload) {
+  /**
+   * algoritimo de debug que deve ser utilizado
+   * 
+   * @param strategy
+   */
+  public void setDebugStrategy(DebugStrategy strategy) {
+    this.strategy = strategy;
+  }
 
-	if (estado == EstadosDebug.ATIVO)
-	    this.setEstado(EstadosDebug.EXECUTANDO);
-	if (payload instanceof AstDebugNode) {
-	    AstDebugNode node = (AstDebugNode) payload;
-	    if (node.getLinha() < 1)
-		return;
+  /**
+   * SE o debugador deve ser executado quando o codigo for interpretado
+   * 
+   * @param ativo
+   */
+  public void setDebugadorAtivo(boolean ativo) {
+    this.setEstado(ativo ? EstadoDebug.ON : EstadoDebug.OFF);
+  }
 
-	    ultimoNode = node;
-	    this.linhaAnterior = this.strategy.executar(node, this);
+  // CONTROLADORES DA EXECUÇÃO
 
-	}
+  /**
+   * Pausa a execução do interpretador
+   */
+  protected void pausarExecucao() {
+
+    this.setEstado(EstadoDebug.PAUSADO);
+    this.ge.notificar(EventoInterpretador.ACAO_DEBUG, new DebugSnapshot(ultimoNode, this.interpretador.getAmbienteSnapshot()));
+    interpretador.suspenderExecucao();
+
+  }
+
+  /**
+   * Para a execução do interpretador
+   */
+  protected void terminarExecucao() {
+    this.setEstado(EstadoDebug.OFF);
+    this.interpretador.terminarExecucao();
+  }
+
+  /**
+   * Continua a execução do interpretador, se estiver pausado.
+   */
+  protected void continuarExecucao() {
+
+    if (this.estado == EstadoDebug.PAUSADO) {
+      this.setEstado(EstadoDebug.EXECUTANDO);
+      this.interpretador.continuarExecucao();
     }
 
-    /**
-     * algoritimo de debug que deve ser utilizado
-     * 
-     * @param strategy
-     */
-    public void setDebugStrategy(DebugStrategy strategy) {
-	this.strategy = strategy;
-    }
+  }
 
-    /**
-     * SE o debugador deve ser executado quando o codigo for interpretado
-     * 
-     * @param ativo
-     */
-    public void setDebugadorAtivo(boolean ativo) {
-	this.setEstado(ativo ? EstadosDebug.ATIVO : EstadosDebug.DESATIVO);
-    }
+  /**
+   * Continua a execução do interpretador, se estiver pausado, sem o debug.
+   */
+  protected void continuarExecucaoSemDebug() {
 
-    // CONTROLADORES DA EXECUÇÃO
+    if (this.estado == EstadoDebug.PAUSADO) {
 
-    /**
-     * Pausa a execução do interpretador
-     */
-    protected void pausarExecucao() {
-
-	this.setEstado(EstadosDebug.PAUSADO);
-	this.ge.notificar(TiposEvento.ACAO_DEBUG,
-		new DebugSnapshot(ultimoNode, this.interpretador.getAmbienteSnapshot()));
-	interpretador.suspender();
-
-    }
-
-    /**
-     * Para a execução do interpretador
-     */
-    protected void terminarExecucao() {
-	this.setEstado(EstadosDebug.DESATIVO);
-	this.interpretador.terminar();
-    }
-
-    /**
-     * Continua a execução do interpretador, se estiver pausado.
-     */
-    protected void continuarExecucao() {
-
-	if (this.estado == EstadosDebug.PAUSADO) {
-
-	    this.setEstado(EstadosDebug.EXECUTANDO);
-	    this.interpretador.resumir();
-
-	}
-
-    }
-
-    /**
-     * Continua a execução do interpretador, se estiver pausado, sem o debug.
-     */
-    protected void continuarExecucaoSemDebug() {
-
-	if (this.estado == EstadosDebug.PAUSADO) {
-
-	    this.ge.notificar(TiposEvento.TOGGLE_DEBUG, false);
-//			this.setEstado(EstadosDebug.EXECUTANDO);
-	    this.interpretador.resumir();
-
-	}
+      this.ge.notificar(EventoInterpretador.TOGGLE_DEBUG, false);
+      // this.setEstado(EstadosDebug.EXECUTANDO);
+      this.interpretador.continuarExecucao();
 
     }
 
-    /**
-     * Set para o estado do Debugador. Dispara MUDANCA_ESTADO_DEBUG no Gerenciador
-     * de Eventos
-     * 
-     * @param estado
-     */
-    protected void setEstado(EstadosDebug estado) {
-	this.estado = estado;
+  }
 
-	this.ge.notificar(TiposEvento.MUDANCA_ESTADO_DEBUG, this.estado);
-    }
+  /**
+   * Set para o estado do Debugador. Dispara MUDANCA_ESTADO_DEBUG no Gerenciador de Eventos
+   * 
+   * @param estado
+   */
+  protected void setEstado(EstadoDebug estado) {
+    this.estado = estado;
+    this.ge.notificar(EventoInterpretador.MUDANCA_ESTADO_DEBUG, this.estado);
+  }
 
-    /**
-     * 
-     * @return nummero da linha do ultimo node analisado
-     */
-    protected int getLinha() {
-	return this.linhaAnterior;
-    }
+  /**
+   * 
+   * @return nummero da linha do ultimo node analisado
+   */
+  protected int getLinha() {
+    return this.linhaAnterior;
+  }
 
-    public void setInterpretador(Interpretador i) {
-	this.interpretador = i;
-    }
+  public void setInterpretador(Interpretador i) {
+    this.interpretador = i;
+  }
 
 }
