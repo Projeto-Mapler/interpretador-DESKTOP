@@ -55,15 +55,15 @@ declaracaoVariavelArray → "vetor" "[" INTEIRO ".." INTEIRO "]" "de" TIPO_DADO
 declaracao → expressaoDeclarativa | escrever | ler | bloco | se | enquanto | para | repita 
 expressaoDeclarativa → expressao | chamadaModulo ";" 
 
-declaracaoModulo → "modulo" IDENTIFICADOR bloco fim modulo  ";"
+declaracaoModulo → "modulo" IDENTIFICADOR bloco "fim" "modulo"  ";"
 chamadaModulo → IDENTIFICADOR 
 
 bloco →  (declaracao)* 
 escrever → "escrever" expressao ("," expressao)*";" 
 ler → "ler" variavel ";" 
-se  → "se" ou "entao" bloco ("senao" bloco)* fim se ";"
-enquanto → "enquanto" ou "faca" bloco fim enquanto  ";"
-para → "para" variavel "de" adicao "ate" adicao "passo" adicao "faca" bloco fim para ";"
+se  → "se" ou "entao" bloco ("senao" bloco)* "fim" "se" ";"
+enquanto → "enquanto" ou "faca" bloco "fim" "enquanto"  ";"
+para → "para" variavel "de" adicao "ate" adicao "passo" adicao "faca" bloco "fim" "para" ";"
 repita → "repita" bloco "ate" ou ";"
 
 
