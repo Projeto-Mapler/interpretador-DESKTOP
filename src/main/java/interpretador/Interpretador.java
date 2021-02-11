@@ -94,6 +94,13 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
     if (this.isExecutando()) {
       this.pausado = true;
       this.terminado = false;
+      synchronized (this.thread) {
+        try {
+          this.thread.wait();
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+        }
+      }
     }
   }
 
@@ -130,16 +137,10 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   }
 
   private void checkFlagsExecucao() {
-    if (this.pausado) {
-      // loop infinito para 'pausar' execução
-      try {
-        synchronized (this.thread) {
-          this.thread.wait();
-        }
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-      }
-    }
+    // if (this.pausado) {
+    // // loop infinito para 'pausar' execução
+    //
+    // }
     if (this.terminado) {
       throw new ExecucaoInterrompidaException();
     }
@@ -399,7 +400,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
     String valor = this.entradaConsole.getValor();
     this.entradaConsole.reset();
-    System.err.println("lido: " + valor);// imprime acoes no terminal
+   // System.err.println("lido: " + valor);// imprime acoes no terminal
 
     Expressao atribuicao = declaracao.atribuicao;
     if (atribuicao instanceof Expressao.Atribuicao) {
