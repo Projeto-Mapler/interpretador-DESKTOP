@@ -1,0 +1,21 @@
+variaveis
+	numero: inteiro;
+	contador: inteiro;
+	fatorial: inteiro;
+inicio
+
+	escrever "Informe um número: ";
+	ler numero;
+	
+	se numero = 0 entao
+		escrever "Fatorial de ", numero, " é 1.";
+	senao
+		contador <- 1;
+		fatorial <- 1;
+		enquanto contador <= numero faca
+			fatorial <- fatorial * contador;
+			contador <- contador + 1;
+		fim enquanto;
+		escrever "Fatorial de ", numero, " é ", fatorial, ".";
+	fim se;			
+fim 

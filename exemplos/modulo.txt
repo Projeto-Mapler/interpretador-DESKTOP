@@ -1,16 +1,31 @@
 variaveis
 
 	a, b:inteiro;
-	soma: modulo;
+	soma, divisao, subtracao, multiplicacao: modulo;
 
 inicio
 
-	a<-1;
+	a<-10;
 	b<-5;	
   soma;
+  subtracao;
+  multiplicacao;
+  divisao;
 
 fim
 
 modulo soma 
-	escrever a+b;
+	escrever a, "+", b, "=", a+b;
+fim modulo;
+
+modulo multiplicacao 
+	escrever a, "*", b, "=", a*b;
+fim modulo;
+
+modulo subtracao 
+	escrever a, "-", b, "=", a-b;
+fim modulo;
+
+modulo divisao 
+	escrever a, "/", b, "=", a/b;
 fim modulo;
