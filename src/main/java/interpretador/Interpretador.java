@@ -69,7 +69,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
     this.thread = new Thread(new Runnable() {
       @Override
       public void run() {
-        long startTime = System.nanoTime();
+        long startTime =  System.currentTimeMillis();
 
         try {
           visitProgramaDeclaracao(programa);
@@ -80,8 +80,8 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
         } catch (ExecucaoInterrompidaException e) {
           gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_INTERROMPIDA, null);
         }
-        long elapsedTime = System.nanoTime() - startTime;
-        gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, (double) elapsedTime / 1000000000);
+        long elapsedTime =System.currentTimeMillis();
+        gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, (double)  (elapsedTime - startTime) / 1000F );
         terminarExecucao();
       }
     });
