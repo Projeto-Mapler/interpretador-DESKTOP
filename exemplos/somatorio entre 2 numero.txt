@@ -1,0 +1,19 @@
+variaveis
+	a,b: inteiro;
+	x,y: inteiro; 
+inicio
+
+	a<-1;
+	b<-100;
+	
+	x<-a;
+	y<-a;
+	
+	enquanto y < b faca
+		y<-y+1;
+		x<- x+y;
+	fim enquanto;
+	
+	escrever "Somatório de ", a, " até ", b, " é ", x;
+
+fim

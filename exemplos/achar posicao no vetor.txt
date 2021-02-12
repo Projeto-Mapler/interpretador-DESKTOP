@@ -1,0 +1,33 @@
+variaveis
+	v: vetor [1..9] de inteiro;
+	n, i: inteiro;
+	achou: logico;
+inicio
+	para i de 1 ate 9 passo 1 faca
+		v[i] <- i *13;
+	fim para;
+	
+	escrever "Vetor gerado: ";
+	para i de 1 ate 9 passo 1 faca
+		 escrever v[i];
+	fim para;
+	
+	escrever "Qual número deseja saber a posição?";
+	ler n;
+	
+	
+	achou <- falso;
+	para i de 1 ate 9 passo 1 faca
+		se nao achou entao
+			se v[i] = n entao
+				achou <- verdadeiro;
+				 escrever "Posição de ", n, " = ", i;
+			fim se;
+		fim se;		
+	fim para;
+	
+	se nao achou entao
+		escrever "Valor ", n, " não existe no vetor!"; 
+	fim se;
+
+fim

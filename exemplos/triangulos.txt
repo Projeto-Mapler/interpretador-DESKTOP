@@ -1,0 +1,30 @@
+variaveis
+
+	a, b, c: inteiro;
+inicio
+
+	escrever "Informe o primeiro ângulo do triângulo: ";
+	ler a;
+	
+	escrever "Informe o segundo ângulo do triângulo ";
+	ler b;
+	
+	escrever "Informe o terceiro ângulo do triângulo ";
+	ler c;
+	
+	se (a +b >= c) ou (b + c >= a) ou (c >= a + c) entao 		
+		se (a = b) ou (b = c) ou (a = c) entao
+	 		escrever "Triângulo isósceles";
+		fim se;
+		
+		se (a = b) e (b = c) e (a = c) entao
+			escrever "Triângulo equilátero";
+		fim se;
+		
+		se (a * a = b * b + c * c) ou (b * b = a * a + c * c) ou (c * c = a * a + b * b) entao
+			escrever "Triângulo retângulo";
+		fim se;
+	senao
+		escrever "Os ângulos informados não formam um triângulo!";
+	fim se;
+fim
