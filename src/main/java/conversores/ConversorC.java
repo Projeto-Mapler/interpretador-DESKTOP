@@ -9,7 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
@@ -49,7 +49,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
     private Map<String, TiposToken> variaveis = new HashMap<String, TiposToken>();// variavel, tipo
 
-    public ConversorC(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
+    public ConversorC(Declaracao.Programa programa, EventosService gerenciadorEventos) {
 	super(programa, gerenciadorEventos);
     }
 

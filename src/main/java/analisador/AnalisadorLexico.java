@@ -1,4 +1,4 @@
-package scanner;
+package analisador;
 
 import static modelos.TiposToken.ASTERISCO;
 import static modelos.TiposToken.ATE;
@@ -61,7 +61,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import evento.EventoInterpretador;
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.excecao.ParserError;
@@ -72,9 +72,9 @@ import modelos.excecao.ParserError;
  * @author Kerlyson
  *
  */
-public class Scanner {
+public class AnalisadorLexico {
   
-  private final String source;
+  private String source;
   private final List<Token> tokens = new ArrayList<>();
   private static final Map<String, TiposToken> keywords;
 
@@ -114,14 +114,20 @@ public class Scanner {
   private int comeco = 0;
   private int atual = 0;
   private int linha = 1;
-  private GerenciadorEventos gerenciadorEventos;
+  private EventosService gerenciadorEventos;
 
-  public Scanner(String source, GerenciadorEventos eventos) {
+  public AnalisadorLexico(EventosService eventos) {
     this.gerenciadorEventos = eventos;
-    this.source = source;
+    this.source = "";
   }
 
-  public List<Token> scanTokens() {
+  public List<Token> scanTokens(String source) {
+    // reset:
+    this.source = source;
+    this.comeco = 0;
+    this.atual = 0;
+    this.linha = 1;
+    
     while (!isFinal()) {
       // comeco do proximo lexeme
       comeco = atual;
@@ -229,7 +235,7 @@ public class Scanner {
         } else if (isLetra(c)) {
           identificador();
         } else {
-          this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE,
+          this.gerenciadorEventos.notificar(EventoInterpretador.ERRO,
               new ParserError(linha, "caractere '" + c + "' não identificado."));
         }
         break;
@@ -295,7 +301,7 @@ public class Scanner {
 
     // Unterminated string.
     if (isFinal()) {
-      this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE,
+      this.gerenciadorEventos.notificar(EventoInterpretador.ERRO,
           new ParserError(linha, "cadeia não determinada."));
       return;
     }

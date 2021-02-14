@@ -12,10 +12,10 @@ import java.util.Set;
  * @author Kerlyson
  *
  */
-public class GerenciadorEventos {
+public class EventosService {
     Map<EventoInterpretador, Set<EventoListener>> inscritos;
 
-    public GerenciadorEventos() {
+    public EventosService() {
 	inscritos = new HashMap<EventoInterpretador, Set<EventoListener>>();
 	for (EventoInterpretador t : EventoInterpretador.values()) {
 	    inscritos.put(t, new HashSet<EventoListener>());

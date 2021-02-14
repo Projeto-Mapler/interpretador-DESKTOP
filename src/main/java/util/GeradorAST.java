@@ -49,10 +49,10 @@ class GeradorAST {
 	}
 
 	private static void defineAst(String outputDir, String baseName, List<String> types) throws IOException {
-		String path = outputDir + "/tree/" + baseName + ".java";
+		String path = outputDir + "modelos/tree/" + baseName + ".java";
 		PrintWriter writer = new PrintWriter(path, "UTF-8");
 
-		writer.println("package tree;");
+		writer.println("package modelos.tree;");
 		writer.println();
 		writer.println("import java.util.List;");
 		writer.println();

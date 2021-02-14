@@ -1,7 +1,7 @@
 package conversores;
 
 import java.util.List;
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
@@ -39,7 +39,7 @@ import modelos.tree.Expressao.Variavel;
  */
 public class ConversorPascal extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
 
-    public ConversorPascal(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
+    public ConversorPascal(Declaracao.Programa programa, EventosService gerenciadorEventos) {
 	super(programa, gerenciadorEventos);
     }
 

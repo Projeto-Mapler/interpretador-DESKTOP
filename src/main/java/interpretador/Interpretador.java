@@ -8,7 +8,7 @@ import static modelos.TiposToken.OU;
 import java.util.List;
 import java.util.Map;
 import evento.EventoInterpretador;
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
@@ -48,12 +48,12 @@ import modelos.tree.Expressao.Variavel;
 public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visitor<Void> {
 
   private Ambiente environment = new Ambiente();
-  private GerenciadorEventos gerenciadorEventos;
+  private EventosService gerenciadorEventos;
   private LeitorEntradaConsole entradaConsole = new LeitorEntradaConsole(this);
   private boolean terminado, pausado;
   private Thread thread;
 
-  public Interpretador(GerenciadorEventos ge) {
+  public Interpretador(EventosService ge) {
     this.gerenciadorEventos = ge;
     this.terminado = true;
     this.pausado = false;
@@ -74,15 +74,24 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
         try {
           visitProgramaDeclaracao(programa);
         } catch (RuntimeError error) {
-          gerenciadorEventos.notificar(EventoInterpretador.ERRO_RUNTIME, error);
+          gerenciadorEventos.notificar(EventoInterpretador.ERRO, error);
+          terminado = true;
         } catch (StackOverflowError e) {
           e.printStackTrace();
         } catch (ExecucaoInterrompidaException e) {
-          gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_INTERROMPIDA, null);
+          //e.printStackTrace();
+          System.out.println("interpretacao foi interrompida");
         }
+        
         long elapsedTime =System.currentTimeMillis();
-        gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, (double)  (elapsedTime - startTime) / 1000F );
-        terminarExecucao();
+        double tempoExecucao = (double)  (elapsedTime - startTime) / 1000F;
+        
+        if(terminado) {
+          gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_INTERROMPIDA, tempoExecucao);
+        } else {          
+          gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, tempoExecucao);
+          terminado = true;
+        }
       }
     });
     this.thread.start();
@@ -136,27 +145,22 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
     return this.terminado;
   }
 
-  private void checkFlagsExecucao() {
-    // if (this.pausado) {
-    // // loop infinito para 'pausar' execução
-    //
-    // }
+  private void checkTerminado() {
     if (this.terminado) {
       throw new ExecucaoInterrompidaException();
     }
   }
 
   // AUXILIARES:
-
   private void execute(Declaracao declaracao) {
     gerenciadorEventos.notificar(EventoInterpretador.VISITA_NODE_AST, declaracao);
-    checkFlagsExecucao();
+    checkTerminado();
     declaracao.accept(this);
   }
 
   private Object evaluate(Expressao expressao) {
     gerenciadorEventos.notificar(EventoInterpretador.VISITA_NODE_AST, expressao);
-    checkFlagsExecucao();
+    checkTerminado();
     return expressao.accept(this);
   }
 

@@ -7,12 +7,14 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -31,7 +33,7 @@ import debug.EstadoDebug;
 import debug.PassoAPassoDebugStrategy;
 import evento.EventoInterpretador;
 import evento.EventoListener;
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import interpretador.LeitorEntradaConsole;
 import modelos.TiposToken;
 import modelos.excecao.ParserError;
@@ -44,11 +46,10 @@ import util.JGraphTBuilder;
  * @author Kerlyson
  *
  */
-public class MainUI extends JFrame implements EventoListener {
+public class MainUI extends JFrame implements AcaoInterpretador {
+
   private static final long serialVersionUID = 1L;
-
   private final String PATH_EXEMPLOS = "exemplos\\";
-
   private JPanel panel;
   private JButton botaoArquivo, botaoIniciarExemplo, botaoDebugParar, botaoDebugContinuar, botaoDebugContinuarSem;
   private JLabel labelOu;
@@ -56,32 +57,20 @@ public class MainUI extends JFrame implements EventoListener {
   private JFileChooser fileChooser;
   private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao, checkBoxJGraphT;
 
-  private GerenciadorEventos ge = new GerenciadorEventos();
-  private Debugador debugador;
-  private Principal principal;
+  private InterpretadorService interpretador;
 
   public MainUI() {
+
+    this.interpretador = new InterpretadorService(this, true);
+
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-    } catch (ClassNotFoundException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (InstantiationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (UnsupportedLookAndFeelException e) {
-      // TODO Auto-generated catch block
+    } catch (Exception e) {
       e.printStackTrace();
     }
+
     this.setup();
     this.setVisible(true);
-
-    this.ge.inscreverTodos(new EventoInterpretador[] {EventoInterpretador.MUDANCA_ESTADO_DEBUG, EventoInterpretador.OUTPUT, EventoInterpretador.INPUT, EventoInterpretador.INTERPRETACAO_CONCLUIDA,
-        EventoInterpretador.ERRO_PARSE, EventoInterpretador.ERRO_RUNTIME, EventoInterpretador.INTERPRETACAO_CONCLUIDA}, this);
-
   }
 
   public static void main(String[] args) {
@@ -104,7 +93,7 @@ public class MainUI extends JFrame implements EventoListener {
 
     this.labelOu = new JLabel("OU");
     this.labelOu.setHorizontalAlignment(JLabel.CENTER);
-
+    // SELETOR EXEMPLOS
     this.comboBoxExemplos = new JComboBox<String>(this.getNomeArquivosExemplo());
 
     cons.gridx = 0;
@@ -123,7 +112,7 @@ public class MainUI extends JFrame implements EventoListener {
 
     cons.gridy++;
     this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
-
+    // SELETOR TRADUCAO
     this.comboBoxTraducoes = new JComboBox<String>(this.getNomesTraducoes());
     this.comboBoxTraducoes.setEnabled(false);
 
@@ -176,9 +165,9 @@ public class MainUI extends JFrame implements EventoListener {
   private void setupBotoes() {
     this.fileChooser = new JFileChooser();
     JFrame frame = this;
+    // RODA ARQUIVO DO PC
     this.botaoArquivo = new JButton("Executar Arquivo");
     this.botaoArquivo.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         int resultado = fileChooser.showOpenDialog(frame);
@@ -189,21 +178,18 @@ public class MainUI extends JFrame implements EventoListener {
         }
       }
     });
-
+    // RODA EXEMPLO
     this.botaoIniciarExemplo = new JButton("Executar Exemplo");
     this.botaoIniciarExemplo.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         String caminho = getCamihoArquivo();
         rodarArquivo(caminho);
-
       }
     });
-
+    // TRADUCAO
     this.checkBoxImprimirTraducao = new JCheckBox("Imprimir Tradução", false);
     this.checkBoxImprimirTraducao.addActionListener(new ActionListener() {
-
       @Override
       public void actionPerformed(ActionEvent e) {
         JCheckBox x = (JCheckBox) e.getSource();
@@ -212,55 +198,47 @@ public class MainUI extends JFrame implements EventoListener {
         } else {
           comboBoxTraducoes.setEnabled(false);
         }
-
       }
     });
+    // DEBUG CHECKBOX
     this.checkBoxDebugAtivo = new JCheckBox("Debug ativo", false);
-
-//    this.checkBoxDebugAtivo.addActionListener(new ActionListener() {
-//
+//    this.checkBoxDebugAtivo.addActionListener(new ActionListener() {      
 //      @Override
 //      public void actionPerformed(ActionEvent e) {
-//        if (debugador == null)
-//          return;
-//        JCheckBox cbLog = (JCheckBox) e.getSource();
-//        ge.notificar(EventoInterpretador.TOGGLE_DEBUG, cbLog.isSelected());
-//
+//        JCheckBox c = (JCheckBox) e.getSource();
+//        interpretador.setDebugAtivo(c.isSelected());
+//        toggledDebug();
 //      }
 //    });
-
+    // GRAFO
     this.checkBoxJGraphT = new JCheckBox("Exibir Grafo", false);
-
+    // ->
     this.botaoDebugContinuar = new JButton("->");
-
-    this.botaoDebugParar = new JButton("X");
-
-    this.botaoDebugContinuarSem = new JButton("|>");
-
     this.botaoDebugContinuar.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        ge.notificar(EventoInterpretador.CONTINUAR_DEBUG_ON, null);
+        interpretador.debugProxPasso();
       }
     });
-
+    this.botaoDebugContinuar.setEnabled(false);
+    // |>
+    this.botaoDebugContinuarSem = new JButton("|>");
     this.botaoDebugContinuarSem.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        ge.notificar(EventoInterpretador.CONTINUAR_DEBUG_OFF, null);
+        interpretador.debugContinuar();
       }
     });
-
+    this.botaoDebugContinuarSem.setEnabled(false);
+    // X
+    this.botaoDebugParar = new JButton("X");
     this.botaoDebugParar.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        ge.notificar(EventoInterpretador.FINALIZAR_DEBUG, null);
+        interpretador.debugParar();
       }
     });
-
-    this.botaoDebugContinuar.setEnabled(false);
-    this.botaoDebugParar.setEnabled(false);
-    this.botaoDebugContinuarSem.setEnabled(false);
+    this.botaoDebugParar.setEnabled(false);  
   }
 
   private String[] getNomesTraducoes() {
@@ -292,25 +270,16 @@ public class MainUI extends JFrame implements EventoListener {
 
     return arquivos;
   }
-
+  
+  // EXECUCAO
   private void rodarArquivo(String caminho) {
-
-
     try {
-      if (this.principal == null) {
-        this.debugador = new Debugador(this.ge, this.checkBoxDebugAtivo.isSelected());
-        // BreakpointsDebugStrategy breakpointsDebugStrategy = new BreakpointsDebugStrategy();
-        // breakpointsDebugStrategy.addBreakPoint(13);
-        // debugador.setDebugStrategy(breakpointsDebugStrategy);
-        debugador.setDebugStrategy(new PassoAPassoDebugStrategy());
-
-        this.principal = new Principal(ge, debugador);
-      }
-
-      this.principal.executarViaArquivo(caminho);
+      this.interpretador.setDebugStrategy(new PassoAPassoDebugStrategy());
+      this.interpretador.setDebugAtivo(this.checkBoxDebugAtivo.isSelected());
+      this.interpretador.executarViaArquivo(caminho);
 
       if (this.checkBoxJGraphT.isSelected()) {
-        new JGraphTBuilder().print(principal.getProgramaAST(caminho));
+        new JGraphTBuilder().print(this.interpretador.getProgramaASTViaArquivo(caminho));
       }
 
     } catch (IOException e) {
@@ -323,54 +292,83 @@ public class MainUI extends JFrame implements EventoListener {
     String caminho = PATH_EXEMPLOS + arquivo;
     return caminho;
   }
+  // PRINT DOS ERROS
+  private void report(int line, String onde, String msg) {
+    System.err.println("[Parser Erro | linha " + line + "] Erro " + onde + ": " + msg);
+  }
 
-  @Override
-  public void update(EventoInterpretador tipoEvento, Object payload) {
-
-    switch (tipoEvento) {
-      case INTERPRETACAO_CONCLUIDA:
-        interpretacaoConcluida(payload);
-        return;
-      case OUTPUT:
-        String msg = (String) payload;
-        System.out.println(msg);
-        return;
-      case INPUT:
-        LeitorEntradaConsole leitor = (LeitorEntradaConsole) payload;
-        System.out.println(">");
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
-        try {
-          leitor.setValor(reader.readLine());
-        } catch (IOException e) {
-          e.printStackTrace();
-        }
-        return;
-      case ERRO_PARSE:
-        this.error((ParserError) payload);
-        return;
-      case ERRO_RUNTIME:
-        this.runtimeError((RuntimeError) payload);
-        return;
-      case ACAO_DEBUG:
-        AcaoDebug(payload);
-        return;
-      case MUDANCA_ESTADO_DEBUG:
-        mudancaEstadoDebug(payload);
-        return;
-      default:
-        return;
+  private void error(ParserError erro) {
+    if (erro.token != null) {
+      if (erro.token.type == TiposToken.EOF) {
+        report(erro.linha, " no fim", erro.mensagem);
+      } else {
+        report(erro.linha, " em '" + erro.token.lexeme + "'", erro.mensagem);
+      }
+    } else {
+      report(erro.linha, "", erro.mensagem);
     }
   }
 
-  private void mudancaEstadoDebug(Object payload) {
-    EstadoDebug estado = (EstadoDebug) payload;
+  private void runtimeError(RuntimeError error) {
+    System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
+  }
+  
+  // ACOES PARA O INTERPRETADOR
+  private void interpretacaoConcluida(double payload, boolean temErro) {
+    System.out.println("Tempo de execução: " + payload + "s");
 
-    switch (estado) {
-      case OFF:
-        this.checkBoxDebugAtivo.setSelected(false);
-        return;
-      case ON:
-      case FINALIZADO:// reset
+    this.botaoDebugContinuar.setEnabled(false);
+    this.botaoDebugParar.setEnabled(false);
+    this.botaoDebugContinuarSem.setEnabled(false);
+
+    if (temErro)
+      return;
+
+    if (this.checkBoxImprimirTraducao.isSelected()) {
+      String cs = (String) this.comboBoxTraducoes.getSelectedItem();
+      ConversorStrategy conversor = ConversorStrategy.valueOf(cs);
+      String result;
+      try {
+        result = this.interpretador.traduzirDoArquivo(this.getCamihoArquivo(), conversor);
+        System.out.println("Conversao " + cs);
+        System.out.println(result);
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+  }
+  
+  @Override
+  public void onInput(LeitorEntradaConsole leitor) {
+    System.out.println(">");
+    BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+    try {
+      leitor.setValor(reader.readLine());
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void onOutput(String output) {
+    System.out.println(output);
+  }
+
+  @Override
+  public void onInterpretacaoConcluida(double tempoExecucao) {
+    this.interpretacaoConcluida(tempoExecucao, false);
+  }
+
+  @Override
+  public void onInterpretacaoInterrompida(double tempoExecucao) {
+    this.interpretacaoConcluida(tempoExecucao, true);
+  }
+
+  @Override
+  public void onDebugMudancaEstado(EstadoDebug novoEstado) {
+    // System.out.println("[Estado] = " + novoEstado.toString());
+    switch (novoEstado) {
+      case INICIAL:// reset
         this.checkBoxDebugAtivo.setEnabled(true);
         this.botaoDebugContinuar.setEnabled(false);
         this.botaoDebugParar.setEnabled(false);
@@ -388,23 +386,22 @@ public class MainUI extends JFrame implements EventoListener {
         this.botaoDebugParar.setEnabled(true);
         this.botaoDebugContinuarSem.setEnabled(false);
         return;
-
       default:
         return;
     }
+
   }
 
-
-
-  private void AcaoDebug(Object payload) {
-    DebugSnapshot s = (DebugSnapshot) payload;
+  @Override
+  public void onDebugPassoExecutado(DebugSnapshot snapshot) {
+   if(true) return; // testes apenas
     System.out.println("=================");
-    System.out.println("linha: " + s.getNode().getLinha() + " .. " + s.getNode().getClass().getName());
+    System.out.println("linha: " + snapshot.getNode().getLinha() + " .. " + snapshot.getNode().getClass().getName());
     System.out.println("Ambiente:");
     System.out.println("Nome\tValor");
-    for (String n : s.getAmbienteSnapshot().keySet()) {
+    for (String n : snapshot.getAmbienteSnapshot().keySet()) {
       System.out.print(n + "\t");
-      Object valor = s.getAmbienteSnapshot().get(n);
+      Object valor = snapshot.getAmbienteSnapshot().get(n);
       if (valor != null) {
         System.out.print(valor.toString());
       }
@@ -414,50 +411,13 @@ public class MainUI extends JFrame implements EventoListener {
     System.out.println("=================");
   }
 
-  private void report(int line, String onde, String msg) {
-    System.err.println("[Parser Erro | linha " + line + "] Erro " + onde + ": " + msg);
-
-  }
-
-  private void error(ParserError erro) {
-
-    if (erro.token != null) {
-      if (erro.token.type == TiposToken.EOF) {
-        report(erro.linha, " no fim", erro.mensagem);
-      } else {
-        report(erro.linha, " em '" + erro.token.lexeme + "'", erro.mensagem);
-      }
-    } else {
-      report(erro.linha, "", erro.mensagem);
+  @Override
+  public void onErro(RuntimeException erro) {
+    if (erro instanceof ParserError) {
+      this.error((ParserError) erro);
+    } else if (erro instanceof RuntimeError) {
+      this.runtimeError((RuntimeError) erro);
     }
   }
 
-  private void runtimeError(RuntimeError error) {
-    System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
-  }
-
-  private void interpretacaoConcluida(Object payload) {
-    System.out.println("Tempo de execução: " + (double) payload + "s");
-
-    this.botaoDebugContinuar.setEnabled(false);
-    this.botaoDebugParar.setEnabled(false);
-    this.botaoDebugContinuarSem.setEnabled(false);
-
-
-    if (this.checkBoxImprimirTraducao.isSelected()) {
-      String cs = (String) this.comboBoxTraducoes.getSelectedItem();
-      ConversorStrategy conversor = ConversorStrategy.valueOf(cs);
-
-      String result;
-      try {
-        result = new Principal(ge, null).traduzirDoArquivo(this.getCamihoArquivo(), conversor);
-        System.out.println("Conversao " + cs);
-        System.out.println(result);
-      } catch (IOException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-
-    }
-  }
 }

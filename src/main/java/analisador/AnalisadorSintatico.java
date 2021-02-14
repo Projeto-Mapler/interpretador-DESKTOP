@@ -1,4 +1,4 @@
-package parser;
+package analisador;
 
 import static modelos.TiposToken.ASTERISCO;
 import static modelos.TiposToken.ATE;
@@ -56,7 +56,7 @@ import static modelos.TiposToken.VIRGULA;
 import java.util.ArrayList;
 import java.util.List;
 import evento.EventoInterpretador;
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.excecao.ParserError;
@@ -69,18 +69,22 @@ import modelos.tree.Expressao;
  * @author Kerlyson
  *
  */
-public class Parser {
+public class AnalisadorSintatico {
   
-  private final List<Token> tokens;
+  private List<Token> tokens;
   private int indexTokenAtual = 0;
-  private GerenciadorEventos gerenciadorEventos;
+  private EventosService gerenciadorEventos;
 
-  public Parser(List<Token> tokens, GerenciadorEventos eventos) {
+  public AnalisadorSintatico(EventosService eventos) {
     this.gerenciadorEventos = eventos;
-    this.tokens = tokens;
+    this.tokens = new ArrayList<Token>();
   }
 
-  public Declaracao.Programa parse() {
+  public Declaracao.Programa parse(List<Token> tokens) {
+    //reset:
+    this.tokens = tokens;
+    indexTokenAtual = 0;
+    
     List<Declaracao> variaveis = new ArrayList<Declaracao>();
     List<Declaracao> corpo = new ArrayList<Declaracao>();
     List<Declaracao> modulos = new ArrayList<Declaracao>();
@@ -106,7 +110,7 @@ public class Parser {
       
       return new Declaracao.Programa(variaveisToken.line, variaveis, corpo, modulos);
     } catch (ParserError e) {
-      this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE, e);
+      this.gerenciadorEventos.notificar(EventoInterpretador.ERRO, e);
     }
     
     return null;
@@ -188,7 +192,7 @@ public class Parser {
 
   private ParserError error(Token token, String mensagem) {
     ParserError erro = new ParserError(token, mensagem);
-    this.gerenciadorEventos.notificar(EventoInterpretador.ERRO_PARSE, erro);
+    this.gerenciadorEventos.notificar(EventoInterpretador.ERRO, erro);
     return erro;
   }
 

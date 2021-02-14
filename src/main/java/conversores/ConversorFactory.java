@@ -1,6 +1,6 @@
 package conversores;
 
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import modelos.tree.Declaracao.Programa;
 
 /**
@@ -14,7 +14,7 @@ public class ConversorFactory {
     private ConversorFactory() {
     }
 
-    public static Conversor getConversor(GerenciadorEventos gerenciadorEventos, Programa programa,
+    public static Conversor getConversor(EventosService gerenciadorEventos, Programa programa,
 	    ConversorStrategy conversor) {
 	switch (conversor) {
 	case C:

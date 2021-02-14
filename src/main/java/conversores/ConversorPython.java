@@ -1,7 +1,7 @@
 package conversores;
 
 import java.util.List;
-import evento.GerenciadorEventos;
+import evento.EventosService;
 import modelos.TiposToken;
 import modelos.VariavelVetor;
 import modelos.excecao.RuntimeError;
@@ -38,7 +38,7 @@ import modelos.tree.Expressao.Variavel;
  */
 public class ConversorPython extends Conversor implements Expressao.Visitor<Void>, Declaracao.Visitor<Void> {
 
-    public ConversorPython(Declaracao.Programa programa, GerenciadorEventos gerenciadorEventos) {
+    public ConversorPython(Declaracao.Programa programa, EventosService gerenciadorEventos) {
 	super(programa, gerenciadorEventos);
     }
 
