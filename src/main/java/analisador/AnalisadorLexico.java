@@ -123,10 +123,11 @@ public class AnalisadorLexico {
 
   public List<Token> scanTokens(String source) {
     // reset:
-    this.source = source;
+    this.source = source.trim();
     this.comeco = 0;
     this.atual = 0;
     this.linha = 1;
+    this.tokens.clear();
     
     while (!isFinal()) {
       // comeco do proximo lexeme
