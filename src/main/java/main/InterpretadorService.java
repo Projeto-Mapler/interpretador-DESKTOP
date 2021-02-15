@@ -49,7 +49,6 @@ public class InterpretadorService implements EventoListener {
     this.acoes = acoes;
     
     this.eventos = new EventosService();   
-    this.eventos.inscreverTodos(EventoInterpretador.values(), this);
 
     this.analisadorLexico = new AnalisadorLexico(this.eventos);
     this.analisadorSintatico = new AnalisadorSintatico(this.eventos);
@@ -62,9 +61,10 @@ public class InterpretadorService implements EventoListener {
     executarViaTexto(source);
   }
   public void executarViaTexto(String source) {
-    if (!interpreter.isExecutando()) {
-      interpreter.terminarExecucao();
-    }
+    // resets:
+    interpreter.terminarExecucao();
+    this.temErro = false;
+    this.eventos.inscreverTodos(EventoInterpretador.values(), this);
     Programa programa = this.gerarPrograma(source);
     if (programa == null) return;
     interpreter.interpretar(programa);
@@ -142,6 +142,7 @@ public class InterpretadorService implements EventoListener {
       case ERRO:
         temErro = true;
         this.acoes.onErro((RuntimeException) payload);
+        this.eventos.desiscreverTodos(this); // para a execucao.. habilita o garbageCollector
         return;
       case INPUT:
         this.acoes.onInput((LeitorEntradaConsole) payload);
@@ -151,9 +152,11 @@ public class InterpretadorService implements EventoListener {
         return;
       case INTERPRETACAO_CONCLUIDA: 
         this.acoes.onInterpretacaoConcluida((double) payload);
+        this.eventos.desiscreverTodos(this);// para a execucao.. habilita o garbageCollector
         return;
       case INTERPRETACAO_INTERROMPIDA: 
         this.acoes.onInterpretacaoInterrompida((double) payload);
+        this.eventos.desiscreverTodos(this);// para a execucao.. habilita o garbageCollector
         return;
       case DEBUG_MUDANCA_ESTADO: 
         this.acoes.onDebugMudancaEstado((EstadoDebug) payload);
@@ -164,10 +167,6 @@ public class InterpretadorService implements EventoListener {
       case VISITA_NODE_AST:
         return;
     }
-  }
-
-  public void fechar() {
-    this.eventos.desiscreverTodos(this);
   }
   
 }

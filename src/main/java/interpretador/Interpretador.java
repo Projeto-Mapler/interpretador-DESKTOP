@@ -124,8 +124,8 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
   }
 
   public void terminarExecucao() {
+    this.terminado = true;
     if (this.pausado) {
-      this.terminado = true;
       this.pausado = false;
       synchronized (this.thread) {
         this.thread.notify();
