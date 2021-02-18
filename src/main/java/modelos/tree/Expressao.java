@@ -1,7 +1,5 @@
 package modelos.tree;
 
-import java.util.List;
-
 import modelos.Token;
 
 public abstract class Expressao extends AstDebugNode {

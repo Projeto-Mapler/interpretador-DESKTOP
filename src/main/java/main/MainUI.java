@@ -7,14 +7,12 @@ import java.awt.Insets;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.beans.PropertyChangeListener;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -24,16 +22,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.UIManager;
-import javax.swing.UnsupportedLookAndFeelException;
 import javax.swing.border.EmptyBorder;
 import conversores.ConversorStrategy;
 import debug.DebugSnapshot;
-import debug.Debugador;
 import debug.EstadoDebug;
 import debug.PassoAPassoDebugStrategy;
-import evento.EventoInterpretador;
-import evento.EventoListener;
-import evento.EventosService;
 import interpretador.LeitorEntradaConsole;
 import modelos.TiposToken;
 import modelos.excecao.ParserError;
@@ -394,21 +387,20 @@ public class MainUI extends JFrame implements AcaoInterpretador {
 
   @Override
   public void onDebugPassoExecutado(DebugSnapshot snapshot) {
-   if(true) return; // testes apenas
-    System.out.println("=================");
-    System.out.println("linha: " + snapshot.getNode().getLinha() + " .. " + snapshot.getNode().getClass().getName());
-    System.out.println("Ambiente:");
-    System.out.println("Nome\tValor");
-    for (String n : snapshot.getAmbienteSnapshot().keySet()) {
-      System.out.print(n + "\t");
-      Object valor = snapshot.getAmbienteSnapshot().get(n);
-      if (valor != null) {
-        System.out.print(valor.toString());
-      }
-      System.out.print("\n");
-
-    }
-    System.out.println("=================");
+//    System.out.println("=================");
+//    System.out.println("linha: " + snapshot.getNode().getLinha() + " .. " + snapshot.getNode().getClass().getName());
+//    System.out.println("Ambiente:");
+//    System.out.println("Nome\tValor");
+//    for (String n : snapshot.getAmbienteSnapshot().keySet()) {
+//      System.out.print(n + "\t");
+//      Object valor = snapshot.getAmbienteSnapshot().get(n);
+//      if (valor != null) {
+//        System.out.print(valor.toString());
+//      }
+//      System.out.print("\n");
+//
+//    }
+//    System.out.println("=================");
   }
 
   @Override

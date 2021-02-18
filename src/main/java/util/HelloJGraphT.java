@@ -1,14 +1,9 @@
 package util;
 
-import java.util.Iterator;
-import java.util.stream.Stream;
-import org.graphstream.graph.Edge;
 import org.graphstream.graph.Graph;
 import org.graphstream.graph.Node;
-import org.graphstream.graph.NodeFactory;
 import org.graphstream.graph.implementations.MultiGraph;
 import org.graphstream.ui.view.Viewer;
-import modelos.tree.AstDebugNode;
 
 /**
  * Teste de visualização da AST
