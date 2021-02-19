@@ -27,10 +27,12 @@ import conversores.ConversorStrategy;
 import debug.DebugSnapshot;
 import debug.EstadoDebug;
 import debug.PassoAPassoDebugStrategy;
+import evento.EventoInterpretador;
 import interpretador.LeitorEntradaConsole;
 import modelos.TiposToken;
 import modelos.excecao.ParserError;
 import modelos.excecao.RuntimeError;
+import scala.actors.threadpool.Arrays;
 import util.JGraphTBuilder;
 
 /**
@@ -54,7 +56,10 @@ public class MainUI extends JFrame implements AcaoInterpretador {
 
   public MainUI() {
 
-    this.interpretador = new InterpretadorService(this, true);
+    this.interpretador = new InterpretadorService(this);
+    this.interpretador.ativarLog(true);
+    this.interpretador.logColorido(true);
+    this.interpretador.setEventosLog(Arrays.asList(EventoInterpretador.values()));
 
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -410,6 +415,11 @@ public class MainUI extends JFrame implements AcaoInterpretador {
     } else if (erro instanceof RuntimeError) {
       this.runtimeError((RuntimeError) erro);
     }
+  }
+
+  @Override
+  public void onLog(String msgLog) {
+    System.out.println(msgLog);
   }
 
 }

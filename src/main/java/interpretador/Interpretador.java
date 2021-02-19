@@ -89,8 +89,8 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
         if(terminado) {
           gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_INTERROMPIDA, tempoExecucao);
         } else {          
-          gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, tempoExecucao);
           terminado = true;
+          gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, tempoExecucao);
         }
       }
     });

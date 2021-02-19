@@ -5,8 +5,8 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
-import analisador.AnalisadorSintatico;
 import analisador.AnalisadorLexico;
+import analisador.AnalisadorSintatico;
 import conversores.Conversor;
 import conversores.ConversorFactory;
 import conversores.ConversorStrategy;
@@ -19,6 +19,7 @@ import evento.EventoListener;
 import evento.EventosService;
 import interpretador.Interpretador;
 import interpretador.LeitorEntradaConsole;
+import log.LogService;
 import modelos.Token;
 import modelos.tree.Declaracao;
 import modelos.tree.Declaracao.Programa;
@@ -39,13 +40,14 @@ public class InterpretadorService implements EventoListener {
   private EventosService eventos;
   private Debugador debugador;
   private final AcaoInterpretador acoes;
+  private LogService log;
   
   /**
    * Gerencia o fluxo de interpretacao, tradução e debug
    * @param acoes - Implementacao com as acoes que devem ser executadas nos eventos
    * @param debugAtivo 
    */
-  public InterpretadorService(AcaoInterpretador acoes, boolean debugAtivo) {
+  public InterpretadorService(AcaoInterpretador acoes) {
     this.acoes = acoes;
     
     this.eventos = new EventosService();   
@@ -53,7 +55,8 @@ public class InterpretadorService implements EventoListener {
     this.analisadorLexico = new AnalisadorLexico(this.eventos);
     this.analisadorSintatico = new AnalisadorSintatico(this.eventos);
     this.interpreter = new Interpretador(this.eventos);
-    this.debugador = new Debugador(this.eventos, this.interpreter, debugAtivo);
+    this.debugador = new Debugador(this.eventos, this.interpreter, false);
+    this.log = new LogService();
   }
   // EXECUTAR
   public void executarViaArquivo(String path) throws IOException {
@@ -133,12 +136,45 @@ public class InterpretadorService implements EventoListener {
   public void debugParar() {
     this.debugador.terminarExecucao();
   }
+  //LOG
+  public void ativarLog(boolean ativar) {
+    this.log.setAtivo(ativar);
+  }
+  
+  public void logColorido(boolean colorido) {
+    this.log.setColorido(colorido);
+  }
+  
+  public boolean isLogColorido() {
+    return this.log.isColorido();
+  }
+  
+  public boolean isLogAtivo() {
+    return this.log.isAtivo();
+  }
+  
+  public void setEventosLog(List<EventoInterpretador> eventos) {
+    this.log.addEventos(eventos);
+  }
+  
+  public void removerEventosLog(List<EventoInterpretador> eventos) {
+    this.log.removerEventos(eventos);
+  }
+  
+  public void removerEventosLog() {
+    this.log.removerEventos();
+  }
+  
+  
   
   // EVENTOS
   @Override
-  public void update(EventoInterpretador tipoEvento, Object payload) {
-    //System.out.println("[EVENTO]= "+ tipoEvento.toString());
-    switch (tipoEvento) {
+  public void update(EventoInterpretador evento, Object payload) {
+    
+    String logMsg = this.log.printLog(evento, payload);
+    if(logMsg != null)this.acoes.onLog(logMsg);
+    
+    switch (evento) {
       case ERRO:
         temErro = true;
         this.acoes.onErro((RuntimeException) payload);

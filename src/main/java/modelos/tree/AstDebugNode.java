@@ -15,4 +15,10 @@ public class AstDebugNode {
 	public int getLinha() {
 		return linha;
 	}	
+	
+	@Override
+	public String toString() {
+	  return "Linha: " + this.linha + " || Node: " + this.getClass().getName();
+	}
+
 }

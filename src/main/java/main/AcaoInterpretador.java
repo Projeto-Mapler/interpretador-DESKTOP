@@ -17,4 +17,5 @@ public interface AcaoInterpretador {
    * necessita ser tratado com instanceof por exemplo
    */
   public void onErro(RuntimeException erro);
+  public void onLog(String msgLog);
 }
