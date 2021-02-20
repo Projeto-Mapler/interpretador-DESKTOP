@@ -1,8 +1,7 @@
-package main;
+package interpretador;
 
 import debug.DebugSnapshot;
 import debug.EstadoDebug;
-import interpretador.LeitorEntradaConsole;
 
 public interface AcaoInterpretador {
   public void onInput(LeitorEntradaConsole leitor);

@@ -1,4 +1,4 @@
-package main;
+package interpretador;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
@@ -17,8 +17,6 @@ import debug.EstadoDebug;
 import evento.EventoInterpretador;
 import evento.EventoListener;
 import evento.EventosService;
-import interpretador.Interpretador;
-import interpretador.LeitorEntradaConsole;
 import log.LogService;
 import modelos.Token;
 import modelos.tree.Declaracao;
@@ -137,11 +135,11 @@ public class InterpretadorService implements EventoListener {
     this.debugador.terminarExecucao();
   }
   //LOG
-  public void ativarLog(boolean ativar) {
+  public void setLogAtivo(boolean ativar) {
     this.log.setAtivo(ativar);
   }
   
-  public void logColorido(boolean colorido) {
+  public void setLogColorido(boolean colorido) {
     this.log.setColorido(colorido);
   }
   
@@ -151,6 +149,10 @@ public class InterpretadorService implements EventoListener {
   
   public boolean isLogAtivo() {
     return this.log.isAtivo();
+  }
+  
+  public void setEventoLog(EventoInterpretador eventos) {
+    this.log.addEvento(eventos);
   }
   
   public void setEventosLog(List<EventoInterpretador> eventos) {

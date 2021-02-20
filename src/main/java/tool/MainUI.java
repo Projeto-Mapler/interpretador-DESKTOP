@@ -1,5 +1,6 @@
-package main;
+package tool;
 
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -12,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
@@ -28,12 +31,13 @@ import debug.DebugSnapshot;
 import debug.EstadoDebug;
 import debug.PassoAPassoDebugStrategy;
 import evento.EventoInterpretador;
+import interpretador.AcaoInterpretador;
+import interpretador.InterpretadorService;
 import interpretador.LeitorEntradaConsole;
 import modelos.TiposToken;
 import modelos.excecao.ParserError;
 import modelos.excecao.RuntimeError;
 import scala.actors.threadpool.Arrays;
-import util.JGraphTBuilder;
 
 /**
  * Classe de teste de implementação da biblioteca
@@ -50,21 +54,29 @@ public class MainUI extends JFrame implements AcaoInterpretador {
   private JLabel labelOu;
   private JComboBox<String> comboBoxExemplos, comboBoxTraducoes;
   private JFileChooser fileChooser;
-  private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao, checkBoxJGraphT;
+  private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao, checkBoxJGraphT, checkBoxLogAtivo;
+  private Map<JCheckBox, EventoInterpretador> logTipos;
 
   private InterpretadorService interpretador;
 
   public MainUI() {
 
     this.interpretador = new InterpretadorService(this);
-    this.interpretador.ativarLog(true);
-    this.interpretador.logColorido(true);
+    this.interpretador.setLogAtivo(true);
+    this.interpretador.setLogColorido(true);
     this.interpretador.setEventosLog(Arrays.asList(EventoInterpretador.values()));
 
     try {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     } catch (Exception e) {
       e.printStackTrace();
+    }
+
+    this.logTipos = new HashMap<>();
+    for (EventoInterpretador e : EventoInterpretador.values()) {
+      JCheckBox cb = new JCheckBox(e.toString());
+      cb.setEnabled(false);
+      this.logTipos.put(cb, e);
     }
 
     this.setup();
@@ -85,68 +97,47 @@ public class MainUI extends JFrame implements AcaoInterpretador {
     cons.fill = GridBagConstraints.HORIZONTAL;
     cons.insets = new Insets(0, 0, 5, 0);
 
-    this.panel.setBorder(new EmptyBorder(new Insets(100, 50, 100, 50)));
-
+    this.panel.setBorder(new EmptyBorder(new Insets(20, 50, 20, 50)));
+    // BOTOES
     this.setupBotoes();
-
+    // LABELS
     this.labelOu = new JLabel("OU");
     this.labelOu.setHorizontalAlignment(JLabel.CENTER);
     // SELETOR EXEMPLOS
     this.comboBoxExemplos = new JComboBox<String>(this.getNomeArquivosExemplo());
-
+    // SELETOR TRADUCAO
+    this.comboBoxTraducoes = new JComboBox<String>(this.getNomesTraducoes());
+    this.comboBoxTraducoes.setEnabled(false);
+    // LAYOUT
     cons.gridx = 0;
     cons.weightx = 1;
     cons.gridy = 0;
     this.panel.add(this.botaoArquivo, cons);
 
-    cons.gridy++;
-    this.panel.add(this.labelOu, cons);
-
-    cons.gridy++;
-    this.panel.add(this.comboBoxExemplos, cons);
-
-    cons.gridy++;
-    this.panel.add(this.botaoIniciarExemplo, cons);
-
-    cons.gridy++;
-    this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
-    // SELETOR TRADUCAO
-    this.comboBoxTraducoes = new JComboBox<String>(this.getNomesTraducoes());
-    this.comboBoxTraducoes.setEnabled(false);
-
-    cons.gridy++;
-    this.panel.add(this.checkBoxImprimirTraducao, cons);
-
-    cons.gridy++;
-    this.panel.add(this.comboBoxTraducoes, cons);
-
-    cons.gridy++;
-    this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
-
-    cons.gridy++;
-    this.panel.add(this.checkBoxDebugAtivo, cons);
-
-    JPanel p = new JPanel();
-    p.setLayout(new GridBagLayout());
+    JPanel panelBotoesDebug = new JPanel();
+    panelBotoesDebug.setLayout(new GridBagLayout());
     GridBagConstraints cons2 = new GridBagConstraints();
     cons2.fill = GridBagConstraints.HORIZONTAL;
     cons2.insets = new Insets(0, 5, 5, 5);
     cons2.gridx = 0;
     cons2.gridy = 0;
-    p.add(this.botaoDebugContinuar, cons2);
-    cons2.gridx = 1;
-    p.add(this.botaoDebugParar, cons2);
-    cons2.gridx = 2;
-    p.add(this.botaoDebugContinuarSem, cons2);
+    List<Component> botoesDebug = Arrays.asList(new Component[] {this.botaoDebugContinuar, this.botaoDebugParar, this.botaoDebugContinuarSem});
+    for (Component c : botoesDebug) {
+      cons2.gridx++;
+      panelBotoesDebug.add(c, cons2);
+    }
 
-    cons.gridy++;
-    this.panel.add(p, cons);
+    List<Component> componentes = new ArrayList<Component>();
+    componentes.addAll(Arrays.asList(new Component[] {this.labelOu, this.comboBoxExemplos, this.botaoIniciarExemplo, new JSeparator(JSeparator.HORIZONTAL), this.checkBoxImprimirTraducao,
+        this.comboBoxTraducoes, new JSeparator(JSeparator.HORIZONTAL), this.checkBoxDebugAtivo, panelBotoesDebug, new JSeparator(JSeparator.HORIZONTAL), this.checkBoxJGraphT,
+        new JSeparator(JSeparator.HORIZONTAL), this.checkBoxLogAtivo,}));
+    componentes.addAll(this.logTipos.keySet());
 
-    cons.gridy++;
-    this.panel.add(new JSeparator(JSeparator.HORIZONTAL), cons);
+    for (Component c : componentes) {
+      cons.gridy++;
+      this.panel.add(c, cons);
+    }
 
-    cons.gridy++;
-    this.panel.add(this.checkBoxJGraphT, cons);
 
     this.add(panel);
     this.pack();
@@ -198,16 +189,21 @@ public class MainUI extends JFrame implements AcaoInterpretador {
         }
       }
     });
+    // LOG CHECKBOX
+    this.checkBoxLogAtivo = new JCheckBox("Log ativo", false);
+    this.checkBoxLogAtivo.addActionListener(new ActionListener() {
+      @Override
+      public void actionPerformed(ActionEvent e) {
+        JCheckBox x = (JCheckBox) e.getSource();
+        if (x.isSelected()) {
+          logTipos.keySet().forEach(c -> c.setEnabled(true));
+        } else {
+          logTipos.keySet().forEach(c -> c.setEnabled(false));
+        }
+      }
+    });
     // DEBUG CHECKBOX
     this.checkBoxDebugAtivo = new JCheckBox("Debug ativo", false);
-//    this.checkBoxDebugAtivo.addActionListener(new ActionListener() {      
-//      @Override
-//      public void actionPerformed(ActionEvent e) {
-//        JCheckBox c = (JCheckBox) e.getSource();
-//        interpretador.setDebugAtivo(c.isSelected());
-//        toggledDebug();
-//      }
-//    });
     // GRAFO
     this.checkBoxJGraphT = new JCheckBox("Exibir Grafo", false);
     // ->
@@ -236,7 +232,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
         interpretador.debugParar();
       }
     });
-    this.botaoDebugParar.setEnabled(false);  
+    this.botaoDebugParar.setEnabled(false);
   }
 
   private String[] getNomesTraducoes() {
@@ -268,18 +264,26 @@ public class MainUI extends JFrame implements AcaoInterpretador {
 
     return arquivos;
   }
-  
+
   // EXECUCAO
   private void rodarArquivo(String caminho) {
     try {
       this.interpretador.setDebugStrategy(new PassoAPassoDebugStrategy());
       this.interpretador.setDebugAtivo(this.checkBoxDebugAtivo.isSelected());
       this.interpretador.executarViaArquivo(caminho);
-
+      // LOG
+      this.interpretador.setLogAtivo(this.checkBoxLogAtivo.isSelected());
+      if (this.checkBoxLogAtivo.isSelected()) {
+        this.interpretador.removerEventosLog();
+        for (JCheckBox c : this.logTipos.keySet()) {
+          if (c.isSelected())
+            this.interpretador.setEventoLog(this.logTipos.get(c));
+        }
+      }
+      // GRAFO
       if (this.checkBoxJGraphT.isSelected()) {
         new JGraphTBuilder().print(this.interpretador.getProgramaASTViaArquivo(caminho));
       }
-
     } catch (IOException e) {
       e.printStackTrace();
     }
@@ -290,6 +294,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
     String caminho = PATH_EXEMPLOS + arquivo;
     return caminho;
   }
+
   // PRINT DOS ERROS
   private void report(int line, String onde, String msg) {
     System.err.println("[Parser Erro | linha " + line + "] Erro " + onde + ": " + msg);
@@ -310,7 +315,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
   private void runtimeError(RuntimeError error) {
     System.err.println("[Runtime Erro | linha " + error.token.line + "] Erro em '" + error.token.lexeme + "': " + error.getMessage());
   }
-  
+
   // ACOES PARA O INTERPRETADOR
   private void interpretacaoConcluida(double payload, boolean temErro) {
     System.out.println("Tempo de execução: " + payload + "s");
@@ -335,7 +340,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
       }
     }
   }
-  
+
   @Override
   public void onInput(LeitorEntradaConsole leitor) {
     System.out.println(">");
@@ -392,20 +397,21 @@ public class MainUI extends JFrame implements AcaoInterpretador {
 
   @Override
   public void onDebugPassoExecutado(DebugSnapshot snapshot) {
-//    System.out.println("=================");
-//    System.out.println("linha: " + snapshot.getNode().getLinha() + " .. " + snapshot.getNode().getClass().getName());
-//    System.out.println("Ambiente:");
-//    System.out.println("Nome\tValor");
-//    for (String n : snapshot.getAmbienteSnapshot().keySet()) {
-//      System.out.print(n + "\t");
-//      Object valor = snapshot.getAmbienteSnapshot().get(n);
-//      if (valor != null) {
-//        System.out.print(valor.toString());
-//      }
-//      System.out.print("\n");
-//
-//    }
-//    System.out.println("=================");
+    // System.out.println("=================");
+    // System.out.println("linha: " + snapshot.getNode().getLinha() + " .. " +
+    // snapshot.getNode().getClass().getName());
+    // System.out.println("Ambiente:");
+    // System.out.println("Nome\tValor");
+    // for (String n : snapshot.getAmbienteSnapshot().keySet()) {
+    // System.out.print(n + "\t");
+    // Object valor = snapshot.getAmbienteSnapshot().get(n);
+    // if (valor != null) {
+    // System.out.print(valor.toString());
+    // }
+    // System.out.print("\n");
+    //
+    // }
+    // System.out.println("=================");
   }
 
   @Override
