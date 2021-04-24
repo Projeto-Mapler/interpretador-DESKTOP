@@ -21,5 +21,4 @@ src/main/webapp/WEB-INF/classes
 # Mac
 .DS_Store
 # Maven
-log/
 bin/
