@@ -1,0 +1,124 @@
+@startuml
+
+' CONFIG
+left to right direction
+skinparam ParticipantPadding 50
+skinparam BoxPadding 10
+
+' PACOTES
+package analisador{
+    class AnalisadorLexico
+    class AnalisadorSintatico
+}
+
+package interpretador{
+    class Interpretador
+    class InterpretadorService
+    class Ambiente
+    class ChecadorTipoEstatico
+    class LeitorEntradaConsole
+    
+    interface AcaoInterpretador
+}
+
+package conversor{
+    abstract class Conversor
+    class Escritor
+    interface ConversorStrategy
+    class ConversorFactory
+
+    class ConversorC
+    class ConversorCpp
+    class ConversorPython
+    class ConversorJava
+    class ConversorPascal
+}
+
+package debug{
+    class Debugador
+    class DebugSnapshot
+    class PassoAPassoDebugStrategy
+    class BreakpointsDebugStrategy
+    enum EstadoDebug
+    interface DebugStrategy
+}
+
+package evento{
+    class EventoService
+    
+    enum EventoInterpretador
+
+    interface EventoListener
+}
+
+package log{
+    class LogPrinter
+    class LogService
+}
+
+package modelos {
+    class Token
+    class Chamavel
+    class Modulo
+    class VariavelVetor
+
+    enum TiposToken
+
+    package tree{
+        class Declaracao
+        class Expressao
+        class AstDebugNode
+
+        interface Declaracao.Visitor
+        interface Expressao.Visitor
+    }
+
+    package excecao {
+        RuntimeException <|-- ExecucaoInterrompidaException
+        RuntimeException <|-- ParserError
+        RuntimeException <|-- RuntimeError
+    }
+
+}
+
+' RELACOES
+AstDebugNode <|-- Declaracao
+AstDebugNode <|-- Expressao
+
+EventoListener <|-- InterpretadorService
+InterpretadorService o-- EventoService
+InterpretadorService -- ConversorStrategy
+InterpretadorService *-- AnalisadorLexico
+InterpretadorService *-- AnalisadorSintatico
+InterpretadorService *-- Interpretador
+InterpretadorService *-- Debugador
+InterpretadorService *-- LogService
+
+Declaracao.Visitor <|-- Interpretador
+Expressao.Visitor <|-- Interpretador
+Interpretador *-- Ambiente
+Interpretador *-- LeitorEntradaConsole
+Ambiente *-- ChecadorTipoEstatico
+
+Token o-- TiposToken
+
+Conversor *- Escritor
+Conversor -up-- EventoService
+Conversor <|-- ConversorC
+Conversor <|-- ConversorCpp
+Conversor <|-- ConversorPython
+Conversor <|-- ConversorJava
+Conversor <|-- ConversorPascal
+
+DebugStrategy <|-- PassoAPassoDebugStrategy
+DebugStrategy <|-- BreakpointsDebugStrategy
+EventoListener <|-- Debugador
+Debugador o-- Interpretador
+Debugador o-- EventoService
+Debugador o-- DebugStrategy
+Debugador o-- EstadoDebug
+
+LogService *- LogPrinter
+
+
+@enduml
