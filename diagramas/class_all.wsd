@@ -102,8 +102,8 @@ Ambiente *-- ChecadorTipoEstatico
 
 Token o-- TiposToken
 
-Conversor *- Escritor
-Conversor -up-- EventoService
+Conversor *-- Escritor
+Conversor -- EventoService
 Conversor <|-- ConversorC
 Conversor <|-- ConversorCpp
 Conversor <|-- ConversorPython
@@ -118,7 +118,7 @@ Debugador o-- EventoService
 Debugador o-- DebugStrategy
 Debugador o-- EstadoDebug
 
-LogService *- LogPrinter
+LogService *-- LogPrinter
 
 
 @enduml
