@@ -52,7 +52,7 @@ public class BreakpointsDebugStrategy implements DebugStrategy {
         debugador.pausarExecucao();
       }
     }
-    System.out.println("[debug] linha: " + node.getLinha() + " .. " + node.getClass().getName());
+    // System.out.println("[debug] linha: " + node.getLinha() + " .. " + node.getClass().getName());
     return node.getLinha();
   }
 

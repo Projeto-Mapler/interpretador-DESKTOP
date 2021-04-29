@@ -80,7 +80,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
           e.printStackTrace();
         } catch (ExecucaoInterrompidaException e) {
           //e.printStackTrace();
-          System.out.println("interpretacao foi interrompida");
+          //System.out.println("interpretacao foi interrompida");
         }
         
         long elapsedTime =System.currentTimeMillis();

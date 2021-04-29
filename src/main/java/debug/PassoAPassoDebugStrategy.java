@@ -14,7 +14,7 @@ public class PassoAPassoDebugStrategy implements DebugStrategy {
     public int executar(AstDebugNode node, Debugador debugador) {
 	int linhaAnterior = debugador.getLinha();
 
-	System.out.println("[debug] linha: " + node.getLinha() + " .. " + node.getClass().getName());
+	// System.out.println("[debug] linha: " + node.getLinha() + " .. " + node.getClass().getName());
 	if (linhaAnterior == node.getLinha())
 	    return linhaAnterior;
 	debugador.pausarExecucao();
