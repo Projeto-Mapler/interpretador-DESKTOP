@@ -79,7 +79,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
         } catch (StackOverflowError e) {
           e.printStackTrace();
         } catch (ExecucaoInterrompidaException e) {
-          //e.printStackTrace();
+          e.printStackTrace();
           //System.out.println("interpretacao foi interrompida");
         }
         

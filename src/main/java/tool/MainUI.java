@@ -268,9 +268,10 @@ public class MainUI extends JFrame implements AcaoInterpretador {
   // EXECUCAO
   private void rodarArquivo(String caminho) {
     try {
+      // DEBUG
       this.interpretador.setDebugStrategy(new PassoAPassoDebugStrategy());
       this.interpretador.setDebugAtivo(this.checkBoxDebugAtivo.isSelected());
-      this.interpretador.executarViaArquivo(caminho);
+    
       // LOG
       this.interpretador.setLogAtivo(this.checkBoxLogAtivo.isSelected());
       if (this.checkBoxLogAtivo.isSelected()) {
@@ -280,6 +281,8 @@ public class MainUI extends JFrame implements AcaoInterpretador {
             this.interpretador.setEventoLog(this.logTipos.get(c));
         }
       }
+      
+      this.interpretador.executarViaArquivo(caminho);
       // GRAFO
       if (this.checkBoxJGraphT.isSelected()) {
         new JGraphTBuilder().print(this.interpretador.getProgramaASTViaArquivo(caminho));

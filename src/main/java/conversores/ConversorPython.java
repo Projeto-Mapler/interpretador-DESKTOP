@@ -107,7 +107,7 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 	for (int i = 0; i < expressoes.size(); i++) {
 	    evaluate(expressoes.get(i));
 	    if (i < (expressoes.size() - 1)) {
-		escritor.concatenarNaLinha(" + ");
+		escritor.concatenarNaLinha(", ");
 	    }
 	}
 	escritor.concatenarNaLinha(")").addQuebraLinha();
