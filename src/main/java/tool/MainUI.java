@@ -400,21 +400,21 @@ public class MainUI extends JFrame implements AcaoInterpretador {
 
   @Override
   public void onDebugPassoExecutado(DebugSnapshot snapshot) {
-    // System.out.println("=================");
-    // System.out.println("linha: " + snapshot.getNode().getLinha() + " .. " +
-    // snapshot.getNode().getClass().getName());
-    // System.out.println("Ambiente:");
-    // System.out.println("Nome\tValor");
-    // for (String n : snapshot.getAmbienteSnapshot().keySet()) {
-    // System.out.print(n + "\t");
-    // Object valor = snapshot.getAmbienteSnapshot().get(n);
-    // if (valor != null) {
-    // System.out.print(valor.toString());
-    // }
-    // System.out.print("\n");
-    //
-    // }
-    // System.out.println("=================");
+     System.out.println("=================");
+     System.out.println("linha: " + snapshot.getNode().getLinha() + " .. " +
+     snapshot.getNode().getClass().getName());
+     System.out.println("Ambiente:");
+     System.out.println("Nome\tValor");
+     for (String n : snapshot.getAmbienteSnapshot().keySet()) {
+     System.out.print(n + "\t");
+     Object valor = snapshot.getAmbienteSnapshot().get(n);
+     if (valor != null) {
+     System.out.print(valor.toString());
+     }
+     System.out.print("\n");
+    
+     }
+     System.out.println("=================");
   }
 
   @Override

@@ -1,12 +1,14 @@
 package modelos;
 
+import java.io.Serializable;
+
 /**
  * Representa uma variavel vetor da pseudoLinguagem
  * 
  * @author Kerlyson
  *
  */
-public class VariavelVetor {
+public class VariavelVetor implements Serializable {
   
   private Object[] valores;
   private TiposToken tipo;
