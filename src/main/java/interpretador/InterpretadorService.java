@@ -194,7 +194,7 @@ public class InterpretadorService implements EventoListener {
 		case ERRO:
 			temErro = true;
 			this.acoes.onErro((RuntimeException) payload);
-			this.eventos.marcarParaDesinscrever(this); // para a execucao.. habilita o garbageCollector
+			if(!this.isDebugAtivo()) this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
 			return;
 		case INPUT:
 			this.acoes.onInput((LeitorEntradaConsole) payload);
@@ -204,14 +204,15 @@ public class InterpretadorService implements EventoListener {
 			return;
 		case INTERPRETACAO_CONCLUIDA:
 			this.acoes.onInterpretacaoConcluida((double) payload);
-			this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
+			if(!this.isDebugAtivo()) this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
 			return;
 		case INTERPRETACAO_INTERROMPIDA:
 			this.acoes.onInterpretacaoInterrompida((double) payload);
-			this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
+			if(!this.isDebugAtivo()) this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
 			return;
 		case DEBUG_MUDANCA_ESTADO:
 			this.acoes.onDebugMudancaEstado((EstadoDebug) payload);
+			if(this.isDebugAtivo() && ((EstadoDebug) payload) == EstadoDebug.INICIAL) this.eventos.marcarParaDesinscrever(this);
 			return;
 		case DEBUG_PASSO_EXECUTADO:
 			this.acoes.onDebugPassoExecutado((DebugSnapshot) payload);
@@ -220,5 +221,7 @@ public class InterpretadorService implements EventoListener {
 			return;
 		}
 	}
+	
+	
 
 }
