@@ -82,7 +82,6 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
         } catch (ExecucaoInterrompidaException e) {
         	terminado = true;
           e.printStackTrace();
-        
         }
         
         long elapsedTime =System.currentTimeMillis();
@@ -94,6 +93,10 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
           terminado = true;
           gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_CONCLUIDA, tempoExecucao);
         }
+       
+        environment.reset();
+        entradaConsole.reset();
+       
       }
     });
     this.thread.start();

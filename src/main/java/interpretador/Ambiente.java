@@ -18,9 +18,20 @@ import modelos.excecao.RuntimeError;
  *
  */
 public class Ambiente {
-	private final Map<String, Object> valores = new HashMap<>(); // valores das variaveis <Nome da variavel, valor>
-	private final Map<String, TiposToken> definicoes = new HashMap<>(); // variaveis declaradas <nome, tipo>
-	private ChecadorTipoEstatico checadorTipo = new ChecadorTipoEstatico();
+	private final Map<String, Object> valores; // valores das variaveis <Nome da variavel, valor>
+	private final Map<String, TiposToken> definicoes; // variaveis declaradas <nome, tipo>
+	private final ChecadorTipoEstatico checadorTipo;
+
+	public Ambiente() {
+		valores = new HashMap<>(); 
+		definicoes = new HashMap<>(); 
+		checadorTipo = new ChecadorTipoEstatico();
+	}
+
+	public void reset() {
+		this.valores.clear();
+		this.definicoes.clear();
+	}
 
 	public void definirVariavel(Token nome, Token tipo) {
 		definicoes.put(nome.lexeme, tipo.type);
@@ -129,5 +140,4 @@ public class Ambiente {
 		return retorno;
 	}
 
-	
 }
