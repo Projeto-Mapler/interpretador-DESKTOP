@@ -3,9 +3,11 @@ package interpretador;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.rits.cloning.Cloner;
 
+import modelos.Chamavel;
 import modelos.TiposToken;
 import modelos.Token;
 import modelos.VariavelVetor;
@@ -131,10 +133,13 @@ public class Ambiente {
 		Map<String, Object> retorno = new HashMap<String, Object>();
 		Map<String, Object> valores = new Cloner().deepClone(this.valores);
 
-		Set<String> nomeVariaveis = this.definicoes.keySet();
+		Set<String> nomeVariaveis = this.definicoes.keySet().stream().filter(d -> definicoes.get(d) != TiposToken.TIPO_MODULO).collect(Collectors.toSet());
 
 		for (String nome : nomeVariaveis) {
-			retorno.put(nome, valores.get(nome));
+			Object valor = valores.get(nome);
+			
+			//if(valor instanceof Chamavel) continue; // ignora modulos
+			retorno.put(nome, this.checadorTipo.castValorObject(valor));
 		}
 
 		return retorno;
