@@ -64,6 +64,16 @@ public class ChecadorTipoEstatico {
 		}
 	}
 
+	public Object castValorObject(Object valor) {
+	
+		if (valor instanceof Boolean) {
+			if((Boolean)valor) return "verdadeiro";
+			if(!(Boolean)valor) return "falso";
+		}
+		if(valor == null) return "nulo";
+		return valor;
+	}
+
 	public boolean isTipoValorValido(TiposToken tipo, Object valor) {
 		return tipo == getTipoDoValor(valor);
 	}
