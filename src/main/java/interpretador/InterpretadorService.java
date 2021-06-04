@@ -194,7 +194,7 @@ public class InterpretadorService implements EventoListener {
 		case ERRO:
 			temErro = true;
 			this.acoes.onErro((RuntimeException) payload);
-			this.eventos.desiscreverTodos(this); // para a execucao.. habilita o garbageCollector
+			this.eventos.marcarParaDesinscrever(this); // para a execucao.. habilita o garbageCollector
 			return;
 		case INPUT:
 			this.acoes.onInput((LeitorEntradaConsole) payload);
@@ -204,11 +204,11 @@ public class InterpretadorService implements EventoListener {
 			return;
 		case INTERPRETACAO_CONCLUIDA:
 			this.acoes.onInterpretacaoConcluida((double) payload);
-			this.eventos.desiscreverTodos(this);// para a execucao.. habilita o garbageCollector
+			this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
 			return;
 		case INTERPRETACAO_INTERROMPIDA:
 			this.acoes.onInterpretacaoInterrompida((double) payload);
-			this.eventos.desiscreverTodos(this);// para a execucao.. habilita o garbageCollector
+			this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
 			return;
 		case DEBUG_MUDANCA_ESTADO:
 			this.acoes.onDebugMudancaEstado((EstadoDebug) payload);

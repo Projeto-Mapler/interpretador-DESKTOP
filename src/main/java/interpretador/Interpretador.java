@@ -77,10 +77,12 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
           gerenciadorEventos.notificar(EventoInterpretador.ERRO, error);
           terminado = true;
         } catch (StackOverflowError e) {
+        	terminado = true;
           e.printStackTrace();
         } catch (ExecucaoInterrompidaException e) {
+        	terminado = true;
           e.printStackTrace();
-          //System.out.println("interpretacao foi interrompida");
+        
         }
         
         long elapsedTime =System.currentTimeMillis();
