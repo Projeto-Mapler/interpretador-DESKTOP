@@ -1,0 +1,7 @@
+version = 1
+
+exclude_patterns = ["exemplos/**"]
+
+[[analyzers]]
+name = "java"
+enabled = true
