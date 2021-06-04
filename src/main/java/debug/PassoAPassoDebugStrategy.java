@@ -10,15 +10,16 @@ import modelos.tree.AstDebugNode;
  */
 public class PassoAPassoDebugStrategy implements DebugStrategy {
 
-    @Override
-    public int executar(AstDebugNode node, Debugador debugador) {
-	int linhaAnterior = debugador.getLinha();
+	@Override
+	public int executar(AstDebugNode node, Debugador debugador) {
+		int linhaAnterior = debugador.getLinha();
 
-	// System.out.println("[debug] linha: " + node.getLinha() + " .. " + node.getClass().getName());
-	if (linhaAnterior == node.getLinha())
-	    return linhaAnterior;
-	debugador.pausarExecucao();
-	return node.getLinha();
-    }
+		// System.out.println("[debug] linha: " + node.getLinha() + " .. " +
+		// node.getClass().getName());
+		if (linhaAnterior == node.getLinha())
+			return linhaAnterior;
+		debugador.pausarExecucao();
+		return node.getLinha();
+	}
 
 }
