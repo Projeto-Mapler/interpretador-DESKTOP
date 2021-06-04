@@ -37,6 +37,8 @@ public abstract class Declaracao extends AstDebugNode {
 		public R visitChamadaModuloDeclaracao(ChamadaModulo declaracao);
 
 		public R visitProgramaDeclaracao(Programa declaracao);
+		
+		public R visitFimDeclaracao(Fim declaracao);
 	}
 
 	public static class Bloco extends Declaracao {
@@ -233,13 +235,27 @@ public abstract class Declaracao extends AstDebugNode {
 
 		public final Token identificador;
 	}
+	
+	public static class Fim extends Declaracao {
+		public Fim(int linha, Token fim) {
+			super(linha);
+			this.fim = fim;
+		}
+
+		public <R> R accept(Visitor<R> visitor) {
+			return visitor.visitFimDeclaracao(this);
+		}
+
+		public final Token fim;
+	}
 
 	public static class Programa extends Declaracao {
-		public Programa(int linha, List<Declaracao> variaveis, List<Declaracao> corpo, List<Declaracao> modulos) {
+		public Programa(int linha, List<Declaracao> variaveis, List<Declaracao> corpo, List<Declaracao> modulos, Fim fim) {
 			super(linha);
 			this.variaveis = variaveis;
 			this.corpo = corpo;
 			this.modulos = modulos;
+			this.fim = fim;
 		}
 
 		public <R> R accept(Visitor<R> visitor) {
@@ -249,6 +265,7 @@ public abstract class Declaracao extends AstDebugNode {
 		public final List<Declaracao> variaveis;
 		public final List<Declaracao> corpo;
 		public final List<Declaracao> modulos;
+		public final Fim fim;
 	}
 
 	public abstract <R> R accept(Visitor<R> visitor);

@@ -102,13 +102,13 @@ public class AnalisadorSintatico {
         corpo.add(declaracao());
       }
       
-      consumirToken(FIM, "Esperado \"fim\"");
-
+      Token fim = consumirToken(FIM, "Esperado \"fim\"");
+      
       while (!isFimDoArquivo()) {
         modulos.add(declaracaoModulo());
       }
       
-      return new Declaracao.Programa(variaveisToken.line, variaveis, corpo, modulos);
+      return new Declaracao.Programa(variaveisToken.line, variaveis, corpo, modulos, new Declaracao.Fim(fim.line, fim));
     } catch (ParserError e) {
       this.gerenciadorEventos.notificar(EventoInterpretador.ERRO, e);
     }

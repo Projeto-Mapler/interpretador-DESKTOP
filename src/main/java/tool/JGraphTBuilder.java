@@ -13,6 +13,7 @@ import modelos.tree.Declaracao.Bloco;
 import modelos.tree.Declaracao.ChamadaModulo;
 import modelos.tree.Declaracao.Enquanto;
 import modelos.tree.Declaracao.Escreva;
+import modelos.tree.Declaracao.Fim;
 import modelos.tree.Declaracao.Ler;
 import modelos.tree.Declaracao.Modulo;
 import modelos.tree.Declaracao.Para;
@@ -277,5 +278,11 @@ public class JGraphTBuilder implements Expressao.Visitor<Void>, Declaracao.Visit
     // TODO Auto-generated method stub
     return null;
   }
+
+@Override
+public Void visitFimDeclaracao(Fim declaracao) {
+	// TODO Auto-generated method stub
+	return null;
+}
 
 }

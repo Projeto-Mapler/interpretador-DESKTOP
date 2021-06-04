@@ -20,6 +20,7 @@ import modelos.tree.Declaracao.Bloco;
 import modelos.tree.Declaracao.ChamadaModulo;
 import modelos.tree.Declaracao.Enquanto;
 import modelos.tree.Declaracao.Escreva;
+import modelos.tree.Declaracao.Fim;
 import modelos.tree.Declaracao.Ler;
 import modelos.tree.Declaracao.Modulo;
 import modelos.tree.Declaracao.Para;
@@ -611,5 +612,11 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 	escritor.concatenarNaLinha(expressao.nome.lexeme);
 	return null;
     }
+
+	@Override
+	public Void visitFimDeclaracao(Fim declaracao) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 }
