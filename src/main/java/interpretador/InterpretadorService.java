@@ -32,6 +32,8 @@ import modelos.tree.Declaracao.Programa;
 public class InterpretadorService implements EventoListener {
 
 	private boolean temErro = false;
+	private boolean debugAtivo = false;
+	private boolean interrompido = false;
 	private Interpretador interpreter;
 	private AnalisadorLexico analisadorLexico;
 	private AnalisadorSintatico analisadorSintatico;
@@ -67,12 +69,16 @@ public class InterpretadorService implements EventoListener {
 
 	public void executarViaTexto(String source) {
 		// resets:
+		interrompido = false;
 		interpreter.terminarExecucao();
 		this.temErro = false;
 		this.eventos.inscreverTodos(EventoInterpretador.values(), this);
 		Programa programa = this.gerarPrograma(source);
 		if (programa == null)
 			return;
+		
+		this.debugador.setAtivo(debugAtivo);
+		
 		interpreter.interpretar(programa);
 	}
 
@@ -125,11 +131,13 @@ public class InterpretadorService implements EventoListener {
 
 	// DEBUGADOR
 	public boolean isDebugAtivo() {
-		return this.debugador.isAtivo();
+		//return this.debugador.isAtivo();
+		return this.debugAtivo;
 	}
 
 	public void setDebugAtivo(boolean ativo) {
-		this.debugador.setAtivo(ativo);
+		//this.debugador.setAtivo(ativo);
+		this.debugAtivo = ativo;
 	}
 
 	public void setDebugStrategy(DebugStrategy s) {
@@ -204,15 +212,16 @@ public class InterpretadorService implements EventoListener {
 			return;
 		case INTERPRETACAO_CONCLUIDA:
 			this.acoes.onInterpretacaoConcluida((double) payload);
-			if(!this.isDebugAtivo()) this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
+			if(!debugAtivo) this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
 			return;
 		case INTERPRETACAO_INTERROMPIDA:
 			this.acoes.onInterpretacaoInterrompida((double) payload);
-			if(!this.isDebugAtivo()) this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
+			if(!debugAtivo) this.eventos.marcarParaDesinscrever(this);// para a execucao.. habilita o garbageCollector
+			this.interrompido = true;
 			return;
 		case DEBUG_MUDANCA_ESTADO:
 			this.acoes.onDebugMudancaEstado((EstadoDebug) payload);
-			if(this.isDebugAtivo() && ((EstadoDebug) payload) == EstadoDebug.INICIAL) this.eventos.marcarParaDesinscrever(this);
+			if(debugAtivo && interrompido) this.eventos.marcarParaDesinscrever(this);
 			return;
 		case DEBUG_PASSO_EXECUTADO:
 			this.acoes.onDebugPassoExecutado((DebugSnapshot) payload);

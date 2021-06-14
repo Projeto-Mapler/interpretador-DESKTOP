@@ -78,13 +78,13 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 				} catch (RuntimeError error) {
 					gerenciadorEventos.notificar(EventoInterpretador.ERRO, error);
 					terminado = true;
-				} catch (StackOverflowError e) {
-					terminado = true;
-					e.printStackTrace();
 				} catch (ExecucaoInterrompidaException e) {
 					terminado = true;
+					//e.printStackTrace();
+				}catch (Exception e) {
+					terminado = true;
 					e.printStackTrace();
-				}
+				} 
 
 				long elapsedTime = System.currentTimeMillis();
 				double tempoExecucao = (double) (elapsedTime - startTime) / 1000F;
@@ -98,6 +98,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 				environment.reset();
 				entradaConsole.reset();
+				
 
 			}
 		});
