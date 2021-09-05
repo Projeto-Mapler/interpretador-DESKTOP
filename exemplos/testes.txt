@@ -1,0 +1,28 @@
+variaveis
+  //declare aqui suas variaveis
+  contador: inteiro;
+  soma: inteiro;
+  qnt: inteiro;
+  maior: inteiro;
+  entrada:inteiro;
+
+inicio
+  escrever "Informe uma quantidade: "  ;
+  ler qnt;
+contador<- 1;
+soma<- 0;
+maior <- 0;
+enquanto contador <= qnt faca
+escrever "Informe o ", contador, "º: "  ;
+  ler entrada;
+ soma <- soma + entrada;
+ se maior < entrada entao
+  maior <- entrada;
+ fim se;
+
+contador <- contador+1;
+fim enquanto;
+
+ escrever "Maior: ", maior;
+ escrever "Media: ", (soma/qnt);
+fim
