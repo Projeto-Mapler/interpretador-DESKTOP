@@ -40,4 +40,5 @@ public class LeitorEntradaConsole {
   public String getValor() {
     return this.valor;
   }
+  
 }

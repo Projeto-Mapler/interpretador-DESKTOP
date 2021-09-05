@@ -60,7 +60,7 @@ public class LogPrinter {
         return sw.getBuffer().toString();
 
       case INPUT:
-        return (((String) payload));
+        return payload.toString();
       case INTERPRETACAO_CONCLUIDA:
         return (((Double) payload)).toString();
       case INTERPRETACAO_INTERROMPIDA:

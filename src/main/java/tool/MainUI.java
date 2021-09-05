@@ -357,7 +357,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
 
   @Override
   public void onOutput(String output) {
-   // System.out.println(output);
+   System.out.println(output);
   }
 
   @Override
