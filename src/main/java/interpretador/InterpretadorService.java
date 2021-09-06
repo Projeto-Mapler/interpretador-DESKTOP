@@ -56,9 +56,13 @@ public class InterpretadorService implements EventoListener {
 
 		this.analisadorLexico = new AnalisadorLexico(this.eventos);
 		this.analisadorSintatico = new AnalisadorSintatico(this.eventos);
+		this.log = new LogService();
+		initInterpretadorDebug();
+	}
+	
+	private void initInterpretadorDebug() {
 		this.interpreter = new Interpretador(this.eventos);
 		this.debugador = new Debugador(this.eventos, this.interpreter, false);
-		this.log = new LogService();
 	}
 
 	// EXECUTAR
@@ -230,6 +234,12 @@ public class InterpretadorService implements EventoListener {
 			return;
 		}
 	}
+
+	public void destruir() {
+		initInterpretadorDebug();
+	}
+
+	
 	
 	
 
