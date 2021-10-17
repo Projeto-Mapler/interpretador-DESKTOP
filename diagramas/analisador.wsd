@@ -1,0 +1,1283 @@
+@startuml
+
+left to right direction
+skinparam linetype ortho
+skinparam ParticipantPadding 10
+skinparam BoxPadding 10
+skinparam Nodesep 100
+skinparam Ranksep 100
+
+
+class analisador.AnalisadorLexico {
+	{field} -atual : int
+	{field} -comeco : int
+	{field} {static} -keywords : java.util.Map
+	{field} -linha : int
+	{field} -source : String
+	{method} -addToken ( paramTiposToken1 : modelos.TiposToken ) : void
+	{method} -addToken ( paramTiposToken1 : modelos.TiposToken , paramObject2 : Object ) : void
+	{method} -avancar () : char
+	{method} -cadeia () : void
+	{method} -checar () : char
+	{method} -checkProximo () : char
+	{method} -comparar ( paramchar1 : char ) : boolean
+	{method} -identificador () : void
+	{method} -isFinal () : boolean
+	{method} -isLetra ( paramchar1 : char ) : boolean
+	{method} -isLetraOuNumero ( paramchar1 : char ) : boolean
+	{method} -isNumerico ( paramchar1 : char ) : boolean
+	{method} -numero () : void
+	{method} -scanToken () : void
+	{method} +scanTokens ( paramString1 : String ) : java.util.List
+}
+
+
+class analisador.AnalisadorSintatico {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{field} -indexTokenAtual : int
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} -adicao () : modelos.tree.Expressao
+	{method} -anterior () : modelos.Token
+	{method} -atribuicao () : modelos.tree.Expressao
+	{method} -avancar () : modelos.Token
+	{method} -bloco () : java.util.List
+	{method} -chamadaModulo ( paramToken1 : modelos.Token ) : modelos.tree.Declaracao
+	{method} -checar ( paramTiposToken1 : modelos.TiposToken ) : boolean
+	{method} -comparacao () : modelos.tree.Expressao
+	{method} -consumirToken ( paramTiposToken1 : modelos.TiposToken , paramString2 : String ) : modelos.Token
+	{method} -declaracao () : modelos.tree.Declaracao
+	{method} -declaracaoModulo () : modelos.tree.Declaracao
+	{method} -declaracaoVariaveis () : modelos.tree.Declaracao
+	{method} -declaracaoVariavelArray ( paramToken1 : modelos.Token , paramToken2 : modelos.Token , paramToken3 : modelos.Token , paramToken4 : modelos.Token ) : modelos.tree.Declaracao
+	{method} -e () : modelos.tree.Expressao
+	{method} -enquantoDeclaracao () : modelos.tree.Declaracao
+	{method} -error ( paramToken1 : modelos.Token , paramString2 : String ) : modelos.excecao.ParserError
+	{method} -escreverDeclaracao () : modelos.tree.Declaracao
+	{method} -espiar () : modelos.Token
+	{method} -expParentizada () : modelos.tree.Expressao
+	{method} -expressao () : modelos.tree.Expressao
+	{method} -expressaoDeclaracao () : modelos.tree.Declaracao
+	{method} -igualdade () : modelos.tree.Expressao
+	{method} -isFimDoArquivo () : boolean
+	{method} -isTokenTypeIgualA ( paramTiposToken;1 : [Lmodelos.TiposToken; ) : boolean
+	{method} -lerDeclaracao () : modelos.tree.Declaracao
+	{method} -multiplicacao () : modelos.tree.Expressao
+	{method} -ou () : modelos.tree.Expressao
+	{method} -paraDeclaracao () : modelos.tree.Declaracao
+	{method} +parse ( paramList1 : java.util.List ) : modelos.tree.Declaracao$Programa
+	{method} -primario () : modelos.tree.Expressao
+	{method} -repitaDeclaracao () : modelos.tree.Declaracao
+	{method} -seDeclaracao () : modelos.tree.Declaracao
+	{method} -sincronizar () : void
+	{method} -tipoDado () : modelos.Token
+	{method} -unario () : modelos.tree.Expressao
+}
+
+
+abstract class conversores.Conversor {
+	{field} -mapaVariaveisVetor : java.util.Map
+	{method} #addVariavelVetor ( paramString1 : String , paramVariavelVetor2 : modelos.VariavelVetor ) : void
+	{method}  {abstract} +converter () : String
+	{method}  {abstract} #getOperadorLogico ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} #getVariavelVetor ( paramString1 : String ) : modelos.VariavelVetor
+	{method} #getVariavelVetorTipo ( paramString1 : String ) : modelos.TiposToken
+	{method} #throwRuntimeErro ( paramRuntimeError1 : modelos.excecao.RuntimeError ) : void
+	{method}  {abstract} #tipoVariavel ( paramTiposToken1 : modelos.TiposToken ) : String
+}
+
+
+class conversores.ConversorC {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{field} -variaveis : java.util.Map
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} +converter () : String
+	{method} -evaluate ( paramExpressao1 : modelos.tree.Expressao ) : void
+	{method} -execute ( paramDeclaracao1 : modelos.tree.Declaracao ) : void
+	{method} -getEspecificadorBinario ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : String
+	{method} -getEspecificadorEscreva ( paramList1 : java.util.List ) : String
+	{method} -getEspecificadorTipo ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} -getLerFuncao ( paramString1 : String ) : String
+	{method} #getOperadorLogico ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} -getTamanhoVetorTipoString ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} -isCadeia ( paramString1 : String ) : boolean
+	{method} -isTokenTypeIgualA ( paramToken1 : modelos.Token , paramTiposToken;2 : [Lmodelos.TiposToken; ) : boolean
+	{method} -isVetorCadeia ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} #tipoVariavel ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Void
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Void
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Void
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Void
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Void
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Void
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+}
+
+
+class conversores.ConversorCpp {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} +converter () : String
+	{method} -evaluate ( paramExpressao1 : modelos.tree.Expressao ) : void
+	{method} -execute ( paramDeclaracao1 : modelos.tree.Declaracao ) : void
+	{method} #getOperadorLogico ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} #tipoVariavel ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Void
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Void
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Void
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Void
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Void
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Void
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Void
+}
+
+
+class conversores.ConversorFactory {
+	{field} {static} -$SWITCH_TABLE$conversores$ConversorStrategy : [I
+	{method}  {static} ~$SWITCH_TABLE$conversores$ConversorStrategy () : [I
+	{method}  {static} +getConversor ( paramEventosService1 : evento.EventosService , paramDeclaracao$Programa2 : modelos.tree.Declaracao$Programa , paramConversorStrategy3 : conversores.ConversorStrategy ) : conversores.Conversor
+}
+
+
+class conversores.ConversorJava {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} +converter () : String
+	{method} -evaluate ( paramExpressao1 : modelos.tree.Expressao ) : void
+	{method} -execute ( paramDeclaracao1 : modelos.tree.Declaracao ) : void
+	{method} #getOperadorLogico ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} #tipoVariavel ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Void
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Void
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Void
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Void
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Void
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Void
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Void
+}
+
+
+class conversores.ConversorPascal {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} +converter () : String
+	{method} -evaluate ( paramExpressao1 : modelos.tree.Expressao ) : void
+	{method} -execute ( paramDeclaracao1 : modelos.tree.Declaracao ) : void
+	{method} #getOperadorLogico ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} #tipoVariavel ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Void
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Void
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Void
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Void
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Void
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Void
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Void
+}
+
+
+class conversores.ConversorPython {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} +converter () : String
+	{method} -evaluate ( paramExpressao1 : modelos.tree.Expressao ) : void
+	{method} -execute ( paramDeclaracao1 : modelos.tree.Declaracao ) : void
+	{method} #getOperadorLogico ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} #tipoVariavel ( paramTiposToken1 : modelos.TiposToken ) : String
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Void
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Void
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Void
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Void
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Void
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Void
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Void
+}
+
+
+enum conversores.ConversorStrategy {
+	{field} +C
+	{field} +Cpp
+	{field} +JAVA
+	{field} +PASCAL
+	{field} +PYTHON
+}
+
+
+class conversores.Escritor {
+	{field} -indexIndentacao : int
+	{field} -stringBuilder : StringBuilder
+	{method} #addQuebraLinha () : conversores.Escritor
+	{method} #addQuebraLinha ( paramint1 : int ) : conversores.Escritor
+	{method} #concatenarNaLinha ( paramString1 : String ) : conversores.Escritor
+	{method} #getResultado () : String
+	{method} #indentar () : conversores.Escritor
+	{method} #removerIdentacao () : conversores.Escritor
+	{method} #reset () : void
+}
+
+
+class debug.BreakpointsDebugStrategy {
+	{field} -breakpoint : Integer
+	{field} -breakpoints : java.util.Set
+	{method} +addBreakPoint ( paramint1 : int ) : void
+	{method} +executar ( paramAstDebugNode1 : modelos.tree.AstDebugNode , paramDebugador2 : debug.Debugador ) : int
+	{method} +removeBreakPoint ( paramint1 : int ) : void
+	{method} +removeTodosBreakPoins () : void
+}
+
+
+class debug.DebugSnapshot {
+	{field} -ambienteSnapshot : java.util.Map
+	{method} +getLinha () : int
+	{method} +getNodeClassName () : String
+}
+
+
+interface debug.DebugStrategy {
+	{method}  {abstract} +executar ( paramAstDebugNode1 : modelos.tree.AstDebugNode , paramDebugador2 : debug.Debugador ) : int
+}
+
+
+class debug.Debugador {
+	{field} {static} -$SWITCH_TABLE$evento$EventoInterpretador : [I
+	{field} +ativo : boolean
+	{field} -linhaAnterior : Integer
+	{field} -resumir : boolean
+	{method}  {static} ~$SWITCH_TABLE$evento$EventoInterpretador () : [I
+	{method} +continuarExecucao () : void
+	{method} +getLinha () : int
+	{method} +pausarExecucao () : void
+	{method} +proximoPasso () : void
+	{method} +setDebugStrategy ( paramDebugStrategy1 : debug.DebugStrategy ) : void
+	{method} +terminarExecucao () : void
+	{method} +update ( paramEventoInterpretador1 : evento.EventoInterpretador , paramObject2 : Object ) : void
+	{method} -updateNodeDebug ( paramObject1 : Object ) : void
+}
+
+
+enum debug.EstadoDebug {
+	{field} +EXECUTANDO
+	{field} +INICIAL
+	{field} +PAUSADO
+}
+
+
+class debug.PassoAPassoDebugStrategy {
+	{method} +executar ( paramAstDebugNode1 : modelos.tree.AstDebugNode , paramDebugador2 : debug.Debugador ) : int
+}
+
+
+enum evento.EventoInterpretador {
+	{field} +DEBUG_MUDANCA_ESTADO
+	{field} +DEBUG_PASSO_EXECUTADO
+	{field} +ERRO
+	{field} +INPUT
+	{field} +INTERPRETACAO_CONCLUIDA
+	{field} +INTERPRETACAO_INTERROMPIDA
+	{field} +OUTPUT
+	{field} +VISITA_NODE_AST
+}
+
+
+interface evento.EventoListener {
+	{method}  {abstract} +update ( paramEventoInterpretador1 : evento.EventoInterpretador , paramObject2 : Object ) : void
+}
+
+
+class evento.EventosService {
+	{field} ~inscritos : java.util.Map
+	{method} +desinscrever ( paramEventoInterpretador1 : evento.EventoInterpretador , paramEventoListener2 : evento.EventoListener ) : void
+	{method} +desinscreverTodos ( paramEventoListener1 : evento.EventoListener ) : void
+	{method} +inscrever ( paramEventoInterpretador1 : evento.EventoInterpretador , paramEventoListener2 : evento.EventoListener ) : void
+	{method} +inscreverTodos ( paramEventoInterpretador;1 : [Levento.EventoInterpretador; , paramEventoListener2 : evento.EventoListener ) : void
+	{method} +marcarParaDesinscrever ( paramEventoListener1 : evento.EventoListener ) : void
+	{method} +notificar ( paramEventoInterpretador1 : evento.EventoInterpretador , paramObject2 : Object ) : void
+}
+
+
+interface interpretador.AcaoInterpretador {
+	{method}  {abstract} +onDebugMudancaEstado ( paramEstadoDebug1 : debug.EstadoDebug ) : void
+	{method}  {abstract} +onDebugPassoExecutado ( paramDebugSnapshot1 : debug.DebugSnapshot ) : void
+	{method}  {abstract} +onErro ( paramRuntimeException1 : RuntimeException ) : void
+	{method}  {abstract} +onInput ( paramLeitorEntradaConsole1 : interpretador.LeitorEntradaConsole ) : void
+	{method}  {abstract} +onInterpretacaoConcluida ( paramdouble1 : double ) : void
+	{method}  {abstract} +onInterpretacaoInterrompida ( paramdouble1 : double ) : void
+	{method}  {abstract} +onLog ( paramString1 : String ) : void
+	{method}  {abstract} +onOutput ( paramString1 : String ) : void
+}
+
+
+class interpretador.Ambiente {
+	{field} -definicoes : java.util.Map
+	{field} -valores : java.util.Map
+	{method} #criarSnapshot () : java.util.Map
+	{method} +definirVariavel ( paramToken1 : modelos.Token , paramToken2 : modelos.Token ) : void
+	{method} +definirVariavelVetor ( paramToken1 : modelos.Token , paramVariavelVetor2 : modelos.VariavelVetor ) : void
+	{method} +getTipoVariavel ( paramToken1 : modelos.Token ) : modelos.TiposToken
+	{method} +getValorVariavel ( paramToken1 : modelos.Token ) : Object
+	{method} -lambda$0 ( paramString1 : String ) : boolean
+	{method} +reset () : void
+	{method} +setValorVariavel ( paramToken1 : modelos.Token , paramObject2 : Object ) : void
+	{method} +setValorVariavelVetor ( paramToken1 : modelos.Token , paramObject2 : Object , paramObject3 : Object ) : void
+	{method} +setVariavelPorFuncaoLer ( paramToken1 : modelos.Token , paramString2 : String , paramObject3 : Object ) : void
+}
+
+
+class interpretador.ChecadorTipoEstatico {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} +castLerValor ( paramString1 : String , paramTiposToken2 : modelos.TiposToken ) : Object
+	{method} +castValorObject ( paramObject1 : Object ) : Object
+	{method} +getTipoDoValor ( paramObject1 : Object ) : modelos.TiposToken
+	{method} +isTipoValorValido ( paramTiposToken1 : modelos.TiposToken , paramObject2 : Object ) : boolean
+}
+
+
+class interpretador.Interpretador {
+	{field} {static} -$SWITCH_TABLE$modelos$TiposToken : [I
+	{field} -pausado : boolean
+	{field} -terminado : boolean
+	{field} -thread : Thread
+	{method}  {static} ~$SWITCH_TABLE$modelos$TiposToken () : [I
+	{method} -checarOperadorNumericos ( paramToken1 : modelos.Token , paramObject2 : Object , paramObject3 : Object ) : void
+	{method} -checkTerminado () : void
+	{method} -checkarOperadorNumerico ( paramToken1 : modelos.Token , paramObject2 : Object ) : void
+	{method} +continuarExecucao () : void
+	{method} -evaluate ( paramExpressao1 : modelos.tree.Expressao ) : Object
+	{method} -execute ( paramDeclaracao1 : modelos.tree.Declaracao ) : void
+	{method} +executeBlock ( paramList1 : java.util.List , paramAmbiente2 : interpretador.Ambiente ) : void
+	{method} +getAmbienteSnapshot () : java.util.Map
+	{method} +interpretar ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : void
+	{method} +isExecutando () : boolean
+	{method} -isIgual ( paramObject1 : Object , paramObject2 : Object ) : boolean
+	{method} -isLogico ( paramObject1 : Object ) : boolean
+	{method} -retornaValorNumericoTipoCorreto ( paramTiposToken1 : modelos.TiposToken , paramObject2 : Object , paramObject3 : Object ) : Object
+	{method} -stringify ( paramObject1 : Object ) : String
+	{method} +suspenderExecucao () : void
+	{method} +terminarExecucao () : void
+	{method} -toDouble ( paramObject1 : Object ) : Double
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+}
+
+
+class interpretador.Interpretador$1 {
+	{method} +run () : void
+}
+
+
+class interpretador.InterpretadorService {
+	{field} {static} -$SWITCH_TABLE$evento$EventoInterpretador : [I
+	{field} +debugAtivo : boolean
+	{field} -interrompido : boolean
+	{field} -temErro : boolean
+	{method}  {static} ~$SWITCH_TABLE$evento$EventoInterpretador () : [I
+	{method} +debugContinuar () : void
+	{method} +debugParar () : void
+	{method} +debugProxPasso () : void
+	{method} +destruir () : void
+	{method} +executarViaArquivo ( paramString1 : String ) : void
+	{method} +executarViaTexto ( paramString1 : String ) : void
+	{method} -gerarPrograma ( paramString1 : String ) : modelos.tree.Declaracao$Programa
+	{method} +getProgramaASTViaArquivo ( paramString1 : String ) : modelos.tree.Declaracao$Programa
+	{method} +getProgramaASTViaTexto ( paramString1 : String ) : modelos.tree.Declaracao$Programa
+	{method} -getTextoCodigoDoArquivo ( paramString1 : String ) : String
+	{method} +getTokensViaArquivo ( paramString1 : String ) : java.util.List
+	{method} +getTokensViaTexto ( paramString1 : String ) : java.util.List
+	{method} -initInterpretadorDebug () : void
+	{method} +isLogAtivo () : boolean
+	{method} +isLogColorido () : boolean
+	{method} +removerEventosLog () : void
+	{method} +removerEventosLog ( paramList1 : java.util.List ) : void
+	{method} +setDebugStrategy ( paramDebugStrategy1 : debug.DebugStrategy ) : void
+	{method} +setEventoLog ( paramEventoInterpretador1 : evento.EventoInterpretador ) : void
+	{method} +setEventosLog ( paramList1 : java.util.List ) : void
+	{method} +setLogAtivo ( paramboolean1 : boolean ) : void
+	{method} +setLogColorido ( paramboolean1 : boolean ) : void
+	{method} +traduzirDoArquivo ( paramString1 : String , paramConversorStrategy2 : conversores.ConversorStrategy ) : String
+	{method} +traduzirDoTexto ( paramString1 : String , paramConversorStrategy2 : conversores.ConversorStrategy ) : String
+	{method} +update ( paramEventoInterpretador1 : evento.EventoInterpretador , paramObject2 : Object ) : void
+}
+
+
+class interpretador.LeitorEntradaConsole {
+	{field} +valor : String
+	{field} -valorSetado : boolean
+	{method} +reset () : void
+}
+
+
+class log.LogPrinter {
+	{field} {static} -$SWITCH_TABLE$evento$EventoInterpretador : [I
+	{field} -eventoTagMap : java.util.Map
+	{method}  {static} ~$SWITCH_TABLE$evento$EventoInterpretador () : [I
+	{method} -criaMsgLogComCor ( paramString1 : String , paramEventoInterpretador2 : evento.EventoInterpretador ) : String
+	{method} -criaMsgLogSemCor ( paramString1 : String , paramEventoInterpretador2 : evento.EventoInterpretador ) : String
+	{method} +criarMsgLog ( paramObject1 : Object , paramEventoInterpretador2 : evento.EventoInterpretador , paramboolean3 : boolean ) : String
+	{method} -getPayloadString ( paramObject1 : Object , paramEventoInterpretador2 : evento.EventoInterpretador ) : String
+}
+
+
+class log.LogService {
+	{field} +ativo : boolean
+	{field} +colorido : boolean
+	{method} +addEvento ( paramEventoInterpretador1 : evento.EventoInterpretador ) : void
+	{method} +addEventos ( paramList1 : java.util.List ) : void
+	{method} +printLog ( paramEventoInterpretador1 : evento.EventoInterpretador , paramObject2 : Object ) : String
+	{method} +removerEvento ( paramEventoInterpretador1 : evento.EventoInterpretador ) : void
+	{method} +removerEventos () : void
+	{method} +removerEventos ( paramList1 : java.util.List ) : void
+}
+
+
+interface modelos.Chamavel {
+	{method}  {abstract} +chamar ( paramInterpretador1 : interpretador.Interpretador , paramList2 : java.util.List ) : Object
+}
+
+
+class modelos.Modulo {
+	{method} +chamar ( paramInterpretador1 : interpretador.Interpretador , paramList2 : java.util.List ) : Object
+}
+
+
+enum modelos.TiposToken {
+	{field} +ASTERISCO
+	{field} +ATE
+	{field} +ATRIBUICAO
+	{field} +BARRA
+	{field} +CADEIA
+	{field} +CARACTERE
+	{field} +CASO
+	{field} +DE
+	{field} +DIFERENTE
+	{field} +DIR_CHAVES
+	{field} +DIR_COLCHETE
+	{field} +DIR_PARENTESES
+	{field} +DOIS_PONTOS
+	{field} +E
+	{field} +ENQUANTO
+	{field} +ENTAO
+	{field} +EOF
+	{field} +ESCREVER
+	{field} +ESQ_CHAVES
+	{field} +ESQ_COLCHETE
+	{field} +ESQ_PARENTESES
+	{field} +FACA
+	{field} +FALSO
+	{field} +FIM
+	{field} +IDENTIFICADOR
+	{field} +IGUAL
+	{field} +INICIO
+	{field} +INTEIRO
+	{field} +INTERVALO
+	{field} +LER
+	{field} +MAIOR_IQUAL
+	{field} +MAIOR_QUE
+	{field} +MAIS
+	{field} +MENOR_IGUAL
+	{field} +MENOR_QUE
+	{field} +MENOS
+	{field} +NAO
+	{field} +OU
+	{field} +PARA
+	{field} +PASSO
+	{field} +PONTO
+	{field} +PONTO_VIRGULA
+	{field} +REAL
+	{field} +REPITA
+	{field} +SE
+	{field} +SENAO
+	{field} +TIPO_CADEIA
+	{field} +TIPO_CARACTERE
+	{field} +TIPO_INTEIRO
+	{field} +TIPO_LOGICO
+	{field} +TIPO_MODULO
+	{field} +TIPO_REAL
+	{field} +TIPO_VETOR
+	{field} +VARIAVEIS
+	{field} +VERDADEIRO
+	{field} +VETOR
+	{field} +VIRGULA
+}
+
+
+class modelos.Token {
+	{field} +lexeme : String
+	{field} +line : int
+	{field} +literal : Object
+	{method} +toString () : String
+}
+
+
+class modelos.VariavelVetor {
+	{field} +intervaloF : int
+	{field} +intervaloI : int
+	{field} +tamanho : int
+	{field} -valores : [Ljava.lang.Object;
+	{method} +getValorNoIndex ( paramint1 : int ) : Object
+	{method} +resolverIndex ( paramint1 : int ) : int
+	{method} +setValor ( paramint1 : int , paramObject2 : Object ) : void
+	{method} +toString () : String
+}
+
+
+class modelos.excecao.ExecucaoInterrompidaException {
+	{field} {static} -serialVersionUID : long
+}
+
+
+class modelos.excecao.ParserError {
+	{field} +linha : int
+	{field} +mensagem : String
+	{field} {static} -serialVersionUID : long
+	{method} +getLexeme () : String
+}
+
+
+class modelos.excecao.RuntimeError {
+	{field} {static} -serialVersionUID : long
+	{method} +getLexeme () : String
+	{method} +getLinha () : int
+}
+
+
+class modelos.tree.AstDebugNode {
+	{field} -linha : int
+	{method} +toString () : String
+}
+
+
+abstract class modelos.tree.Declaracao {
+	{method}  {abstract} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Bloco {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$ChamadaModulo {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Enquanto {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Escreva {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Expressao {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Fim {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Ler {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Modulo {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Para {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Programa {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Repita {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Se {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$Var {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$VarDeclaracoes {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+class modelos.tree.Declaracao$VariavelArray {
+	{method} +accept ( paramDeclaracao$Visitor1 : modelos.tree.Declaracao$Visitor ) : Object
+}
+
+
+interface modelos.tree.Declaracao$Visitor {
+	{method}  {abstract} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method}  {abstract} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method}  {abstract} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method}  {abstract} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method}  {abstract} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method}  {abstract} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method}  {abstract} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method}  {abstract} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method}  {abstract} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method}  {abstract} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method}  {abstract} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method}  {abstract} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method}  {abstract} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method}  {abstract} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method}  {abstract} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+}
+
+
+abstract class modelos.tree.Expressao {
+	{method}  {abstract} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$Atribuicao {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$AtribuicaoArray {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$Binario {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$ExpParentizada {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$Grupo {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$Literal {
+	{field} +valor : Object
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$Logico {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$Unario {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$Variavel {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+class modelos.tree.Expressao$VariavelArray {
+	{method} +accept ( paramExpressao$Visitor1 : modelos.tree.Expressao$Visitor ) : Object
+}
+
+
+interface modelos.tree.Expressao$Visitor {
+	{method}  {abstract} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method}  {abstract} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method}  {abstract} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method}  {abstract} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method}  {abstract} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method}  {abstract} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method}  {abstract} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method}  {abstract} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method}  {abstract} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method}  {abstract} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+}
+
+
+class tool.GeradorAST {
+	{method}  {static} -defineAst ( paramString1 : String , paramString2 : String , paramList3 : java.util.List ) : void
+	{method}  {static} -defineType ( paramPrintWriter1 : java.io.PrintWriter , paramString2 : String , paramString3 : String , paramString4 : String ) : void
+	{method}  {static} -defineVisitor ( paramPrintWriter1 : java.io.PrintWriter , paramString2 : String , paramList3 : java.util.List ) : void
+	{method}  {static} +main ( paramString;1 : [Ljava.lang.String; ) : void
+}
+
+
+class tool.HelloJGraphT {
+	{method}  {static} -lambda$0 ( paramNode1 : org.graphstream.graph.Node ) : void
+	{method}  {static} +main ( paramString;1 : [Ljava.lang.String; ) : void
+}
+
+
+class tool.JGraphTBuilder {
+	{field} {static} -ID : Integer
+	{field} {static} -NODE_ATRB : String
+	{field} {static} -POSICAO_X : int
+	{field} {static} -POSICAO_Y : int
+	{field} -graph : org.graphstream.graph.Graph
+	{method} -addNode ( paramAstDebugNode1 : modelos.tree.AstDebugNode , paramboolean2 : boolean ) : void
+	{method} -evaluate ( paramExpressao1 : modelos.tree.Expressao ) : void
+	{method} -execute ( paramDeclaracao1 : modelos.tree.Declaracao ) : void
+	{method} -getNodeName ( paramAstDebugNode1 : modelos.tree.AstDebugNode ) : String
+	{method} +print ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : void
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Void
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Void
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Void
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Void
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Void
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Void
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Void
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Void
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Void
+}
+
+
+class tool.MainUI {
+	{field} {static} -$SWITCH_TABLE$debug$EstadoDebug : [I
+	{field} -PATH_EXEMPLOS : String
+	{field} -botaoArquivo : javax.swing.JButton
+	{field} -botaoDebugContinuar : javax.swing.JButton
+	{field} -botaoDebugContinuarSem : javax.swing.JButton
+	{field} -botaoDebugParar : javax.swing.JButton
+	{field} -botaoIniciarExemplo : javax.swing.JButton
+	{field} -checkBoxDebugAtivo : javax.swing.JCheckBox
+	{field} -checkBoxImprimirTraducao : javax.swing.JCheckBox
+	{field} -checkBoxJGraphT : javax.swing.JCheckBox
+	{field} -checkBoxLogAtivo : javax.swing.JCheckBox
+	{field} -comboBoxExemplos : javax.swing.JComboBox
+	{field} -comboBoxTraducoes : javax.swing.JComboBox
+	{field} -fileChooser : javax.swing.JFileChooser
+	{field} -labelOu : javax.swing.JLabel
+	{field} -logTipos : java.util.Map
+	{field} -panel : javax.swing.JPanel
+	{field} {static} -serialVersionUID : long
+	{method}  {static} ~$SWITCH_TABLE$debug$EstadoDebug () : [I
+	{method} -centralizaJanela () : void
+	{method} -error ( paramParserError1 : modelos.excecao.ParserError ) : void
+	{method} -getCamihoArquivo () : String
+	{method} -getNomeArquivosExemplo () : [Ljava.lang.String;
+	{method} -getNomesTraducoes () : [Ljava.lang.String;
+	{method} -interpretacaoConcluida ( paramdouble1 : double , paramboolean2 : boolean ) : void
+	{method}  {static} +main ( paramString;1 : [Ljava.lang.String; ) : void
+	{method} +onDebugMudancaEstado ( paramEstadoDebug1 : debug.EstadoDebug ) : void
+	{method} +onDebugPassoExecutado ( paramDebugSnapshot1 : debug.DebugSnapshot ) : void
+	{method} +onErro ( paramRuntimeException1 : RuntimeException ) : void
+	{method} +onInput ( paramLeitorEntradaConsole1 : interpretador.LeitorEntradaConsole ) : void
+	{method} +onInterpretacaoConcluida ( paramdouble1 : double ) : void
+	{method} +onInterpretacaoInterrompida ( paramdouble1 : double ) : void
+	{method} +onLog ( paramString1 : String ) : void
+	{method} +onOutput ( paramString1 : String ) : void
+	{method} -report ( paramint1 : int , paramString2 : String , paramString3 : String ) : void
+	{method} -rodarArquivo ( paramString1 : String ) : void
+	{method} -runtimeError ( paramRuntimeError1 : modelos.excecao.RuntimeError ) : void
+	{method} -setup () : void
+	{method} -setupBotoes () : void
+}
+
+
+class tool.MainUI$1 {
+	{field} -val$frame : javax.swing.JFrame
+	{method} +actionPerformed ( paramActionEvent1 : java.awt.event.ActionEvent ) : void
+}
+
+
+class tool.MainUI$2 {
+	{method} +actionPerformed ( paramActionEvent1 : java.awt.event.ActionEvent ) : void
+}
+
+
+class tool.MainUI$3 {
+	{method} +actionPerformed ( paramActionEvent1 : java.awt.event.ActionEvent ) : void
+}
+
+
+class tool.MainUI$4 {
+	{method} +actionPerformed ( paramActionEvent1 : java.awt.event.ActionEvent ) : void
+	{method}  {static} -lambda$0 ( paramJCheckBox1 : javax.swing.JCheckBox ) : void
+	{method}  {static} -lambda$1 ( paramJCheckBox1 : javax.swing.JCheckBox ) : void
+}
+
+
+class tool.MainUI$5 {
+	{method} +actionPerformed ( paramActionEvent1 : java.awt.event.ActionEvent ) : void
+}
+
+
+class tool.MainUI$6 {
+	{method} +actionPerformed ( paramActionEvent1 : java.awt.event.ActionEvent ) : void
+}
+
+
+class tool.MainUI$7 {
+	{method} +actionPerformed ( paramActionEvent1 : java.awt.event.ActionEvent ) : void
+}
+
+
+class tool.PlantUmlGenerator {
+	{method}  {static} +main ( paramString;1 : [Ljava.lang.String; ) : void
+}
+
+
+
+
+analisador.AnalisadorLexico "1" o-- "0..*"  modelos.Token : tokens
+analisador.AnalisadorLexico -->  evento.EventosService : gerenciadorEventos
+analisador.AnalisadorSintatico "1" o-- "0..*"  modelos.Token : tokens
+analisador.AnalisadorSintatico -->  evento.EventosService : gerenciadorEventos
+conversores.Conversor -->  conversores.Escritor : escritor
+conversores.Conversor -->  evento.EventosService : gerenciadorEventos
+conversores.Conversor -->  modelos.tree.Declaracao$Programa : programa
+conversores.ConversorC --|>  conversores.Conversor
+conversores.ConversorC ..|>  modelos.tree.Declaracao$Visitor
+conversores.ConversorC ..|>  modelos.tree.Expressao$Visitor
+conversores.ConversorCpp --|>  conversores.Conversor
+conversores.ConversorCpp ..|>  modelos.tree.Declaracao$Visitor
+conversores.ConversorCpp ..|>  modelos.tree.Expressao$Visitor
+conversores.ConversorJava --|>  conversores.Conversor
+conversores.ConversorJava ..|>  modelos.tree.Declaracao$Visitor
+conversores.ConversorJava ..|>  modelos.tree.Expressao$Visitor
+conversores.ConversorPascal --|>  conversores.Conversor
+conversores.ConversorPascal ..|>  modelos.tree.Declaracao$Visitor
+conversores.ConversorPascal ..|>  modelos.tree.Expressao$Visitor
+conversores.ConversorPython --|>  conversores.Conversor
+conversores.ConversorPython ..|>  modelos.tree.Declaracao$Visitor
+conversores.ConversorPython ..|>  modelos.tree.Expressao$Visitor
+debug.BreakpointsDebugStrategy ..|>  debug.DebugStrategy
+debug.DebugSnapshot -->  modelos.tree.AstDebugNode : node
+debug.Debugador -->  debug.DebugStrategy : strategy
+debug.Debugador -->  debug.EstadoDebug : estado
+debug.Debugador -->  evento.EventosService : eventos
+debug.Debugador -->  interpretador.Interpretador : interpretador
+debug.Debugador -->  modelos.tree.AstDebugNode : ultimoNode
+debug.Debugador ..|>  evento.EventoListener
+debug.PassoAPassoDebugStrategy ..|>  debug.DebugStrategy
+evento.EventosService "1" o-- "0..*"  evento.EventoListener : marcadosParaDesinscrever
+interpretador.Ambiente -->  interpretador.ChecadorTipoEstatico : checadorTipo
+interpretador.Interpretador -->  evento.EventosService : gerenciadorEventos
+interpretador.Interpretador -->  interpretador.Ambiente : environment
+interpretador.Interpretador -->  interpretador.LeitorEntradaConsole : entradaConsole
+interpretador.Interpretador ..|>  modelos.tree.Declaracao$Visitor
+interpretador.Interpretador ..|>  modelos.tree.Expressao$Visitor
+interpretador.Interpretador$1 -->  interpretador.Interpretador : this$0
+interpretador.Interpretador$1 -->  modelos.tree.Declaracao$Programa : val$programa
+interpretador.InterpretadorService -->  analisador.AnalisadorLexico : analisadorLexico
+interpretador.InterpretadorService -->  analisador.AnalisadorSintatico : analisadorSintatico
+interpretador.InterpretadorService -->  debug.Debugador : debugador
+interpretador.InterpretadorService -->  evento.EventosService : eventos
+interpretador.InterpretadorService -->  interpretador.AcaoInterpretador : acoes
+interpretador.InterpretadorService -->  interpretador.Interpretador : interpreter
+interpretador.InterpretadorService -->  log.LogService : log
+interpretador.InterpretadorService ..|>  evento.EventoListener
+interpretador.LeitorEntradaConsole -->  interpretador.Interpretador : interpretador
+log.LogService "1" o-- "0..*"  evento.EventoInterpretador : eventosObservados
+log.LogService -->  log.LogPrinter : printer
+modelos.Modulo -->  modelos.tree.Declaracao$Modulo : modulo
+modelos.Modulo ..|>  modelos.Chamavel
+modelos.Token -->  modelos.TiposToken : type
+modelos.VariavelVetor -->  modelos.TiposToken : tipo
+modelos.excecao.ParserError -->  modelos.Token : token
+modelos.excecao.RuntimeError -->  modelos.Token : token
+modelos.tree.Declaracao --|>  modelos.tree.AstDebugNode
+modelos.tree.Declaracao$Bloco "1" o-- "0..*"  modelos.tree.Declaracao : declaracoes
+modelos.tree.Declaracao$Bloco --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$ChamadaModulo -->  modelos.Token : identificador
+modelos.tree.Declaracao$ChamadaModulo --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Enquanto -->  modelos.tree.Declaracao$Bloco : corpo
+modelos.tree.Declaracao$Enquanto -->  modelos.tree.Expressao : condicao
+modelos.tree.Declaracao$Enquanto --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Escreva "1" o-- "0..*"  modelos.tree.Expressao : expressoes
+modelos.tree.Declaracao$Escreva --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Expressao -->  modelos.tree.Expressao : expressao
+modelos.tree.Declaracao$Expressao --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Fim -->  modelos.Token : fim
+modelos.tree.Declaracao$Fim --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Ler -->  modelos.tree.Expressao : atribuicao
+modelos.tree.Declaracao$Ler --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Modulo -->  modelos.Token : nome
+modelos.tree.Declaracao$Modulo -->  modelos.tree.Declaracao$Bloco : corpo
+modelos.tree.Declaracao$Modulo --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Para -->  modelos.tree.Declaracao$Bloco : facaBloco
+modelos.tree.Declaracao$Para -->  modelos.tree.Expressao : atribuicao
+modelos.tree.Declaracao$Para -->  modelos.tree.Expressao : condicao
+modelos.tree.Declaracao$Para -->  modelos.tree.Expressao : incremento
+modelos.tree.Declaracao$Para --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Programa "1" o-- "0..*"  modelos.tree.Declaracao : corpo
+modelos.tree.Declaracao$Programa "1" o-- "0..*"  modelos.tree.Declaracao : modulos
+modelos.tree.Declaracao$Programa "1" o-- "0..*"  modelos.tree.Declaracao : variaveis
+modelos.tree.Declaracao$Programa -->  modelos.tree.Declaracao$Fim : fim
+modelos.tree.Declaracao$Programa --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Repita -->  modelos.tree.Declaracao$Bloco : corpo
+modelos.tree.Declaracao$Repita -->  modelos.tree.Expressao : condicao
+modelos.tree.Declaracao$Repita --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Se -->  modelos.tree.Declaracao$Bloco : entaoBloco
+modelos.tree.Declaracao$Se -->  modelos.tree.Declaracao$Bloco : senaoBloco
+modelos.tree.Declaracao$Se -->  modelos.tree.Expressao : condicao
+modelos.tree.Declaracao$Se --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$Var -->  modelos.Token : nome
+modelos.tree.Declaracao$Var -->  modelos.Token : tipo
+modelos.tree.Declaracao$Var --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$VarDeclaracoes "1" o-- "0..*"  modelos.tree.Declaracao : variaveis
+modelos.tree.Declaracao$VarDeclaracoes --|>  modelos.tree.Declaracao
+modelos.tree.Declaracao$VariavelArray -->  modelos.Token : nome
+modelos.tree.Declaracao$VariavelArray -->  modelos.Token : tipo
+modelos.tree.Declaracao$VariavelArray -->  modelos.tree.Expressao : intervaloF
+modelos.tree.Declaracao$VariavelArray -->  modelos.tree.Expressao : intervaloI
+modelos.tree.Declaracao$VariavelArray --|>  modelos.tree.Declaracao
+modelos.tree.Expressao --|>  modelos.tree.AstDebugNode
+modelos.tree.Expressao$Atribuicao -->  modelos.Token : nome
+modelos.tree.Expressao$Atribuicao -->  modelos.tree.Expressao : valor
+modelos.tree.Expressao$Atribuicao --|>  modelos.tree.Expressao
+modelos.tree.Expressao$AtribuicaoArray -->  modelos.Token : nome
+modelos.tree.Expressao$AtribuicaoArray -->  modelos.tree.Expressao : index
+modelos.tree.Expressao$AtribuicaoArray -->  modelos.tree.Expressao : valor
+modelos.tree.Expressao$AtribuicaoArray --|>  modelos.tree.Expressao
+modelos.tree.Expressao$Binario -->  modelos.Token : operador
+modelos.tree.Expressao$Binario -->  modelos.tree.Expressao : direita
+modelos.tree.Expressao$Binario -->  modelos.tree.Expressao : esquerda
+modelos.tree.Expressao$Binario --|>  modelos.tree.Expressao
+modelos.tree.Expressao$ExpParentizada -->  modelos.tree.Expressao$Grupo : grupo
+modelos.tree.Expressao$ExpParentizada --|>  modelos.tree.Expressao
+modelos.tree.Expressao$Grupo -->  modelos.tree.Expressao : expressao
+modelos.tree.Expressao$Grupo --|>  modelos.tree.Expressao
+modelos.tree.Expressao$Literal -->  modelos.Token : token
+modelos.tree.Expressao$Literal --|>  modelos.tree.Expressao
+modelos.tree.Expressao$Logico -->  modelos.Token : operador
+modelos.tree.Expressao$Logico -->  modelos.tree.Expressao : direita
+modelos.tree.Expressao$Logico -->  modelos.tree.Expressao : esquerda
+modelos.tree.Expressao$Logico --|>  modelos.tree.Expressao
+modelos.tree.Expressao$Unario -->  modelos.Token : operador
+modelos.tree.Expressao$Unario -->  modelos.tree.Expressao : direira
+modelos.tree.Expressao$Unario --|>  modelos.tree.Expressao
+modelos.tree.Expressao$Variavel -->  modelos.Token : nome
+modelos.tree.Expressao$Variavel --|>  modelos.tree.Expressao
+modelos.tree.Expressao$VariavelArray -->  modelos.Token : nome
+modelos.tree.Expressao$VariavelArray -->  modelos.tree.Expressao : index
+modelos.tree.Expressao$VariavelArray --|>  modelos.tree.Expressao
+tool.JGraphTBuilder ..|>  modelos.tree.Declaracao$Visitor
+tool.JGraphTBuilder ..|>  modelos.tree.Expressao$Visitor
+tool.MainUI -->  interpretador.InterpretadorService : interpretador
+tool.MainUI ..|>  interpretador.AcaoInterpretador
+tool.MainUI$1 -->  tool.MainUI : this$0
+tool.MainUI$2 -->  tool.MainUI : this$0
+tool.MainUI$3 -->  tool.MainUI : this$0
+tool.MainUI$4 -->  tool.MainUI : this$0
+tool.MainUI$5 -->  tool.MainUI : this$0
+tool.MainUI$6 -->  tool.MainUI : this$0
+tool.MainUI$7 -->  tool.MainUI : this$0
+
+hide methods
+
+@enduml

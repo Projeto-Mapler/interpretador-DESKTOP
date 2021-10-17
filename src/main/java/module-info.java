@@ -16,6 +16,7 @@ module interpretadorMACP {
 	requires java.desktop;
 	requires pherd;
 	requires scala.library;
+  requires plantuml.generator.util;
 	
 	opens modelos to cloning;
 }
