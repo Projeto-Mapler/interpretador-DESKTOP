@@ -80,11 +80,11 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 					terminado = true;
 				} catch (ExecucaoInterrompidaException e) {
 					terminado = true;
-					//e.printStackTrace();
-				}catch (Exception e) {
+					// e.printStackTrace();
+				} catch (Exception e) {
 					terminado = true;
 					e.printStackTrace();
-				} 
+				}
 
 				long elapsedTime = System.currentTimeMillis();
 				double tempoExecucao = (double) (elapsedTime - startTime) / 1000F;
@@ -98,7 +98,6 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 
 				environment.reset();
 				entradaConsole.reset();
-				
 
 			}
 		});
@@ -297,7 +296,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 	public Object visitBinarioExpressao(Binario expressao) {
 		Object esquerda = evaluate(expressao.esquerda);
 		Object direita = evaluate(expressao.direita);
-
+		try {
 		switch (expressao.operador.type) {
 		case MENOS:
 			checarOperadorNumericos(expressao.operador, esquerda, direita);
@@ -337,6 +336,9 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 			return isIgual(esquerda, direita);
 		default:
 			break;
+		}
+		} catch (ArithmeticException ex) {			
+			throw new RuntimeError(expressao.operador, "Expressão aritimética inválida!");
 		}
 		return null;
 	}
@@ -518,7 +520,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 		for (Declaracao corpo : declaracao.corpo) {
 			execute(corpo);
 		}
-		
+
 		execute(declaracao.fim);
 
 		return null;
