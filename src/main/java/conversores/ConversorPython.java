@@ -237,7 +237,7 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 	public Void visitRepitaDeclaracao(Repita declaracao) {
 		escritor.concatenarNaLinha("while True :").indentar().addQuebraLinha();
 		execute(declaracao.corpo);
-		escritor.concatenarNaLinha("if ");
+		escritor.concatenarNaLinha("if not ");
 		evaluate(declaracao.condicao);
 		escritor.concatenarNaLinha(" : break").removerIdentacao().addQuebraLinha();
 		return null;
