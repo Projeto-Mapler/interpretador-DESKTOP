@@ -56,6 +56,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
   private JFileChooser fileChooser;
   private JCheckBox checkBoxDebugAtivo, checkBoxImprimirTraducao, checkBoxJGraphT, checkBoxLogAtivo;
   private Map<JCheckBox, EventoInterpretador> logTipos;
+  private String arquivoExecutado;
 
   private InterpretadorService interpretador;
 
@@ -172,8 +173,8 @@ public class MainUI extends JFrame implements AcaoInterpretador {
     this.botaoIniciarExemplo.addActionListener(new ActionListener() {
       @Override
       public void actionPerformed(ActionEvent e) {
-        String caminho = getCamihoArquivo();
-        rodarArquivo(caminho);
+        arquivoExecutado = getCamihoArquivo();
+        rodarArquivo(arquivoExecutado);
       }
     });
     // TRADUCAO
@@ -268,6 +269,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
   // EXECUCAO
   private void rodarArquivo(String caminho) {
     try {
+      this.arquivoExecutado = caminho;
       // DEBUG
       this.interpretador.setDebugStrategy(new PassoAPassoDebugStrategy());
       this.interpretador.setDebugAtivo(this.checkBoxDebugAtivo.isSelected());
@@ -281,6 +283,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
             this.interpretador.setEventoLog(this.logTipos.get(c));
         }
       }
+     
       
       this.interpretador.executarViaArquivo(caminho);
       // GRAFO
@@ -335,7 +338,7 @@ public class MainUI extends JFrame implements AcaoInterpretador {
       ConversorStrategy conversor = ConversorStrategy.valueOf(cs);
       String result;
       try {
-        result = this.interpretador.traduzirDoArquivo(this.getCamihoArquivo(), conversor);
+        result = this.interpretador.traduzirDoArquivo(this.arquivoExecutado, conversor);
         System.out.println("Conversao " + cs);
         System.out.println(result);
       } catch (IOException e) {

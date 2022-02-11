@@ -337,7 +337,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 						     (int) ((Expressao.Literal) varriavel.intervaloI).valor,
 						     (int) ((Expressao.Literal) varriavel.intervaloF).valor);
 		addVariavelVetor(varriavel.nome.lexeme, vv);
-		escritor.concatenarNaLinha(varriavel.nome.lexeme + "[" + vv.getTamanho() + "]");
+		escritor.concatenarNaLinha(varriavel.nome.lexeme + "[" + (vv.getTamanho()+1) + "]");
 		if (i < lista.size() - 1) {
 		    escritor.concatenarNaLinha(", ");
 		}
@@ -360,7 +360,7 @@ public class ConversorC extends Conversor implements Expressao.Visitor<Void>, De
 
 	escritor
 		.concatenarNaLinha(
-				   tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "]"
+				   tipo + " " + declaracao.nome.lexeme + "[" + (vv.getTamanho()+1) + "]"
 					   + this.isVetorCadeia(declaracao.tipo.type) + ";")
 		.addQuebraLinha();
 	addVariavelVetor(declaracao.nome.lexeme, vv);

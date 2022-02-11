@@ -187,11 +187,11 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 						(int) ((Expressao.Literal) varriavel.intervaloF).valor);
 				addVariavelVetor(varriavel.nome.lexeme, vv);
 				escritor.concatenarNaLinha(varriavel.nome.lexeme);
-				if (i < lista.size() - 1) {
-					escritor.concatenarNaLinha(" = ");
-				}
+//				if (i < lista.size() - 1) {
+//					escritor.concatenarNaLinha(" = ");
+//				}
+				escritor.concatenarNaLinha(" = [] * " + vv.getTamanho()+1).addQuebraLinha();
 			}
-			escritor.concatenarNaLinha(" = []").addQuebraLinha();
 
 		}
 
@@ -204,7 +204,7 @@ public class ConversorPython extends Conversor implements Expressao.Visitor<Void
 				(int) ((Expressao.Literal) declaracao.intervaloI).valor,
 				(int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
-		escritor.concatenarNaLinha(declaracao.nome.lexeme + " = [None] * " + vv.getTamanho()).addQuebraLinha();
+		escritor.concatenarNaLinha(declaracao.nome.lexeme + " = [None] * " + vv.getTamanho() + 1).addQuebraLinha();
 		addVariavelVetor(declaracao.nome.lexeme, vv);
 		return null;
 	}

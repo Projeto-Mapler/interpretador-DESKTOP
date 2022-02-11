@@ -206,20 +206,20 @@ public class ConversorJava extends Conversor
       Token tipoVar = ((Declaracao.VariavelArray) primeiro).tipo;
       String tipo = this.tipoVariavel(tipoVar.type);
 
-      escritor.concatenarNaLinha("public static " + tipo + " ");
 
       for (int i = 0; i < lista.size(); i++) {
+        escritor.concatenarNaLinha("public static " + tipo + " ");
         Declaracao.VariavelArray varriavel = (Declaracao.VariavelArray) lista.get(i);
         VariavelVetor vv = new VariavelVetor(varriavel.tipo.type,
             (int) ((Expressao.Literal) varriavel.intervaloI).valor,
             (int) ((Expressao.Literal) varriavel.intervaloF).valor);
         addVariavelVetor(varriavel.nome.lexeme, vv);
-        escritor.concatenarNaLinha(varriavel.nome.lexeme + "[" + vv.getTamanho() + "]");
+        escritor.concatenarNaLinha(varriavel.nome.lexeme + "[] = new " + tipo +"[" + (vv.getTamanho()+1) + "];"  ).addQuebraLinha();
         if (i < lista.size() - 1) {
           escritor.concatenarNaLinha(", ");
         }
       }
-      escritor.concatenarNaLinha(";").addQuebraLinha();
+      //escritor.concatenarNaLinha(";").addQuebraLinha();
 
     }
 
@@ -235,7 +235,7 @@ public class ConversorJava extends Conversor
 
     escritor
         .concatenarNaLinha(
-            "public static " + tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "];")
+            "public static " + tipo + " " + declaracao.nome.lexeme + "[] = new "+ tipo+"[" + (vv.getTamanho()+1) + "];")
         .addQuebraLinha();
     addVariavelVetor(declaracao.nome.lexeme, vv);
     return null;

@@ -253,16 +253,14 @@ public class ConversorPascal extends Conversor
 
   @Override
   public Void visitParaDeclaracao(Para declaracao) {
-    escritor.concatenarNaLinha("for ");
     evaluate(declaracao.atribuicao);
-    escritor.concatenarNaLinha(" to ");
-    evaluate(declaracao.condicao);
-    escritor.concatenarNaLinha("");
-    evaluate(declaracao.incremento);
-    escritor.concatenarNaLinha("do").addQuebraLinha().concatenarNaLinha("begin").addQuebraLinha()
-        .indentar();
+    escritor.concatenarNaLinha(";").addQuebraLinha().concatenarNaLinha("while "); 
+    evaluate(declaracao.condicao); 
+    escritor.concatenarNaLinha(" do").addQuebraLinha().concatenarNaLinha("begin").addQuebraLinha()
+    .indentar();
     execute(declaracao.facaBloco);
-    escritor.removerIdentacao().concatenarNaLinha("end;").addQuebraLinha();
+    evaluate(declaracao.incremento);   
+    escritor.removerIdentacao().addQuebraLinha().concatenarNaLinha("end;").addQuebraLinha();
     return null;
   }
 
@@ -437,7 +435,7 @@ public class ConversorPascal extends Conversor
     escritor.concatenarNaLinha(expressao.nome.lexeme + "[");
 
     evaluate(expressao.index);
-    escritor.concatenarNaLinha("] = ");
+    escritor.concatenarNaLinha("] := ");
     evaluate(expressao.valor);
     return null;
   }

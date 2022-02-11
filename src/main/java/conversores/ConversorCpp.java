@@ -218,7 +218,7 @@ public class ConversorCpp extends Conversor implements Expressao.Visitor<Void>, 
 						     (int) ((Expressao.Literal) varriavel.intervaloI).valor,
 						     (int) ((Expressao.Literal) varriavel.intervaloF).valor);
 		addVariavelVetor(varriavel.nome.lexeme, vv);
-		escritor.concatenarNaLinha(varriavel.nome.lexeme + "[" + vv.getTamanho() + "]");
+		escritor.concatenarNaLinha(varriavel.nome.lexeme + "[" + (vv.getTamanho()+1) + "]");
 		if (i < lista.size() - 1) {
 		    escritor.concatenarNaLinha(", ");
 		}
@@ -238,7 +238,7 @@ public class ConversorCpp extends Conversor implements Expressao.Visitor<Void>, 
 					     (int) ((Expressao.Literal) declaracao.intervaloI).valor,
 					     (int) ((Expressao.Literal) declaracao.intervaloF).valor);
 
-	escritor.concatenarNaLinha(tipo + " " + declaracao.nome.lexeme + "[" + vv.getTamanho() + "];").addQuebraLinha();
+	escritor.concatenarNaLinha(tipo + " " + declaracao.nome.lexeme + "[" + (vv.getTamanho()+1) + "];").addQuebraLinha();
 	addVariavelVetor(declaracao.nome.lexeme, vv);
 	return null;
     }
