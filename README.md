@@ -1,6 +1,8 @@
-# Mapler
+# Introdução
 
 Interpretador do projeto Mapler Studio: https://portugol.sourceforge.io/
+
+Mapler Studio é uma IDE para portugol (português estruturado) permitindo execução, depuração (passo-a-passo) e tradução do pseudocódigo para outras linguagens de programação.
 
 # Interpretador
 
@@ -24,7 +26,9 @@ Baseado no trabalho no capítulo II do livro online *Crafting Interpreters*, foi
 
 # Como rodar
 
-Executar classe MainUI.java no pacote main.
+Implementar a Interface AcaoInterpretador e utilizar o InterpretadorService.
+
+A classe MainUI no pacote tool pode ser usado como exemplo de uso.
 
 # Exemplo de código
 
@@ -47,7 +51,7 @@ inicio
 fim
 ```
 
-Mais exemplos disponíveis na [pasta de exemplos](exemplos/).
+Mais exemplos disponíveis na [pasta de exemplos](exemplos/) e no site do projeto: https://portugol.sourceforge.io/
 
 # Gramática
 ```
