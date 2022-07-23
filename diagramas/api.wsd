@@ -1,0 +1,62 @@
+@startuml
+
+left to right direction
+skinparam linetype ortho
+skinparam ParticipantPadding 10
+skinparam BoxPadding 10
+skinparam Nodesep 100
+skinparam Ranksep 100
+
+
+interface interpretador.AcaoInterpretador {
+	{method}  {abstract} +onDebugMudancaEstado ( estado : debug.EstadoDebug ) : void
+	{method}  {abstract} +onDebugPassoExecutado ( snapshot : debug.DebugSnapshot ) : void
+	{method}  {abstract} +onErro ( erro : RuntimeException ) : void
+	{method}  {abstract} +onInput ( leitor : interpretador.LeitorEntradaConsole ) : void
+	{method}  {abstract} +onInterpretacaoConcluida ( segundos : double ) : void
+	{method}  {abstract} +onInterpretacaoInterrompida ( segundos : double ) : void
+	{method}  {abstract} +onLog ( msg : String ) : void
+	{method}  {abstract} +onOutput ( msg : String ) : void
+}
+ 
+ 
+class interpretador.InterpretadorService { 
+	{field} -analisadorLexico : analisador.AnalisadorLexico
+	{field} -analisadorSintatico : analisador.AnalisadorSintatico
+	{field} +debugAtivo : boolean
+	{field} -debugador : debug.Debugador
+	{field} -eventos : evento.EventosService
+	{field} -interrompido : boolean
+	{field} -log : log.LogService
+	{field} -temErro : boolean 
+	{method} +debugContinuar () : void
+	{method} +debugParar () : void
+	{method} +debugProxPasso () : void
+	{method} +destruir () : void
+	{method} +executarViaArquivo ( caminho : String ) : void
+	{method} +executarViaTexto ( texto : String ) : void
+	{method} -gerarPrograma ( texto : String ) : modelos.tree.Declaracao$Programa
+	{method} +getProgramaASTViaArquivo ( caminho : String ) : modelos.tree.Declaracao$Programa
+	{method} +getProgramaASTViaTexto ( texto : String ) : modelos.tree.Declaracao$Programa
+	{method} -getTextoCodigoDoArquivo ( caminho : String ) : String
+	{method} +getTokensViaArquivo ( caminho : String ) : java.util.List
+	{method} +getTokensViaTexto ( texto : String ) : java.util.List
+	{method} -initInterpretadorDebug () : void
+	{method} +isLogAtivo () : boolean
+	{method} +isLogColorido () : boolean
+	{method} +removerEventosLog () : void
+	{method} +removerEventosLog ( eventos : java.util.List ) : void
+	{method} +setDebugStrategy ( strategy : debug.DebugStrategy ) : void
+	{method} +setEventoLog ( evento : evento.EventoInterpretador ) : void
+	{method} +setEventosLog ( eventos : java.util.List ) : void
+	{method} +setLogAtivo ( value : boolean ) : void
+	{method} +setLogColorido ( value : boolean ) : void
+	{method} +traduzirDoArquivo ( caminho : String , strategy : conversores.ConversorStrategy ) : String
+	{method} +traduzirDoTexto ( texto : String , strategy : conversores.ConversorStrategy ) : String
+	{method} +update ( evento : evento.EventoInterpretador , payload : Object ) : void
+}
+
+interpretador.InterpretadorService -->  interpretador.AcaoInterpretador : acoes 
+ 
+
+@enduml

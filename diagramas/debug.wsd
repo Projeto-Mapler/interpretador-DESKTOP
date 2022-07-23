@@ -1,0 +1,71 @@
+@startuml
+
+top to bottom direction
+skinparam linetype ortho
+skinparam ParticipantPadding 10
+skinparam BoxPadding 10
+skinparam Nodesep 50
+skinparam Ranksep 50
+
+
+class debug.BreakpointsDebugStrategy {
+	{field} -breakpoint : Integer
+	{field} -breakpoints : java.util.Set
+	{method} +addBreakPoint ( numLinha : int ) : void
+	{method} +executar ( node : modelos.tree.AstDebugNode , debugador : debug.Debugador ) : int
+	{method} +removeBreakPoint ( numLinha : int ) : void
+	{method} +removeTodosBreakPoins () : void
+}
+
+
+class debug.DebugSnapshot {
+	{field} -ambienteSnapshot : java.util.Map
+	{field} -node : modelos.tree.AstDebugNode
+	{method} +getLinha () : int
+	{method} +getNodeClassName () : String
+}
+
+
+interface debug.DebugStrategy {
+	{method}  {abstract} +executar ( node : modelos.tree.AstDebugNode , debugador : debug.Debugador ) : int
+}
+
+
+class debug.Debugador { 
+	{field} +ativo : boolean
+	{field} -eventos : evento.EventosService
+	{field} -interpretador : interpretador.Interpretador
+	{field} -linhaAnterior : Integer
+	{field} -resumir : boolean
+	{field} -ultimoNode : modelos.tree.AstDebugNode 
+	{method} +continuarExecucao () : void
+	{method} +getLinha () : int
+	{method} +pausarExecucao () : void
+	{method} +proximoPasso () : void
+	{method} +setDebugStrategy ( strategy : debug.DebugStrategy ) : void
+	{method} +terminarExecucao () : void
+	{method} +update ( evento : evento.EventoInterpretador , payload : Object ) : void
+	{method} -updateNodeDebug ( payload : Object ) : void
+}
+
+
+enum debug.EstadoDebug {
+	{field} +EXECUTANDO
+	{field} +INICIAL
+	{field} +PAUSADO
+}
+
+
+class debug.PassoAPassoDebugStrategy {
+	{method} +executar ( node : modelos.tree.AstDebugNode , debugador : debug.Debugador ) : int
+}
+
+
+
+debug.Debugador -->  debug.DebugStrategy : strategy
+debug.Debugador -->  debug.EstadoDebug : estado
+debug.BreakpointsDebugStrategy .up.|>  debug.DebugStrategy
+debug.PassoAPassoDebugStrategy .up.|>  debug.DebugStrategy
+
+
+@enduml

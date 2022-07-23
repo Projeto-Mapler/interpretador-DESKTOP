@@ -1,0 +1,79 @@
+@startuml
+
+top to bottom direction
+skinparam linetype ortho
+skinparam ParticipantPadding 10
+skinparam BoxPadding 10
+skinparam Nodesep 50
+skinparam Ranksep 50
+
+abstract class Declaracao{
+    {method} +accept(visitor: DeclaracaoVisitor)
+}
+
+abstract class Expressao{
+    {method} +accept(visitor: ExpressaoVisitor)
+}
+
+class Se{
+    {method} +accept(visitor: ExpressaoVisitor)
+}
+
+class Adicao{
+    {method} +accept(visitor: ExpressaoVisitor)
+}
+
+interface  DeclaracaoVisitor {
+	{method}  +visitBlocoDeclaracao ( bloco :Bloco ) : Object
+	{method}  +visitChamadaModuloDeclaracao ( ChamadaModulo1 :ChamadaModulo ) : Object
+	{method}  +visitEnquantoDeclaracao ( Enquanto1 :Enquanto ) : Object
+	{method}  +visitEscrevaDeclaracao ( Escreva1 :Escreva ) : Object
+	{method}  +visitExpressaoDeclaracao ( Expressao1 :Expressao ) : Object
+	{method}  +visitFimDeclaracao ( Fim1 :Fim ) : Object
+	{method}  +visitLerDeclaracao ( Ler1 :Ler ) : Object
+	{method}  +visitModuloDeclaracao ( Modulo1 :Modulo ) : Object
+	{method}  +visitParaDeclaracao ( Para1 :Para ) : Object
+	{method}  +visitProgramaDeclaracao ( Programa1 :Programa ) : Object
+	{method}  +visitRepitaDeclaracao ( Repita1 :Repita ) : Object
+	{method}  +visitSeDeclaracao ( Se1 :Se ) : Object
+	{method}  +visitVarDeclaracao ( Var1 :Var ) : Object
+	{method}  +visitVarDeclaracoesDeclaracao ( VarDeclaracoes1 :VarDeclaracoes ) : Object
+	{method}  +visitVariavelArrayDeclaracao ( VariavelArray1 :VariavelArray ) : Object
+}
+
+interface  ExpressaoVisitor {
+	{method}  {abstract} +visitAtribuicaoArrayExpressao ( AtribuicaoArray1 : AtribuicaoArray ) : Object
+	{method}  {abstract} +visitAtribuicaoExpressao ( Atribuicao1 : Atribuicao ) : Object
+	{method}  {abstract} +visitBinarioExpressao ( Binario1 : Binario ) : Object
+	{method}  {abstract} +visitExpParentizadaExpressao ( ExpParentizada1 : ExpParentizada ) : Object
+	{method}  {abstract} +visitGrupoExpressao ( Grupo1 : Grupo ) : Object
+	{method}  {abstract} +visitLiteralExpressao ( Literal1 : Literal ) : Object
+	{method}  {abstract} +visitLogicoExpressao ( Logico1 : Logico ) : Object
+	{method}  {abstract} +visitUnarioExpressao ( Unario1 : Unario ) : Object
+	{method}  {abstract} +visitVariavelArrayExpressao ( VariavelArray1 : VariavelArray ) : Object
+	{method}  {abstract} +visitVariavelExpressao ( Variavel1 : Variavel ) : Object
+}
+
+class Interpretador {
+
+}
+
+class InterpretadorService {
+
+}
+
+note "AST" as ast
+
+Se -up-|> Declaracao
+Adicao -up-|> Expressao
+
+Interpretador .down.|> ExpressaoVisitor
+Interpretador .down.|> DeclaracaoVisitor
+
+InterpretadorService -down-> Interpretador
+InterpretadorService -up-> ast
+
+ast -right-> Expressao
+ast -left-> Declaracao
+
+@enduml

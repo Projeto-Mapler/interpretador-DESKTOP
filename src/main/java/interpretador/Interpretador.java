@@ -87,7 +87,7 @@ public class Interpretador implements Expressao.Visitor<Object>, Declaracao.Visi
 				}
 
 				long elapsedTime = System.currentTimeMillis();
-				double tempoExecucao = (double) (elapsedTime - startTime) / 1000F;
+				double tempoExecucao = (double) (elapsedTime - startTime) / 1000d;
 
 				if (terminado) {
 					gerenciadorEventos.notificar(EventoInterpretador.INTERPRETACAO_INTERROMPIDA, tempoExecucao);

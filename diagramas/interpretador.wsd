@@ -1,0 +1,55 @@
+@startuml
+
+left to right direction
+skinparam linetype ortho
+skinparam ParticipantPadding 10
+skinparam BoxPadding 10
+skinparam Nodesep 100
+skinparam Ranksep 100
+
+class interpretador.Interpretador {
+	{method} +visitAtribuicaoArrayExpressao ( paramExpressao$AtribuicaoArray1 : modelos.tree.Expressao$AtribuicaoArray ) : Object
+	{method} +visitAtribuicaoExpressao ( paramExpressao$Atribuicao1 : modelos.tree.Expressao$Atribuicao ) : Object
+	{method} +visitBinarioExpressao ( paramExpressao$Binario1 : modelos.tree.Expressao$Binario ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Object
+	{method} +visitBlocoDeclaracao ( paramDeclaracao$Bloco1 : modelos.tree.Declaracao$Bloco ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Void
+	{method} +visitChamadaModuloDeclaracao ( paramDeclaracao$ChamadaModulo1 : modelos.tree.Declaracao$ChamadaModulo ) : Object
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Void
+	{method} +visitEnquantoDeclaracao ( paramDeclaracao$Enquanto1 : modelos.tree.Declaracao$Enquanto ) : Object
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Void
+	{method} +visitEscrevaDeclaracao ( paramDeclaracao$Escreva1 : modelos.tree.Declaracao$Escreva ) : Object
+	{method} +visitExpParentizadaExpressao ( paramExpressao$ExpParentizada1 : modelos.tree.Expressao$ExpParentizada ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Object
+	{method} +visitExpressaoDeclaracao ( paramDeclaracao$Expressao1 : modelos.tree.Declaracao$Expressao ) : Void
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Object
+	{method} +visitFimDeclaracao ( paramDeclaracao$Fim1 : modelos.tree.Declaracao$Fim ) : Void
+	{method} +visitGrupoExpressao ( paramExpressao$Grupo1 : modelos.tree.Expressao$Grupo ) : Object
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Object
+	{method} +visitLerDeclaracao ( paramDeclaracao$Ler1 : modelos.tree.Declaracao$Ler ) : Void
+	{method} +visitLiteralExpressao ( paramExpressao$Literal1 : modelos.tree.Expressao$Literal ) : Object
+	{method} +visitLogicoExpressao ( paramExpressao$Logico1 : modelos.tree.Expressao$Logico ) : Object
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Void
+	{method} +visitModuloDeclaracao ( paramDeclaracao$Modulo1 : modelos.tree.Declaracao$Modulo ) : Object
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Void
+	{method} +visitParaDeclaracao ( paramDeclaracao$Para1 : modelos.tree.Declaracao$Para ) : Object
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Void
+	{method} +visitProgramaDeclaracao ( paramDeclaracao$Programa1 : modelos.tree.Declaracao$Programa ) : Object
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Void
+	{method} +visitRepitaDeclaracao ( paramDeclaracao$Repita1 : modelos.tree.Declaracao$Repita ) : Object
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Void
+	{method} +visitSeDeclaracao ( paramDeclaracao$Se1 : modelos.tree.Declaracao$Se ) : Object
+	{method} +visitUnarioExpressao ( paramExpressao$Unario1 : modelos.tree.Expressao$Unario ) : Object
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Void
+	{method} +visitVarDeclaracao ( paramDeclaracao$Var1 : modelos.tree.Declaracao$Var ) : Object
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Void
+	{method} +visitVarDeclaracoesDeclaracao ( paramDeclaracao$VarDeclaracoes1 : modelos.tree.Declaracao$VarDeclaracoes ) : Object
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Void
+	{method} +visitVariavelArrayDeclaracao ( paramDeclaracao$VariavelArray1 : modelos.tree.Declaracao$VariavelArray ) : Object
+	{method} +visitVariavelArrayExpressao ( paramExpressao$VariavelArray1 : modelos.tree.Expressao$VariavelArray ) : Object
+	{method} +visitVariavelExpressao ( paramExpressao$Variavel1 : modelos.tree.Expressao$Variavel ) : Object
+}
+
+
+
+@enduml

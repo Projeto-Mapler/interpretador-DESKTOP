@@ -19,14 +19,14 @@ public class PlantUmlGenerator {
 
     // pacotes que dever ser adicionados no diagrama
     List<String> scanpackages = new ArrayList<>();
-    scanpackages.add("analisador");
-    scanpackages.add("conversores");
-    scanpackages.add("debug");
-    scanpackages.add("evento");
+//    scanpackages.add("analisador");
+//    scanpackages.add("conversores");
+//    scanpackages.add("debug");
+//    scanpackages.add("evento");
     scanpackages.add("interpretador");
-    scanpackages.add("log");
-    scanpackages.add("modelos");
-    scanpackages.add("tool");
+//    scanpackages.add("log");
+//    scanpackages.add("modelos");
+//    scanpackages.add("tool");
 
     // gerando declarações
     List<String> hideClasses = new ArrayList<>();

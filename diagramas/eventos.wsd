@@ -1,0 +1,45 @@
+@startuml
+
+top to bottom direction 
+skinparam linetype ortho
+skinparam ParticipantPadding 10
+skinparam BoxPadding 10
+skinparam Nodesep 100
+skinparam Ranksep 100
+
+
+enum evento.EventoInterpretador {
+	{field} +DEBUG_MUDANCA_ESTADO
+	{field} +DEBUG_PASSO_EXECUTADO
+	{field} +ERRO
+	{field} +INPUT
+	{field} +INTERPRETACAO_CONCLUIDA
+	{field} +INTERPRETACAO_INTERROMPIDA
+	{field} +OUTPUT
+	{field} +VISITA_NODE_AST
+}
+
+
+interface evento.EventoListener {
+	{method}  {abstract} +update ( evento : evento.EventoInterpretador , payload : Object ) : void
+}
+
+
+class evento.EventosService {
+	{field} ~inscritos : Map<EventoInterpretador, Set<EventoListener>>
+    {field} ~marcadosParaDesinscrever : Set<EventoListener>
+	{method} +desinscrever ( evento : evento.EventoInterpretador , listener : evento.EventoListener ) : void
+	{method} +desinscreverTodos ( evento : evento.EventoListener ) : void
+	{method} +inscrever ( evento : evento.EventoInterpretador , listener : evento.EventoListener ) : void
+	{method} +inscreverTodos ( evento : evento.EventoInterpretador, listener : evento.EventoListener ) : void
+	{method} +marcarParaDesinscrever ( evento : evento.EventoListener ) : void
+	{method} +notificar ( evento : evento.EventoInterpretador , payload : Object ) : void
+}
+
+
+
+evento.EventosService -- evento.EventoInterpretador
+evento.EventoListener -left- evento.EventoInterpretador
+evento.EventosService -- evento.EventoListener  
+
+@enduml

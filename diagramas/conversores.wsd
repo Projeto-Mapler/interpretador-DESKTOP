@@ -1,0 +1,66 @@
+@startuml
+
+top to bottom direction
+skinparam linetype ortho
+skinparam ParticipantPadding 10
+skinparam BoxPadding 10
+skinparam Nodesep 100
+skinparam Ranksep 100
+
+
+abstract class conversores.Conversor {
+	{field} -gerenciadorEventos : evento.EventosService
+	{field} -mapaVariaveisVetor : java.util.Map
+	{field} #programa : modelos.tree.Declaracao$Programa
+	{method} #addVariavelVetor ( chave : String , valor : modelos.VariavelVetor ) : void
+	{method}  {abstract} +converter () : String
+	{method}  {abstract} #getOperadorLogico ( tipo : modelos.TiposToken ) : String
+	{method} #getVariavelVetor ( chave : String ) : modelos.VariavelVetor
+	{method} #getVariavelVetorTipo ( chave : String ) : modelos.TiposToken
+	{method} #throwRuntimeErro ( error : modelos.excecao.RuntimeError ) : void
+	{method}  {abstract} #tipoVariavel ( tipo : modelos.TiposToken ) : String
+}
+ 
+
+
+class conversores.ConversorFactory { 
+	{method}  {static} +getConversor ( eventoService : evento.EventosService , 
+    programa : modelos.tree.Declaracao$Programa , 
+    estrategia : conversores.ConversorStrategy ) : conversores.Conversor
+}
+ 
+
+
+enum conversores.ConversorStrategy {
+	{field} + C
+	{field} +Cpp
+	{field} +JAVA
+	{field} +PASCAL
+	{field} +PYTHON
+}
+
+
+class conversores.Escritor {
+	{field} -indexIndentacao : int
+	{field} -stringBuilder : StringBuilder
+	{method} #addQuebraLinha () : conversores.Escritor
+	{method} #addQuebraLinha ( qnt : int ) : conversores.Escritor
+	{method} #concatenarNaLinha ( texto : String ) : conversores.Escritor
+	{method} #getResultado () : String
+	{method} #indentar () : conversores.Escritor
+	{method} #removerIdentacao () : conversores.Escritor
+	{method} #reset () : void
+}
+
+note bottom of conversores.ConversorContreto 
+    Classes concretas para cada 
+    linguagem de alto nivel 
+end note
+
+
+conversores.Conversor -down->  conversores.Escritor : escritor
+conversores.ConversorStrategy -down-  conversores.ConversorFactory
+conversores.ConversorContreto  -up-|> conversores.Conversor
+ 
+
+@enduml
